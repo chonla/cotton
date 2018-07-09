@@ -15,7 +15,7 @@ func main() {
 
 	flag.Usage = usage
 
-	flag.StringVar(&url, "u", "http://localhost:8080/", "set base url")
+	flag.StringVar(&url, "u", "http://localhost:8080", "set base url")
 	flag.BoolVar(&help, "h", false, "show this help")
 	flag.Parse()
 

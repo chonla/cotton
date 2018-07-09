@@ -1,13 +1,19 @@
 package testsuite
 
 import (
+	"fmt"
+	"io/ioutil"
+	"net/http"
 	"strings"
+
+	"github.com/kr/pretty"
 )
 
 // TestCase holds a test case
 type TestCase struct {
 	Name         string
 	Method       string
+	BaseURL      string
 	Path         string
 	ContentType  string
 	RequestBody  string
@@ -41,5 +47,21 @@ func (tc *TestCase) SetContentType(ct string) {
 
 // Run executes test case
 func (tc *TestCase) Run() error {
+	client := &http.Client{}
+	url := fmt.Sprintf("%s%s", tc.BaseURL, tc.Path)
+	fmt.Println(url)
+	req, e := http.NewRequest(tc.Method, url, nil)
+	if e != nil {
+		return e
+	}
+	resp, e := client.Do(req)
+
+	b, e := ioutil.ReadAll(resp.Body)
+	resp.Body.Close()
+	if e != nil {
+		return e
+	}
+
+	pretty.Println(string(b))
 	return nil
 }
