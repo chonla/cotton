@@ -3,7 +3,7 @@ package parser
 import (
 	"testing"
 
-	ts "github.com/chonla/thor/testsuite"
+	ts "github.com/chonla/yas/testsuite"
 	"github.com/stretchr/testify/assert"
 )
 

@@ -6,7 +6,7 @@ import (
 	"regexp"
 	"strings"
 
-	ts "github.com/chonla/thor/testsuite"
+	ts "github.com/chonla/yas/testsuite"
 )
 
 var readFileFn = ioutil.ReadFile

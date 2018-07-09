@@ -13,7 +13,7 @@ func TestReadLinesFromFileContainingWindowsNewLine(t *testing.T) {
 	}
 
 	p := NewParser()
-	result := p.readTestSuiteFile("test")
+	result, _ := p.readTestSuiteFile("test")
 
 	assert.Equal(t, []string{"test", "test2", "test3"}, result)
 }
@@ -24,7 +24,7 @@ func TestReadLinesFromFileContainingLinuxNewLine(t *testing.T) {
 	}
 
 	p := NewParser()
-	result := p.readTestSuiteFile("test")
+	result, _ := p.readTestSuiteFile("test")
 
 	assert.Equal(t, []string{"test", "test2", "test3"}, result)
 }
@@ -35,7 +35,7 @@ func TestReadLinesFromFileWithError(t *testing.T) {
 	}
 
 	p := NewParser()
-	result := p.readTestSuiteFile("test")
+	result, _ := p.readTestSuiteFile("test")
 
 	assert.Equal(t, []string{}, result)
 }

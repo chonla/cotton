@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/chonla/thor/parser"
+	"github.com/chonla/yas/parser"
 	"github.com/kr/pretty"
 )
 

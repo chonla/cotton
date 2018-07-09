@@ -38,3 +38,8 @@ func (tc *TestCase) SetContentType(ct string) {
 	}
 	tc.ContentType = ct
 }
+
+// Run executes test case
+func (tc *TestCase) Run() error {
+	return nil
+}
