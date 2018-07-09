@@ -87,6 +87,25 @@ func (p *Parser) parseTestSuiteFile(file string) ([]*ts.TestCase, error) {
 								p.state = "expectation"
 							} else {
 								// nothing to do now
+								if p.substate == "tableheader" {
+									if isRequestHeaderEnd(line) {
+										p.substate = "tableheaderend"
+									} else {
+										return nil, errors.New("unexpected line found. expect expectation table ending here: " + line)
+									}
+								} else {
+									if p.substate == "tableheaderend" {
+										if item, value, ok := isRequestHeaderContent(line); ok {
+											tc.Headers = append(tc.Headers, ts.NewHeader(item, value))
+										}
+									} else {
+										p.substate = ""
+
+										if isRequestHeaderTableHeader(line) {
+											p.substate = "tableheader"
+										}
+									}
+								}
 							}
 						}
 					}
@@ -190,6 +209,25 @@ func isExpectationTableHeaderEnd(line string) bool {
 }
 
 func isExpectationTableContent(line string) (string, string, bool) {
+	re := regexp.MustCompile("(?i)^\\|\\s+([^\\|]+)\\s+\\|\\s+([^\\|]+)\\s+\\|$")
+	matches := re.FindStringSubmatch(line)
+	if len(matches) > 2 {
+		return matches[1], matches[2], true
+	}
+	return "", "", false
+}
+
+func isRequestHeaderEnd(line string) bool {
+	re := regexp.MustCompile("(?i)^\\|\\s+\\-+\\s+\\|\\s+\\-+\\s+\\|$")
+	return re.MatchString(line)
+}
+
+func isRequestHeaderTableHeader(line string) bool {
+	re := regexp.MustCompile("(?i)^\\|\\s+Header\\s+\\|\\s+Value\\s+\\|$")
+	return re.MatchString(line)
+}
+
+func isRequestHeaderContent(line string) (string, string, bool) {
 	re := regexp.MustCompile("(?i)^\\|\\s+([^\\|]+)\\s+\\|\\s+([^\\|]+)\\s+\\|$")
 	matches := re.FindStringSubmatch(line)
 	if len(matches) > 2 {

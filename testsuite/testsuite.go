@@ -3,7 +3,7 @@ package testsuite
 import (
 	"fmt"
 
-	"github.com/chonla/console"
+	"github.com/fatih/color"
 )
 
 // TestSuite holds a test suite
@@ -36,11 +36,11 @@ func (ts *TestSuite) Run() {
 func (ts *TestSuite) Summary() int {
 	if ts.Stat.Total > 0 {
 		fmt.Printf("Tests executed: ")
-		console.Printfln("%d", ts.Stat.Total, console.ColorBold+console.ColorWhite)
+		color.White("%d", ts.Stat.Total)
 		fmt.Printf("Tests passed: ")
-		console.Printfln("%d (%s)", ts.Stat.Success, fmt.Sprintf("%0.2f%%", float64(ts.Stat.Success*100)/float64(ts.Stat.Total)), console.ColorBold+console.ColorGreen)
+		color.Green("%d (%0.2f%%)", ts.Stat.Success, float64(ts.Stat.Success*100)/float64(ts.Stat.Total))
 		fmt.Printf("Tests failed: ")
-		console.Printfln("%d (%s)", ts.Stat.Total-ts.Stat.Success, fmt.Sprintf("%0.2f%%", float64((ts.Stat.Total-ts.Stat.Success)*100)/float64(ts.Stat.Total)), console.ColorBold+console.ColorRed)
+		color.Red("%d (%0.2f%%)", ts.Stat.Total-ts.Stat.Success, float64((ts.Stat.Total-ts.Stat.Success)*100)/float64(ts.Stat.Total))
 		if ts.Stat.Total == ts.Stat.Success {
 			return 0
 		}
