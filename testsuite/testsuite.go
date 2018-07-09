@@ -3,6 +3,7 @@ package testsuite
 // TestSuite holds a test suite
 type TestSuite struct {
 	Name      string
+	BaseURL   string
 	TestCases []*TestCase
 	Stat      TestStat
 }
