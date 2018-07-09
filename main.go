@@ -33,6 +33,8 @@ func main() {
 	ts.BaseURL = url
 
 	ts.Run()
+	exitCode := ts.Summary()
+	os.Exit(exitCode)
 }
 
 func usage() {
