@@ -3,61 +3,27 @@ package assertable
 import (
 	"errors"
 	"fmt"
-	"regexp"
 	"strings"
 
-	"github.com/stretchr/objx"
-
+	"github.com/chonla/yas/referrable"
 	"github.com/chonla/yas/response"
 	"github.com/fatih/color"
 )
 
 // Assertable is something assertable
 type Assertable struct {
-	values map[string][]string
-	data   objx.Map
+	*referrable.Referrable
 }
 
 // NewAssertable creates an assertable object
 func NewAssertable(resp *response.Response) (*Assertable, error) {
-	values := map[string][]string{}
-
-	values["statuscode"] = []string{fmt.Sprintf("%d", resp.StatusCode)}
-	values["status"] = []string{resp.Status}
-
-	for k, v := range resp.Header {
-		key := strings.ToLower(fmt.Sprintf("header.%s", k))
-		if values[key] == nil {
-			values[key] = []string{}
-		}
-		for _, t := range v {
-			values[key] = append(values[key], t)
-		}
-	}
-
-	jsonObj, e := objx.FromJSON(resp.Body)
+	ref, e := referrable.NewReferrable(resp)
 	if e != nil {
 		return nil, e
 	}
-
 	return &Assertable{
-		values: values,
-		data:   jsonObj,
+		Referrable: ref,
 	}, nil
-}
-
-func (a *Assertable) find(k string) ([]string, bool) {
-	re := regexp.MustCompile("(?i)^data\\.(.+)")
-	match := re.FindStringSubmatch(k)
-	if len(match) > 1 {
-		if a.data.Has(match[1]) {
-			return []string{a.data.Get(match[1]).String()}, true
-		}
-		return []string{}, false
-	} else {
-		val, ok := a.values[k]
-		return val, ok
-	}
 }
 
 // Assert to assert with expectations
@@ -76,7 +42,7 @@ func (a *Assertable) Assert(ex map[string]string) error {
 		m := NewMatcher(v)
 		fmt.Printf("Assert %s with %s...", blue(k), blue(m))
 		k = strings.ToLower(k)
-		if val, ok := a.find(k); ok {
+		if val, ok := a.Find(k); ok {
 			match := false
 			for _, t := range val {
 				if m.Match(t) {
