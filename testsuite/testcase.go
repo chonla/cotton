@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"github.com/chonla/yas/request"
-	"github.com/fatih/color"
 )
 
 // TestCase holds a test case
@@ -43,14 +42,7 @@ func (tc *TestCase) SetContentType(ct string) {
 
 // Run executes test case
 func (tc *TestCase) Run() error {
-	// client := &http.Client{}
-
-	green := color.New(color.FgGreen).SprintFunc()
-	// blue := color.New(color.FgBlue).SprintFunc()
-	magenta := color.New(color.FgMagenta).SprintFunc()
-
 	url := fmt.Sprintf("%s%s", tc.BaseURL, tc.Path)
-	fmt.Printf("%s: %s\n", green(tc.Method), url)
 
 	req, e := request.NewRequester(tc.Method)
 	if e != nil {
@@ -59,30 +51,13 @@ func (tc *TestCase) Run() error {
 	req.SetHeaders(tc.Headers)
 	resp, e := req.Request(url, tc.RequestBody)
 
-	// var req *http.Request
-	// var e error
-	// if tc.Method == "GET" {
-	// 	req, e = http.NewRequest(tc.Method, url, nil)
-	// } else {
-	// 	fmt.Printf("%s\n", blue(tc.RequestBody))
-	// 	body := []byte(tc.RequestBody)
-	// 	req, e = http.NewRequest(tc.Method, url, bytes.NewBuffer(body))
-	// }
-	// for _, header := range tc.Headers {
-	// 	req.Header.Set(header.Key, header.Value)
-	// }
-	// if e != nil {
-	// 	return e
-	// }
-
-	// resp, e := client.Do(req)
-
 	b, e := ioutil.ReadAll(resp.Body)
 	defer resp.Body.Close()
 	if e != nil {
 		return e
 	}
 
-	fmt.Printf("->\n%s\n", magenta(string(b)))
+	req.LogResponse(resp, string(b))
+
 	return nil
 }
