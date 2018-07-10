@@ -45,6 +45,7 @@ func (tc *TestCase) SetContentType(ct string) {
 // Run executes test case
 func (tc *TestCase) Run() error {
 	white := color.New(color.FgHiWhite, color.Bold).SprintFunc()
+	red := color.New(color.FgRed).SprintFunc()
 	url := fmt.Sprintf("%s%s", tc.BaseURL, tc.Path)
 
 	fmt.Printf("%s\n", white("================================================================================"))
@@ -58,6 +59,7 @@ func (tc *TestCase) Run() error {
 	req.SetHeaders(tc.Headers)
 	resp, e := req.Request(url, tc.RequestBody)
 	if e != nil {
+		fmt.Printf("%s: %s\n", red("Error"), e)
 		return e
 	}
 
