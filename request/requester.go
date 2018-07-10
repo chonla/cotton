@@ -83,6 +83,7 @@ func (r *Requester) LogResponse(resp *http.Response, body string) {
 	magenta := color.New(color.FgMagenta, color.Bold).SprintFunc()
 	yellow := color.New(color.FgYellow).SprintFunc()
 	green := color.New(color.FgGreen).SprintFunc()
+	blue := color.New(color.FgBlue).SprintFunc()
 
 	fmt.Printf("%s\n", magenta("-->>"))
 	fmt.Printf("%s %s\n", resp.Proto, green(resp.Status))
@@ -93,8 +94,9 @@ func (r *Requester) LogResponse(resp *http.Response, body string) {
 	}
 	fmt.Println()
 
-	blue := color.New(color.FgBlue).SprintFunc()
-	fmt.Printf("%s\n", blue(body))
+	if body != "" {
+		fmt.Printf("%s\n", blue(body))
+	}
 }
 
 func (r *Requester) prettifyJSON(jsonString string) string {
