@@ -52,12 +52,13 @@ func (a *Assertable) Assert(ex map[string]string) error {
 
 	fmt.Printf("%s\n", magenta("----"))
 	for k, v := range ex {
-		fmt.Printf("Assert %s with %s...", blue(k), blue(v))
+		m := NewMatcher(v)
+		fmt.Printf("Assert %s with %s...", blue(k), blue(m))
 		k = strings.ToLower(k)
 		if val, ok := a.values[k]; ok {
 			match := false
 			for _, t := range val {
-				if t == v {
+				if m.Match(t) {
 					match = true
 					break
 				}
