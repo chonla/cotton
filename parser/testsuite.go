@@ -2,7 +2,11 @@ package parser
 
 import (
 	"errors"
+	"fmt"
 	"io/ioutil"
+	"log"
+	"os"
+	"path/filepath"
 	"regexp"
 	"strings"
 
@@ -22,8 +26,47 @@ func NewParser() *Parser {
 	return &Parser{}
 }
 
-// Parse a test file into *TestSuite
-func (p *Parser) Parse(file string) (*ts.TestSuite, error) {
+// Parse a test path into []*TestSuite
+func (p *Parser) Parse(path string) (*ts.TestSuites, error) {
+	suites := &ts.TestSuites{}
+	suite := []*ts.TestSuite{}
+
+	files, e := p.listFiles(path)
+	if e != nil {
+		return suites, e
+	}
+	for _, f := range files {
+		ts, e := p.ParseFile(f)
+		if e != nil {
+			fmt.Printf("Unable to parse file %s: %s", f, e)
+		} else {
+			suite = append(suite, ts)
+		}
+	}
+	suites.Suites = suite
+	return suites, nil
+}
+
+func (p *Parser) listFiles(path string) ([]string, error) {
+	var files []string
+	e := filepath.Walk(path, p.scan(&files))
+	return files, e
+}
+
+func (p *Parser) scan(files *[]string) filepath.WalkFunc {
+	return func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			log.Fatal(err)
+		}
+		if !info.IsDir() && strings.ToLower(filepath.Ext(path)) == ".md" {
+			*files = append(*files, path)
+		}
+		return nil
+	}
+}
+
+// ParseFile a test file into *TestSuite
+func (p *Parser) ParseFile(file string) (*ts.TestSuite, error) {
 	testcases, e := p.parseTestSuiteFile(file)
 	if e != nil {
 		return nil, e
