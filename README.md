@@ -69,6 +69,7 @@ Assertion uses table with 2 columns. The header must be "Assert" and "Expected".
 * Value in response header can be addressed by using "Header" object, e.g. `Header.Content-Type`.
 * Value in response body can be addressd by using "Data" object, e.g. `Data.token`.
 * StatusCode is response status code.
+* Expected value will be treated as regular expression when surrounded by /.
 
 ## Comment
 
