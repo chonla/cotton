@@ -47,7 +47,9 @@ func (tc *TestCase) Run() error {
 	white := color.New(color.FgHiWhite, color.Bold).SprintFunc()
 	url := fmt.Sprintf("%s%s", tc.BaseURL, tc.Path)
 
+	fmt.Printf("%s\n", white("================================================================================"))
 	fmt.Printf("Testcase: %s\n", white(tc.Name))
+	fmt.Printf("%s\n", white("================================================================================"))
 
 	req, e := request.NewRequester(tc.Method)
 	if e != nil {
@@ -64,5 +66,7 @@ func (tc *TestCase) Run() error {
 		return e
 	}
 
-	return as.Assert(tc.Expectations)
+	e = as.Assert(tc.Expectations)
+
+	return e
 }
