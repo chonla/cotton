@@ -5,6 +5,12 @@ Yet Another Silk Test Tool. This project is originally inspired by [silk test](h
 * Markdown based document-driven RESTful API testing.
 * This tool is not compatible with silk markdown.
 
+## Usage
+
+```
+yas -u <base-api-url> [path/file]
+```
+
 ## Test Suite
 
 Test Suite is a markdown file. Test Suite can contain several test cases.
