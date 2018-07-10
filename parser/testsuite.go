@@ -88,6 +88,8 @@ func (p *Parser) parseTestSuiteFileName(file string) string {
 }
 
 func (p *Parser) parseTestSuiteFile(file string) ([]*ts.TestCase, error) {
+	p.state = ""
+	p.substate = ""
 	testcases := []*ts.TestCase{}
 	var tc *ts.TestCase
 	blockData := []string{}
@@ -128,6 +130,7 @@ func (p *Parser) parseTestSuiteFile(file string) ([]*ts.TestCase, error) {
 						} else {
 							if isExpectation(line) {
 								p.state = "expectation"
+								p.substate = ""
 							} else {
 								// nothing to do now
 								if p.substate == "tableheader" {
