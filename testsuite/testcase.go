@@ -59,7 +59,10 @@ func (tc *TestCase) Run() error {
 		return e
 	}
 
-	as := assertable.NewAssertable(response.NewResponse(resp))
+	as, e := assertable.NewAssertable(response.NewResponse(resp))
+	if e != nil {
+		return e
+	}
 
 	return as.Assert(tc.Expectations)
 }
