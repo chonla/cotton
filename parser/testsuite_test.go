@@ -56,15 +56,10 @@ func TestParseTestFile(t *testing.T) {
 			Path:        "/login",
 			RequestBody: "{\n\"login\": \"admin\",\n\"pwd\": \"admin\"\n}",
 			ContentType: "application/json",
-			Expectations: []ts.Expectation{
-				ts.Expectation{
-					Key:   "HEADER.content-type",
-					Value: "application/json",
-				},
-				ts.Expectation{
-					Key:   "DATA.token",
-					Value: "/.+/",
-				},
+			Headers:     map[string]string{},
+			Expectations: map[string]string{
+				"HEADER.content-type": "application/json",
+				"DATA.token":          "/.+/",
 			},
 		},
 	}, result)
