@@ -2,10 +2,11 @@ package testsuite
 
 import (
 	"fmt"
-	"io/ioutil"
 	"strings"
 
 	"github.com/chonla/yas/request"
+	"github.com/chonla/yas/response"
+	"github.com/kr/pretty"
 )
 
 // TestCase holds a test case
@@ -18,6 +19,7 @@ type TestCase struct {
 	RequestBody  string
 	Headers      map[string]string
 	Expectations map[string]string
+	*Assert
 }
 
 // NewTestCase creates a new testcase
@@ -50,14 +52,17 @@ func (tc *TestCase) Run() error {
 	}
 	req.SetHeaders(tc.Headers)
 	resp, e := req.Request(url, tc.RequestBody)
-
-	b, e := ioutil.ReadAll(resp.Body)
-	defer resp.Body.Close()
 	if e != nil {
 		return e
 	}
 
-	req.LogResponse(resp, string(b))
+	res := response.NewResponse(resp)
+
+	pretty.Println(res)
+
+	// for k, v := range tc.Expectations {
+
+	// }
 
 	return nil
 }
