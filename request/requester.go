@@ -34,6 +34,13 @@ func NewRequester(method string) (RequesterInterface, error) {
 				client:  &http.Client{},
 			},
 		}
+	case "GET":
+		req = &Getter{
+			&Requester{
+				headers: map[string]string{},
+				client:  &http.Client{},
+			},
+		}
 	default:
 		e = errors.New("unsupported http method")
 	}
