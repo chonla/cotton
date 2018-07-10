@@ -35,6 +35,9 @@ func (ts *TestSuite) Run() {
 // Summary prints test summary
 func (ts *TestSuite) Summary() int {
 	if ts.Stat.Total > 0 {
+		magenta := color.New(color.FgMagenta, color.Bold).SprintFunc()
+
+		fmt.Printf("%s\n", magenta("----"))
 		fmt.Printf("Tests executed: ")
 		color.White("%d", ts.Stat.Total)
 		fmt.Printf("Tests passed: ")

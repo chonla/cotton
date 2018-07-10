@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/chonla/yas/assertable"
 	"github.com/chonla/yas/request"
 	"github.com/chonla/yas/response"
-	"github.com/kr/pretty"
+	"github.com/fatih/color"
 )
 
 // TestCase holds a test case
@@ -19,7 +20,6 @@ type TestCase struct {
 	RequestBody  string
 	Headers      map[string]string
 	Expectations map[string]string
-	*Assert
 }
 
 // NewTestCase creates a new testcase
@@ -44,7 +44,10 @@ func (tc *TestCase) SetContentType(ct string) {
 
 // Run executes test case
 func (tc *TestCase) Run() error {
+	white := color.New(color.FgHiWhite, color.Bold).SprintFunc()
 	url := fmt.Sprintf("%s%s", tc.BaseURL, tc.Path)
+
+	fmt.Printf("Testcase: %s\n", white(tc.Name))
 
 	req, e := request.NewRequester(tc.Method)
 	if e != nil {
@@ -56,13 +59,7 @@ func (tc *TestCase) Run() error {
 		return e
 	}
 
-	res := response.NewResponse(resp)
+	as := assertable.NewAssertable(response.NewResponse(resp))
 
-	pretty.Println(res)
-
-	// for k, v := range tc.Expectations {
-
-	// }
-
-	return nil
+	return as.Assert(tc.Expectations)
 }
