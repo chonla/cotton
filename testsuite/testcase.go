@@ -1,12 +1,11 @@
 package testsuite
 
 import (
-	"bytes"
 	"fmt"
 	"io/ioutil"
-	"net/http"
 	"strings"
 
+	"github.com/chonla/yas/request"
 	"github.com/fatih/color"
 )
 
@@ -18,35 +17,16 @@ type TestCase struct {
 	Path         string
 	ContentType  string
 	RequestBody  string
-	Headers      []Header
-	Expectations []Expectation
+	Headers      map[string]string
+	Expectations map[string]string
 }
 
-// Header is http header
-type Header struct {
-	Key   string
-	Value string
-}
-
-// NewHeader creates a new header
-func NewHeader(key, value string) Header {
-	return Header{
-		Key:   key,
-		Value: value,
-	}
-}
-
-// Expectation is a set of expectation
-type Expectation struct {
-	Key   string
-	Value string
-}
-
-// NewExpectation creates a new expectation
-func NewExpectation(key, value string) Expectation {
-	return Expectation{
-		Key:   key,
-		Value: value,
+// NewTestCase creates a new testcase
+func NewTestCase(name string) *TestCase {
+	return &TestCase{
+		Name:         name,
+		Headers:      map[string]string{},
+		Expectations: map[string]string{},
 	}
 }
 
@@ -63,32 +43,39 @@ func (tc *TestCase) SetContentType(ct string) {
 
 // Run executes test case
 func (tc *TestCase) Run() error {
-	client := &http.Client{}
+	// client := &http.Client{}
 
 	green := color.New(color.FgGreen).SprintFunc()
-	blue := color.New(color.FgBlue).SprintFunc()
+	// blue := color.New(color.FgBlue).SprintFunc()
 	magenta := color.New(color.FgMagenta).SprintFunc()
 
 	url := fmt.Sprintf("%s%s", tc.BaseURL, tc.Path)
 	fmt.Printf("%s: %s\n", green(tc.Method), url)
 
-	var req *http.Request
-	var e error
-	if tc.Method == "GET" {
-		req, e = http.NewRequest(tc.Method, url, nil)
-	} else {
-		fmt.Printf("%s\n", blue(tc.RequestBody))
-		body := []byte(tc.RequestBody)
-		req, e = http.NewRequest(tc.Method, url, bytes.NewBuffer(body))
-	}
-	for _, header := range tc.Headers {
-		req.Header.Set(header.Key, header.Value)
-	}
+	req, e := request.NewRequester(tc.Method)
 	if e != nil {
 		return e
 	}
+	req.SetHeaders(tc.Headers)
+	resp, e := req.Request(url, tc.RequestBody)
 
-	resp, e := client.Do(req)
+	// var req *http.Request
+	// var e error
+	// if tc.Method == "GET" {
+	// 	req, e = http.NewRequest(tc.Method, url, nil)
+	// } else {
+	// 	fmt.Printf("%s\n", blue(tc.RequestBody))
+	// 	body := []byte(tc.RequestBody)
+	// 	req, e = http.NewRequest(tc.Method, url, bytes.NewBuffer(body))
+	// }
+	// for _, header := range tc.Headers {
+	// 	req.Header.Set(header.Key, header.Value)
+	// }
+	// if e != nil {
+	// 	return e
+	// }
+
+	// resp, e := client.Do(req)
 
 	b, e := ioutil.ReadAll(resp.Body)
 	defer resp.Body.Close()

@@ -96,7 +96,7 @@ func (p *Parser) parseTestSuiteFile(file string) ([]*ts.TestCase, error) {
 								} else {
 									if p.substate == "tableheaderend" {
 										if item, value, ok := isRequestHeaderContent(line); ok {
-											tc.Headers = append(tc.Headers, ts.NewHeader(item, value))
+											tc.Headers[item] = value
 										}
 									} else {
 										p.substate = ""
@@ -122,15 +122,13 @@ func (p *Parser) parseTestSuiteFile(file string) ([]*ts.TestCase, error) {
 				} else {
 					if p.substate == "tableheaderend" {
 						if item, value, ok := isExpectationTableContent(line); ok {
-							tc.Expectations = append(tc.Expectations, ts.NewExpectation(item, value))
+							tc.Expectations[item] = value
 						} else {
 							if title, ok := isTitle(line); ok {
 								if tc != nil {
 									testcases = append(testcases, tc)
 								}
-								tc = &ts.TestCase{
-									Name: title,
-								}
+								tc = ts.NewTestCase(title)
 								p.state = "request"
 								p.substate = "title"
 							}
@@ -147,9 +145,7 @@ func (p *Parser) parseTestSuiteFile(file string) ([]*ts.TestCase, error) {
 			} else {
 				if p.state == "" {
 					if title, ok := isTitle(line); ok {
-						tc = &ts.TestCase{
-							Name: title,
-						}
+						tc = ts.NewTestCase(title)
 						p.state = "request"
 						p.substate = "title"
 					} else {
