@@ -4,15 +4,15 @@ import (
 	"net/http"
 )
 
-// Getter is a requester doing GET
-type Getter struct {
+// Deleter is a requester doing DELETE
+type Deleter struct {
 	*Requester
 }
 
 // Request do actual request
-func (g *Getter) Request(url, body string) (*http.Response, error) {
+func (g *Deleter) Request(url, body string) (*http.Response, error) {
 
-	r, e := http.NewRequest("GET", url, nil)
+	r, e := http.NewRequest("DELETE", url, nil)
 	if e != nil {
 		return nil, e
 	}

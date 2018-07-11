@@ -4,15 +4,15 @@ import (
 	"net/http"
 )
 
-// Getter is a requester doing GET
-type Getter struct {
+// Optioner is a requester doing OPTION
+type Optioner struct {
 	*Requester
 }
 
 // Request do actual request
-func (g *Getter) Request(url, body string) (*http.Response, error) {
+func (g *Optioner) Request(url, body string) (*http.Response, error) {
 
-	r, e := http.NewRequest("GET", url, nil)
+	r, e := http.NewRequest("OPTION", url, nil)
 	if e != nil {
 		return nil, e
 	}

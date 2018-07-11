@@ -25,22 +25,24 @@ type Requester struct {
 // NewRequester creates a new request
 func NewRequester(method string) (RequesterInterface, error) {
 	var req RequesterInterface
+	reqer := &Requester{
+		headers: map[string]string{},
+		client:  &http.Client{},
+	}
 	var e error
 	switch method {
 	case "POST":
-		req = &Poster{
-			&Requester{
-				headers: map[string]string{},
-				client:  &http.Client{},
-			},
-		}
+		req = &Poster{Requester: reqer}
+	case "PUT":
+		req = &Putter{Requester: reqer}
+	case "PATCH":
+		req = &Patcher{Requester: reqer}
 	case "GET":
-		req = &Getter{
-			&Requester{
-				headers: map[string]string{},
-				client:  &http.Client{},
-			},
-		}
+		req = &Getter{Requester: reqer}
+	case "DELETE":
+		req = &Deleter{Requester: reqer}
+	case "OPTION":
+		req = &Optioner{Requester: reqer}
 	default:
 		e = errors.New("unsupported http method")
 	}
