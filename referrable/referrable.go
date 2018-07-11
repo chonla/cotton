@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/chonla/yas/response"
+	"github.com/fatih/color"
 	"github.com/stretchr/objx"
 )
 
@@ -17,6 +18,7 @@ type Referrable struct {
 
 // NewReferrable creates an referrable object
 func NewReferrable(resp *response.Response) (*Referrable, error) {
+	red := color.New(color.FgRed).SprintFunc()
 	values := map[string][]string{}
 
 	values["statuscode"] = []string{fmt.Sprintf("%d", resp.StatusCode)}
@@ -37,7 +39,8 @@ func NewReferrable(resp *response.Response) (*Referrable, error) {
 	if isJSONContent(values["headers.content-type"]) {
 		jsonObj, e = objx.FromJSON(resp.Body)
 		if e != nil {
-			return nil, e
+			fmt.Printf("%s: %s\n", red("Error"), e)
+			jsonObj, _ = objx.FromJSON("{}")
 		}
 	} else {
 		jsonObj, _ = objx.FromJSON("{}")
