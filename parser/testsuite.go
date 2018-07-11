@@ -100,6 +100,8 @@ func (p *Parser) parseTestSuiteFile(file string) ([]*ts.TestCase, error) {
 	}
 
 	for _, line := range lines {
+		fmt.Println(line)
+		fmt.Println(p.state, ".", p.substate)
 		if p.state == "request" {
 			if p.substate == "openblock" {
 				if _, ok := isCodeBlock(line); ok {

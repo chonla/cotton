@@ -32,15 +32,31 @@ func NewReferrable(resp *response.Response) (*Referrable, error) {
 		}
 	}
 
-	jsonObj, e := objx.FromJSON(resp.Body)
-	if e != nil {
-		return nil, e
+	var jsonObj objx.Map
+	var e error
+	if isJSONContent(values["headers.content-type"]) {
+		jsonObj, e = objx.FromJSON(resp.Body)
+		if e != nil {
+			return nil, e
+		}
+	} else {
+		jsonObj, _ = objx.FromJSON("{}")
 	}
 
 	return &Referrable{
 		values: values,
 		data:   jsonObj,
 	}, nil
+}
+
+func isJSONContent(contenttype []string) bool {
+	for _, r := range contenttype {
+		token := strings.Split(strings.ToLower(r), ";")
+		if token[0] == "application/json" {
+			return true
+		}
+	}
+	return false
 }
 
 // Find to find a value of given key

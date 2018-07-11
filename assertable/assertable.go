@@ -17,8 +17,10 @@ type Assertable struct {
 
 // NewAssertable creates an assertable object
 func NewAssertable(resp *response.Response) (*Assertable, error) {
+	red := color.New(color.FgRed).SprintFunc()
 	ref, e := referrable.NewReferrable(resp)
 	if e != nil {
+		fmt.Printf("%s: %s\n", red("Error"), e)
 		return nil, e
 	}
 	return &Assertable{
@@ -38,6 +40,7 @@ func (a *Assertable) Assert(ex map[string]string) error {
 	}
 
 	fmt.Printf("%s\n", magenta("----"))
+
 	for k, v := range ex {
 		m := NewMatcher(v)
 		fmt.Printf("Assert %s with %s...", blue(k), blue(m))
