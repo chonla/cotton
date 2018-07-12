@@ -93,7 +93,7 @@ You can put anything you want surrounding the link to make the step clearer.
 
 Test setup section starts by using H2 (##) with title "Finally".
 
-// TODO
+Declaring steps in test teardown is like doing so in test setup.
 
 ## Tasks
 

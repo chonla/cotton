@@ -99,6 +99,25 @@ func (tc *TestCase) Run() error {
 	}
 
 	e = as.Assert(tc.Expectations)
+	if e != nil {
+		return e
+	}
+
+	if len(tc.Teardowns) > 0 {
+		for _, s := range tc.Teardowns {
+			s.BaseURL = tc.BaseURL
+			s.MergeVariables(tc.Variables)
+			e := s.Run()
+			if e != nil {
+				fmt.Printf("%s: %s\n", red("Error"), e)
+				return e
+			}
+
+			for k, v := range s.Captured {
+				tc.Variables[k] = v
+			}
+		}
+	}
 
 	return e
 }
