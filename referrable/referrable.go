@@ -36,7 +36,7 @@ func NewReferrable(resp *response.Response) (*Referrable, error) {
 
 	var jsonObj objx.Map
 	var e error
-	if isJSONContent(values["headers.content-type"]) {
+	if isJSONContent(values["header.content-type"]) {
 		jsonObj, e = objx.FromJSON(resp.Body)
 		if e != nil {
 			fmt.Printf("%s: %s\n", red("Error"), e)

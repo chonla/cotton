@@ -1,7 +1,6 @@
 package parser
 
 import (
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -10,6 +9,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/chonla/yas/markdown"
 	ts "github.com/chonla/yas/testsuite"
 )
 
@@ -17,8 +17,8 @@ var readFileFn = ioutil.ReadFile
 
 // Parser is test parser
 type Parser struct {
-	state    string
-	substate string
+	// state    string
+	// substate string
 }
 
 // NewParser create a new parser
@@ -58,7 +58,11 @@ func (p *Parser) scan(files *[]string) filepath.WalkFunc {
 		if err != nil {
 			log.Fatal(err)
 		}
+		if !info.IsDir() && info.Name()[0] == '_' {
+			return nil
+		}
 		if !info.IsDir() && strings.ToLower(filepath.Ext(path)) == ".md" {
+			fmt.Println(path)
 			*files = append(*files, path)
 		}
 		return nil
@@ -88,194 +92,81 @@ func (p *Parser) parseTestSuiteFileName(file string) string {
 }
 
 func (p *Parser) parseTestSuiteFile(file string) ([]*ts.TestCase, error) {
-	p.state = ""
-	p.substate = ""
 	testcases := []*ts.TestCase{}
 	var tc *ts.TestCase
-	blockData := []string{}
+	section := ""
 
-	lines, e := p.readTestSuiteFile(file)
+	md := markdown.NewMD()
+	e := md.Parse(file)
 	if e != nil {
 		return []*ts.TestCase{}, e
 	}
 
-	for _, line := range lines {
-		fmt.Println(line)
-		fmt.Println(p.state, ".", p.substate)
-		if p.state == "request" {
-			if p.substate == "openblock" {
-				if _, ok := isCodeBlock(line); ok {
-					p.substate = "closeblock"
-					tc.RequestBody = strings.Join(blockData, "\n")
-					blockData = []string{}
-				} else {
-					blockData = append(blockData, line)
-				}
-			} else {
-				if title, ok := isTitle(line); ok {
-					if tc != nil {
-						testcases = append(testcases, tc)
-					}
-					tc = &ts.TestCase{
-						Name: title,
-					}
-					p.substate = "title"
-				} else {
-					if method, path, ok := isMethod(line); ok {
-						tc.Method = strings.ToUpper(method)
-						tc.Path = path
-						p.substate = "method"
-					} else {
-						if blocktype, ok := isCodeBlock(line); ok {
-							p.substate = "openblock"
-							tc.SetContentType(blocktype)
-						} else {
-							if isExpectation(line) {
-								p.state = "expectation"
-								p.substate = ""
-							} else {
-								// nothing to do now
-								if p.substate == "tableheader" {
-									if isRequestHeaderEnd(line) {
-										p.substate = "tableheaderend"
-									} else {
-										return nil, errors.New("unexpected line found. expect expectation table ending here: " + line)
-									}
-								} else {
-									if p.substate == "tableheaderend" {
-										if item, value, ok := isRequestHeaderContent(line); ok {
-											tc.Headers[item] = value
-										}
-									} else {
-										p.substate = ""
+	for md.Next() {
+		elm := md.Value()
 
-										if isRequestHeaderTableHeader(line) {
-											p.substate = "tableheader"
-										}
-									}
-								}
-							}
-						}
+		switch section {
+		case "":
+			switch elm.GetType() {
+			case "H1":
+				tc = ts.NewTestCase(elm.(*markdown.SimpleElement).Text)
+				section = "suite"
+			}
+		case "suite":
+			switch elm.GetType() {
+			case "H2":
+				se := elm.(*markdown.SimpleElement)
+				if m, ok := se.Capture("(?i)^(GET|POST|DELETE|PUT|PATCH|OPTIONS) (.+)$"); ok {
+					tc.Method = m[0]
+					tc.Path = m[1]
+					section = "request"
+				} else {
+					if se.Match("(?i)^expectations?$") {
+						section = "expectations"
 					}
 				}
 			}
-		} else {
-			if p.state == "expectation" {
-				if p.substate == "tableheader" {
-					if isExpectationTableHeaderEnd(line) {
-						p.substate = "tableheaderend"
-					} else {
-						return nil, errors.New("unexpected line found. expect expectation table ending here: " + line)
-					}
-				} else {
-					if p.substate == "tableheaderend" {
-						if item, value, ok := isExpectationTableContent(line); ok {
-							tc.Expectations[item] = value
-						} else {
-							if title, ok := isTitle(line); ok {
-								if tc != nil {
-									testcases = append(testcases, tc)
-								}
-								tc = ts.NewTestCase(title)
-								p.state = "request"
-								p.substate = "title"
-							}
-						}
-					} else {
-						// table ended
-						p.substate = ""
+		case "request":
+			switch elm.GetType() {
+			case "H1":
+				testcases = append(testcases, tc)
 
-						if isExpectationTableHeader(line) {
-							p.substate = "tableheader"
-						}
+				tc = ts.NewTestCase(elm.(*markdown.SimpleElement).Text)
+				section = "suite"
+			case "H2":
+				se := elm.(*markdown.SimpleElement)
+				if se.Match("(?i)^expectations?$") {
+					section = "expectations"
+				}
+			case "Code":
+				se := elm.(*markdown.SimpleElement)
+				tc.RequestBody = se.Text
+			case "Table":
+				te := elm.(*markdown.TableElement)
+				if te.ColumnCount() == 2 && te.MatchHeaders([]string{"(?i)^header$", "(?i)^value$"}) {
+					for te.Next() {
+						row := te.Value()
+						tc.Headers[row[0]] = row[1]
 					}
 				}
-			} else {
-				if p.state == "" {
-					if title, ok := isTitle(line); ok {
-						tc = ts.NewTestCase(title)
-						p.state = "request"
-						p.substate = "title"
-					} else {
-						return nil, errors.New("unexpected line found. expect testcase name here: " + line)
+			}
+		case "expectations":
+			switch elm.GetType() {
+			case "Table":
+				te := elm.(*markdown.TableElement)
+				if te.ColumnCount() == 2 && te.MatchHeaders([]string{"(?i)^assert$", "(?i)^expected$"}) {
+					for te.Next() {
+						row := te.Value()
+						tc.Expectations[row[0]] = row[1]
 					}
 				}
 			}
 		}
 	}
+
 	if tc != nil {
 		testcases = append(testcases, tc)
 	}
 
 	return testcases, nil
-}
-
-func isCodeBlock(line string) (string, bool) {
-	re := regexp.MustCompile("^```(.*)$")
-	matches := re.FindStringSubmatch(line)
-	if len(matches) > 1 {
-		return matches[1], true
-	}
-	return "", false
-}
-
-func isTitle(line string) (string, bool) {
-	re := regexp.MustCompile("^# (.+)$")
-	matches := re.FindStringSubmatch(line)
-	if len(matches) > 1 {
-		return matches[1], true
-	}
-	return "", false
-}
-
-func isMethod(line string) (string, string, bool) {
-	re := regexp.MustCompile("(?i)^## (GET|POST|DELETE|PUT|PATCH|OPTIONS) (.+)$")
-	matches := re.FindStringSubmatch(line)
-	if len(matches) > 2 {
-		return matches[1], matches[2], true
-	}
-	return "", "", false
-}
-
-func isExpectation(line string) bool {
-	re := regexp.MustCompile("(?i)^## Expectation$")
-	return re.MatchString(line)
-}
-
-func isExpectationTableHeader(line string) bool {
-	re := regexp.MustCompile("(?i)^\\|\\s+Assert\\s+\\|\\s+Expected\\s+\\|$")
-	return re.MatchString(line)
-}
-
-func isExpectationTableHeaderEnd(line string) bool {
-	re := regexp.MustCompile("(?i)^\\|\\s+\\-+\\s+\\|\\s+\\-+\\s+\\|$")
-	return re.MatchString(line)
-}
-
-func isExpectationTableContent(line string) (string, string, bool) {
-	re := regexp.MustCompile("(?i)^\\|\\s+([^\\|]+)\\s+\\|\\s+([^\\|]+)\\s+\\|$")
-	matches := re.FindStringSubmatch(line)
-	if len(matches) > 2 {
-		return matches[1], matches[2], true
-	}
-	return "", "", false
-}
-
-func isRequestHeaderEnd(line string) bool {
-	re := regexp.MustCompile("(?i)^\\|\\s+\\-+\\s+\\|\\s+\\-+\\s+\\|$")
-	return re.MatchString(line)
-}
-
-func isRequestHeaderTableHeader(line string) bool {
-	re := regexp.MustCompile("(?i)^\\|\\s+Header\\s+\\|\\s+Value\\s+\\|$")
-	return re.MatchString(line)
-}
-
-func isRequestHeaderContent(line string) (string, string, bool) {
-	re := regexp.MustCompile("(?i)^\\|\\s+([^\\|]+)\\s+\\|\\s+([^\\|]+)\\s+\\|$")
-	matches := re.FindStringSubmatch(line)
-	if len(matches) > 2 {
-		return matches[1], matches[2], true
-	}
-	return "", "", false
 }

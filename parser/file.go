@@ -2,7 +2,7 @@ package parser
 
 import "strings"
 
-func (p *Parser) readTestSuiteFile(file string) ([]string, error) {
+func (p *Parser) readFile(file string) ([]string, error) {
 	b, err := readFileFn(file)
 	if err != nil {
 		return []string{}, err

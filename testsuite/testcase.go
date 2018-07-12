@@ -20,6 +20,8 @@ type TestCase struct {
 	RequestBody  string
 	Headers      map[string]string
 	Expectations map[string]string
+	Setups       []*Task
+	Teardowns    []*Task
 }
 
 // NewTestCase creates a new testcase
@@ -28,6 +30,8 @@ func NewTestCase(name string) *TestCase {
 		Name:         name,
 		Headers:      map[string]string{},
 		Expectations: map[string]string{},
+		Setups:       []*Task{},
+		Teardowns:    []*Task{},
 	}
 }
 
