@@ -2,6 +2,7 @@ package testsuite
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/chonla/yas/referrable"
 	"github.com/chonla/yas/response"
@@ -21,6 +22,7 @@ type Task struct {
 	Headers     map[string]string
 	Captures    map[string]string
 	Captured    map[string]string
+	Variables   map[string]string
 }
 
 // NewTask to create a new task
@@ -34,6 +36,7 @@ func NewTask(t *TestCase) *Task {
 		RequestBody: t.RequestBody,
 		Headers:     t.Headers,
 		Captures:    t.Captures,
+		Variables:   map[string]string{},
 		Captured:    map[string]string{},
 	}
 }
@@ -53,8 +56,8 @@ func (t *Task) Run() error {
 		fmt.Printf("%s: %s\n", red("Error"), e)
 		return e
 	}
-	req.SetHeaders(t.Headers)
-	resp, e := req.Request(url, t.RequestBody)
+	req.SetHeaders(t.applyVarsToMap(t.Headers))
+	resp, e := req.Request(t.applyVars(url), t.applyVars(t.RequestBody))
 	if e != nil {
 		fmt.Printf("%s: %s\n", red("Error"), e)
 		return e
@@ -70,6 +73,9 @@ func (t *Task) Run() error {
 		r, ok := ref.Find(v)
 		if ok {
 			t.Captured[k] = r[0]
+		} else {
+			e = fmt.Errorf("unable to capture data from response: %s", k)
+			return e
 		}
 	}
 
@@ -82,4 +88,26 @@ func (t *Task) Value(k string) (string, bool) {
 		return v, true
 	}
 	return "", false
+}
+
+// MergeVariables merge a given set of vars to local one
+func (t *Task) MergeVariables(vars map[string]string) {
+	for k, v := range vars {
+		t.Variables[k] = v
+	}
+}
+
+func (t *Task) applyVarsToMap(data map[string]string) map[string]string {
+	out := map[string]string{}
+	for k, v := range data {
+		out[k] = t.applyVars(v)
+	}
+	return out
+}
+
+func (t *Task) applyVars(data string) string {
+	for k, v := range t.Variables {
+		data = strings.Replace(data, fmt.Sprintf("{%s}", k), v, -1)
+	}
+	return data
 }

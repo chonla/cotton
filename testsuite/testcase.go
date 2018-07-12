@@ -68,6 +68,7 @@ func (tc *TestCase) Run() error {
 	if len(tc.Setups) > 0 {
 		for _, s := range tc.Setups {
 			s.BaseURL = tc.BaseURL
+			s.MergeVariables(tc.Variables)
 			e := s.Run()
 			if e != nil {
 				fmt.Printf("%s: %s\n", red("Error"), e)
@@ -86,7 +87,7 @@ func (tc *TestCase) Run() error {
 	}
 
 	req.SetHeaders(tc.applyVarsToMap(tc.Headers))
-	resp, e := req.Request(url, tc.applyVars(tc.RequestBody))
+	resp, e := req.Request(tc.applyVars(url), tc.applyVars(tc.RequestBody))
 	if e != nil {
 		fmt.Printf("%s: %s\n", red("Error"), e)
 		return e
