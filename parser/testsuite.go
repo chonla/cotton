@@ -16,10 +16,7 @@ import (
 var readFileFn = ioutil.ReadFile
 
 // Parser is test parser
-type Parser struct {
-	// state    string
-	// substate string
-}
+type Parser struct{}
 
 // NewParser create a new parser
 func NewParser() *Parser {
