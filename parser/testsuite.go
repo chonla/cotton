@@ -59,7 +59,6 @@ func (p *Parser) scan(files *[]string) filepath.WalkFunc {
 			return nil
 		}
 		if !info.IsDir() && strings.ToLower(filepath.Ext(path)) == ".md" {
-			fmt.Println(path)
 			*files = append(*files, path)
 		}
 		return nil
@@ -92,6 +91,7 @@ func (p *Parser) parseTestSuiteFile(file string) ([]*ts.TestCase, error) {
 	testcases := []*ts.TestCase{}
 	var tc *ts.TestCase
 	section := ""
+	filePath := filepath.Dir(file)
 
 	md := markdown.NewMD()
 	e := md.Parse(file)
@@ -120,6 +120,14 @@ func (p *Parser) parseTestSuiteFile(file string) ([]*ts.TestCase, error) {
 				} else {
 					if se.Match("(?i)^expectations?$") {
 						section = "expectations"
+					} else {
+						if se.Match("(?i)^preconditions?$") {
+							section = "preconditions"
+						} else {
+							if se.Match("(?i)^captures?$") {
+								section = "captures"
+							}
+						}
 					}
 				}
 			}
@@ -134,6 +142,14 @@ func (p *Parser) parseTestSuiteFile(file string) ([]*ts.TestCase, error) {
 				se := elm.(*markdown.SimpleElement)
 				if se.Match("(?i)^expectations?$") {
 					section = "expectations"
+				} else {
+					if se.Match("(?i)^preconditions?$") {
+						section = "preconditions"
+					} else {
+						if se.Match("(?i)^captures?$") {
+							section = "captures"
+						}
+					}
 				}
 			case "Code":
 				se := elm.(*markdown.SimpleElement)
@@ -157,6 +173,79 @@ func (p *Parser) parseTestSuiteFile(file string) ([]*ts.TestCase, error) {
 						tc.Expectations[row[0]] = row[1]
 					}
 				}
+			case "H2":
+				se := elm.(*markdown.SimpleElement)
+				if m, ok := se.Capture("(?i)^(GET|POST|DELETE|PUT|PATCH|OPTIONS) (.+)$"); ok {
+					tc.Method = m[0]
+					tc.Path = m[1]
+					section = "request"
+				} else {
+					if se.Match("(?i)^preconditions?$") {
+						section = "preconditions"
+					} else {
+						if se.Match("(?i)^captures?$") {
+							section = "captures"
+						}
+					}
+				}
+			}
+		case "captures":
+			switch elm.GetType() {
+			case "Table":
+				te := elm.(*markdown.TableElement)
+				if te.ColumnCount() == 2 && te.MatchHeaders([]string{"(?i)^name$", "(?i)^value$"}) {
+					for te.Next() {
+						row := te.Value()
+						tc.Captures[row[0]] = row[1]
+					}
+				}
+			case "H2":
+				se := elm.(*markdown.SimpleElement)
+				if m, ok := se.Capture("(?i)^(GET|POST|DELETE|PUT|PATCH|OPTIONS) (.+)$"); ok {
+					tc.Method = m[0]
+					tc.Path = m[1]
+					section = "request"
+				} else {
+					if se.Match("(?i)^preconditions?$") {
+						section = "preconditions"
+					} else {
+						if se.Match("(?i)^expectations?$") {
+							section = "expectations"
+						}
+					}
+				}
+			}
+		case "preconditions":
+			switch elm.GetType() {
+			case "Bullet":
+				se := elm.(*markdown.RichTextElement)
+				if len(se.Anchor) > 0 {
+					for _, anc := range se.Anchor {
+						setupParser := NewParser()
+						setup, e := setupParser.Parse(filepath.Clean(fmt.Sprintf("%s/%s", filePath, anc.Link)))
+						if e != nil {
+							return []*ts.TestCase{}, e
+						}
+						if len(setup.Suites) > 0 {
+							tc.Setups = append(tc.Setups, ts.NewTask(setup.Suites[0].TestCases[0]))
+						}
+					}
+				}
+			case "H2":
+				se := elm.(*markdown.SimpleElement)
+				if m, ok := se.Capture("(?i)^(GET|POST|DELETE|PUT|PATCH|OPTIONS) (.+)$"); ok {
+					tc.Method = m[0]
+					tc.Path = m[1]
+					section = "request"
+				} else {
+					if se.Match("(?i)^captures?$") {
+						section = "captures"
+					} else {
+						if se.Match("(?i)^expectations?$") {
+							section = "expectations"
+						}
+					}
+				}
 			}
 		}
 	}
@@ -164,6 +253,8 @@ func (p *Parser) parseTestSuiteFile(file string) ([]*ts.TestCase, error) {
 	if tc != nil {
 		testcases = append(testcases, tc)
 	}
+
+	// pretty.Println(testcases)
 
 	return testcases, nil
 }

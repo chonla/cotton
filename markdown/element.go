@@ -30,6 +30,21 @@ type TableElement struct {
 	cursor int
 }
 
+// RichTextElement contain text with some markdown inside
+type RichTextElement struct {
+	*BaseElement
+	Text string
+
+	// Anchor inside element ordered by appearance
+	Anchor []AnchorElement
+}
+
+// AnchorElement is anchor [Text](Link)
+type AnchorElement struct {
+	Text string
+	Link string
+}
+
 func tryHeader(data []string, level int) (ElementInterface, bool) {
 	if len(data) > 1 {
 		return nil, false
@@ -57,11 +72,12 @@ func tryBullet(data []string) (ElementInterface, bool) {
 	re := regexp.MustCompile("^\\* (.+)")
 	m := re.FindStringSubmatch(data[0])
 	if len(m) > 1 {
-		return &SimpleElement{
+		return &RichTextElement{
 			BaseElement: &BaseElement{
 				Type: "Bullet",
 			},
-			Text: m[1],
+			Text:   m[1],
+			Anchor: extractAnchors(m[1]),
 		}, true
 	}
 	return nil, false
@@ -136,6 +152,19 @@ func tryColumn(data string) ([]string, bool) {
 		}
 	}
 	return []string{}, false
+}
+
+func extractAnchors(data string) []AnchorElement {
+	re := regexp.MustCompile(`\[([^\]]+)\]\(([^\)]+)\)`)
+	m := re.FindAllStringSubmatch(data, -1)
+	a := []AnchorElement{}
+	for _, match := range m {
+		a = append(a, AnchorElement{
+			Text: match[1],
+			Link: match[2],
+		})
+	}
+	return a
 }
 
 // NewElement creates a new element implementing ElementInterface

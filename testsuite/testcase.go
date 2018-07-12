@@ -20,8 +20,10 @@ type TestCase struct {
 	RequestBody  string
 	Headers      map[string]string
 	Expectations map[string]string
+	Captures     map[string]string
 	Setups       []*Task
 	Teardowns    []*Task
+	Variables    map[string]string
 }
 
 // NewTestCase creates a new testcase
@@ -30,8 +32,10 @@ func NewTestCase(name string) *TestCase {
 		Name:         name,
 		Headers:      map[string]string{},
 		Expectations: map[string]string{},
+		Captures:     map[string]string{},
 		Setups:       []*Task{},
 		Teardowns:    []*Task{},
+		Variables:    map[string]string{},
 	}
 }
 
@@ -56,12 +60,28 @@ func (tc *TestCase) Run() error {
 	fmt.Printf("Testcase: %s\n", white(tc.Name))
 	fmt.Printf("%s\n", white("================================================================================"))
 
+	if len(tc.Setups) > 0 {
+		for _, s := range tc.Setups {
+			s.BaseURL = tc.BaseURL
+			e := s.Run()
+			if e != nil {
+				fmt.Printf("%s: %s\n", red("Error"), e)
+				return e
+			}
+
+			for k, v := range s.Captured {
+				tc.Variables[k] = v
+			}
+		}
+	}
+
 	req, e := request.NewRequester(tc.Method)
 	if e != nil {
 		return e
 	}
-	req.SetHeaders(tc.Headers)
-	resp, e := req.Request(url, tc.RequestBody)
+
+	req.SetHeaders(tc.applyVarsToMap(tc.Headers))
+	resp, e := req.Request(url, tc.applyVars(tc.RequestBody))
 	if e != nil {
 		fmt.Printf("%s: %s\n", red("Error"), e)
 		return e
@@ -75,4 +95,19 @@ func (tc *TestCase) Run() error {
 	e = as.Assert(tc.Expectations)
 
 	return e
+}
+
+func (tc *TestCase) applyVarsToMap(data map[string]string) map[string]string {
+	out := map[string]string{}
+	for k, v := range data {
+		out[k] = tc.applyVars(v)
+	}
+	return out
+}
+
+func (tc *TestCase) applyVars(data string) string {
+	for k, v := range tc.Variables {
+		data = strings.Replace(data, fmt.Sprintf("{%s}", k), v, -1)
+	}
+	return data
 }
