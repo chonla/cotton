@@ -52,6 +52,11 @@ func (tc *TestCase) SetContentType(ct string) {
 
 // Run executes test case
 func (tc *TestCase) Run() error {
+	// Skip if no assertion
+	if len(tc.Expectations) == 0 {
+		return nil
+	}
+
 	white := color.New(color.FgHiWhite, color.Bold).SprintFunc()
 	red := color.New(color.FgRed).SprintFunc()
 	url := fmt.Sprintf("%s%s", tc.BaseURL, tc.Path)

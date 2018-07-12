@@ -11,11 +11,13 @@ type TestSuite struct {
 // Run executes test case
 func (ts *TestSuite) Run() {
 	for _, tc := range ts.TestCases {
-		tc.BaseURL = ts.BaseURL
-		ts.Stat.Total++
-		e := tc.Run()
-		if e == nil {
-			ts.Stat.Success++
+		if len(tc.Expectations) > 0 {
+			tc.BaseURL = ts.BaseURL
+			ts.Stat.Total++
+			e := tc.Run()
+			if e == nil {
+				ts.Stat.Success++
+			}
 		}
 	}
 }
