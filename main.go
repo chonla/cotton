@@ -8,16 +8,26 @@ import (
 	"github.com/chonla/yas/parser"
 )
 
+// VERSION of yas
+const VERSION = "0.1"
+
 func main() {
 	parser := parser.NewParser()
 	var url string
 	var help bool
+	var ver bool
 
 	flag.Usage = usage
 
 	flag.StringVar(&url, "u", "http://localhost:8080", "set base url")
+	flag.BoolVar(&ver, "v", false, "show yas version")
 	flag.BoolVar(&help, "h", false, "show this help")
 	flag.Parse()
+
+	if ver {
+		fmt.Printf("yas %s\n", VERSION)
+		os.Exit(0)
+	}
 
 	testpath := flag.Arg(0)
 	if testpath == "" {
