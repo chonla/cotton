@@ -71,6 +71,38 @@ Assertion uses table with 2 columns. The header must be "Assert" and "Expected".
 * StatusCode is response status code.
 * Expected value will be treated as regular expression when surrounded by /.
 
+## Test Setup
+
+Test setup section starts by using H2 (##) with title "Precondition".
+
+Steps in test setup are written using bullets with links. Title of link are just a text explaining what to be done. The link is an actual task to be performed.
+
+```
+* [Login](./library/login.md)
+* [Get User Data](./library/get-user-data.md)
+```
+
+You can put anything you want surrounding the link to make the step clearer.
+
+```
+* [Login](./library/login.md) with valid credential and collect access token.
+* Then [Get User Data](./library/get-user-data.md) with the token above.
+```
+
+## Test Teardown
+
+Test setup section starts by using H2 (##) with title "Finally".
+
+// TODO
+
+## Tasks
+
+Tasks are used in Setup and Teardown. Task does not contain any assertion. Capture table can be declared in Task for future use.
+
+## Capture Table
+
+Capture Table is a table telling what to be collected. It has 2 columns with header "Name" and "Value". Name is referrable name. Value is what to be kept. Value syntax is identical to [Assertion](#Assertion).
+
 ## Comment
 
 All lines not mentioned above are comment.
