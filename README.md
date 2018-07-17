@@ -1,9 +1,8 @@
-# cotton
+# Cotton
 
-Yet Another Silk Test Tool. This project is originally inspired by [silk test](https://github.com/matryer/silk).
+Markdown Test Specification Runner. This project is originally inspired by [silk test](https://github.com/matryer/silk).
 
-* Markdown based document-driven RESTful API testing.
-* This tool is not compatible with silk markdown.
+* Executable RESTful API Markdown-based Document Specification.
 
 ## Usage
 
