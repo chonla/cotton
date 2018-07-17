@@ -100,7 +100,7 @@ Tasks are used in Setup and Teardown. Task does not contain any assertion. Captu
 
 ## Capture Table
 
-Capture Table is a table telling what to be collected. It has 2 columns with header "Name" and "Value". Name is referrable name. Value is what to be kept. Value syntax is identical to [Assertion](#Assertion).
+Capture Table is a table telling what to be collected. It has 2 columns with header "Name" and "Value". Name is referrable name. Value is what to be kept. Value syntax is identical to [Assertion](#assertion).
 
 ## Comment
 
