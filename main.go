@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/chonla/yas/parser"
+	"github.com/chonla/cotton/parser"
 )
 
-// VERSION of yas
+// VERSION of cotton
 const VERSION = "0.1"
 
 func main() {
@@ -20,12 +20,12 @@ func main() {
 	flag.Usage = usage
 
 	flag.StringVar(&url, "u", "http://localhost:8080", "set base url")
-	flag.BoolVar(&ver, "v", false, "show yas version")
+	flag.BoolVar(&ver, "v", false, "show cotton version")
 	flag.BoolVar(&help, "h", false, "show this help")
 	flag.Parse()
 
 	if ver {
-		fmt.Printf("yas %s\n", VERSION)
+		fmt.Printf("cotton %s\n", VERSION)
 		os.Exit(0)
 	}
 
@@ -48,9 +48,9 @@ func main() {
 }
 
 func usage() {
-	fmt.Println("Usage of yas:")
+	fmt.Println("Usage of cotton:")
 	fmt.Println()
-	fmt.Println("  yas [-u <base-url>] <test-cases>")
+	fmt.Println("  cotton [-u <base-url>] <test-cases>")
 	fmt.Println()
 	fmt.Println("  test-cases can be a markdown file or a directory contain markdowns.")
 	fmt.Println()

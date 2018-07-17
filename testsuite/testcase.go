@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/chonla/yas/assertable"
-	"github.com/chonla/yas/request"
-	"github.com/chonla/yas/response"
+	"github.com/chonla/cotton/assertable"
+	"github.com/chonla/cotton/request"
+	"github.com/chonla/cotton/response"
 	"github.com/fatih/color"
 )
 

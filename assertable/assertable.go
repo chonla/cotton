@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/chonla/yas/referrable"
-	"github.com/chonla/yas/response"
+	"github.com/chonla/cotton/referrable"
+	"github.com/chonla/cotton/response"
 	"github.com/fatih/color"
 )
 

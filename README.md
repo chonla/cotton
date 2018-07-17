@@ -1,4 +1,4 @@
-# Yas
+# cotton
 
 Yet Another Silk Test Tool. This project is originally inspired by [silk test](https://github.com/matryer/silk).
 
@@ -8,7 +8,7 @@ Yet Another Silk Test Tool. This project is originally inspired by [silk test](h
 ## Usage
 
 ```
-yas -u <base-api-url> [path/file]
+cotton -u <base-api-url> [path/file]
 ```
 
 ## Test Suite

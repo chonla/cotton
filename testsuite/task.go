@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/chonla/yas/referrable"
-	"github.com/chonla/yas/response"
+	"github.com/chonla/cotton/referrable"
+	"github.com/chonla/cotton/response"
 
-	"github.com/chonla/yas/request"
+	"github.com/chonla/cotton/request"
 	"github.com/fatih/color"
 )
 

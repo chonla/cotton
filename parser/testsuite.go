@@ -9,8 +9,8 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/chonla/yas/markdown"
-	ts "github.com/chonla/yas/testsuite"
+	"github.com/chonla/cotton/markdown"
+	ts "github.com/chonla/cotton/testsuite"
 )
 
 var readFileFn = ioutil.ReadFile

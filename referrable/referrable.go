@@ -5,7 +5,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/chonla/yas/response"
+	"github.com/chonla/cotton/response"
 	"github.com/fatih/color"
 	"github.com/stretchr/objx"
 )
