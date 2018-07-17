@@ -16,7 +16,7 @@ func NewMatcher(v string) *Matcher {
 	var m *Matcher
 	if isRegExp(v) {
 		m = &Matcher{
-			reg:   regexp.MustCompile(v[1 : len(v)-2]),
+			reg:   regexp.MustCompile(v[1 : len(v)-1]),
 			value: v,
 		}
 	} else {

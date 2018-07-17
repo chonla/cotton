@@ -132,8 +132,7 @@ func tryTable(data []string) (ElementInterface, bool) {
 		var vCol []string
 		vCol, ok = tryColumn(data[i])
 		if colCount != len(vCol) {
-			fmt.Println("colCount mismatches.")
-			return nil, false
+			break
 		}
 		table.Values = append(table.Values, vCol)
 	}
@@ -142,14 +141,25 @@ func tryTable(data []string) (ElementInterface, bool) {
 }
 
 func tryColumn(data string) ([]string, bool) {
-	re := regexp.MustCompile("^\\|(?:\\s+[^\\|]+\\s+\\|)+")
-	if re.MatchString(data) {
-		pattern := fmt.Sprintf("^\\|%s", strings.Repeat("\\s+([^\\|]+)\\s+\\|", len(strings.Split(data, "|"))-2))
-		re = regexp.MustCompile(pattern)
-		m := re.FindStringSubmatch(data)
-		if len(m) > 1 {
-			return m[1:], true
+	if strings.Contains(data, " | ") {
+		if data[0] == '|' {
+			data = data[1:]
 		}
+		if data[len(data)-1] == '|' {
+			data = data[0 : len(data)-1]
+		}
+		cols := strings.Split(data, " | ")
+		colCount := len(cols) // len(strings.Split(data, " | "))
+
+		for i := 0; i < colCount; i++ {
+			cols[i] = strings.TrimSpace(cols[i])
+		}
+
+		return cols, true
+	}
+	if data[0] == '|' && data[len(data)-1] == '|' {
+		cols := []string{strings.TrimSpace(data[1 : len(data)-1])}
+		return cols, true
 	}
 	return []string{}, false
 }

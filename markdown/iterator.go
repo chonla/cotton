@@ -1,7 +1,6 @@
 package markdown
 
 import (
-	"fmt"
 	"regexp"
 	"strings"
 )
@@ -90,16 +89,26 @@ func (i *Iterator) isCodeBlock(line string) bool {
 }
 
 func (i *Iterator) isTable(line string) (int, bool) {
-	re := regexp.MustCompile("^\\|(?:\\s+[^\\|]+\\s+\\|)+")
-	if re.MatchString(line) {
-		return len(strings.Split(line, "|")) - 2, true
+	if strings.Contains(line, " | ") {
+		cols := strings.Split(line, " | ")
+		colCount := len(cols)
+		return colCount, true
+	}
+	dataLen := len(line)
+	if dataLen >= 4 {
+		if line[0:1] == "| " && line[dataLen-2:dataLen-1] == " |" {
+			return 1, true
+		}
 	}
 	return 0, false
 }
 
 func (i *Iterator) isTableWithColumnCount(line string, count int) bool {
-	re := regexp.MustCompile(fmt.Sprintf("^\\|(?:\\s+[^\\|]+\\s+\\|){%d}", count))
-	return re.MatchString(line)
+	cols, yes := tryColumn(line)
+	if yes {
+		return len(cols) == count
+	}
+	return false
 }
 
 func (i *Iterator) isBullet(line string) bool {
