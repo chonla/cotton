@@ -7,7 +7,7 @@ Markdown Test Specification Runner. This project is originally inspired by [silk
 ## Usage
 
 ```
-cotton -u <base-api-url> [path/file]
+cotton -u <base-api-url> [directory or file]
 ```
 
 ## Test Suite
