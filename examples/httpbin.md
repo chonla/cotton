@@ -1,5 +1,6 @@
 # Get data from API 
 
+This can be run with `cotton -u http://httpbin.org httpbin.md`
 
 ## GET /get?key1=value1
 
