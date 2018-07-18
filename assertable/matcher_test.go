@@ -42,3 +42,18 @@ func TestNewMatcherShouldReturnStringMatcherIfPatternIsNotRegularExpression(t *t
 		value: "a/pattern/b",
 	}, m)
 }
+
+func TestMatcherWithRegularExpressionShouldSuccess(t *testing.T) {
+	m := NewMatcher("/pattern/")
+	assert.True(t, m.Match("my pattern in the room"))
+}
+
+func TestMatcherWithRegularExpressionShouldFailure(t *testing.T) {
+	m := NewMatcher("/pattern/")
+	assert.False(t, m.Match("my cotton in the web"))
+}
+
+func TestNewMatcherWithValueShouldCompareWithValue(t *testing.T) {
+	m := NewMatcher("a/pattern/b")
+	assert.True(t, m.Match("a/pattern/b"))
+}
