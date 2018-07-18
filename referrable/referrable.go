@@ -71,8 +71,7 @@ func (a *Referrable) Find(k string) ([]string, bool) {
 			return []string{a.data.Get(match[1]).String()}, true
 		}
 		return []string{}, false
-	} else {
-		val, ok := a.values[k]
-		return val, ok
 	}
+	val, ok := a.values[k]
+	return val, ok
 }
