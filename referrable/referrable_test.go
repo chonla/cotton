@@ -136,7 +136,7 @@ func TestNewReferrableFromNonJsonResponseShouldContainEmptyData(t *testing.T) {
 }
 
 func TestFindDataStuffInReferrableShouldReturnCorrespondingDataAndTrueWhenFound(t *testing.T) {
-	jsonString := "{ \"data\": \"ok\" }"
+	jsonString := "{ \"data\": \"ok\", \"list\": [{ \"name\": \"john\" }, {\"name\": \"jane\" }] }"
 
 	response := &response.Response{
 		Proto:      "http",
@@ -151,10 +151,10 @@ func TestFindDataStuffInReferrableShouldReturnCorrespondingDataAndTrueWhenFound(
 	}
 
 	ref, _ := NewReferrable(response)
-	result, ok := ref.Find("data.data")
+	result, ok := ref.Find("data.list[1].name")
 
 	assert.True(t, ok)
-	assert.Equal(t, []string{"ok"}, result)
+	assert.Equal(t, []string{"jane"}, result)
 }
 
 func TestFindDataStuffInReferrableShouldReturnNilAndTrueWhenNotFound(t *testing.T) {
