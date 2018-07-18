@@ -6,6 +6,8 @@ The expected values are defined in a 2-columned table with title of `Assert` and
 
 ## Asserted Variables
 
+All variable names are case-insensitive.
+
 | Variable Name | Description |
 | - | - |
 | StatusCode | HTTP Response Status Code, e.g. `200`, `404` |

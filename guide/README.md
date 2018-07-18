@@ -8,4 +8,5 @@
 * [Test setups](TestSetups.md)
 * [Test teardowns](TestTeardowns.md)
 * [Captures](Captures.md)
+* [Comments](Comments.md)
 * [Examples](Examples.md)
