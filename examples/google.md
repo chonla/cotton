@@ -12,4 +12,3 @@ Perform a search for the word `cotton`.
 | - | - |
 | StatusCode | 200 |
 | Header.Server | gws |
-| Data | /cotton/ |
