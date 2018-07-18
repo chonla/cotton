@@ -43,6 +43,11 @@ func TestNewMatcherShouldReturnStringMatcherIfPatternIsNotRegularExpression(t *t
 	}, m)
 }
 
+func TestMatcherWithRegularExpressionShouldFailure(t *testing.T) {
+	m := NewMatcher("/pattern/")
+	assert.False(t, m.Match("my cotton in the web"))
+}
+
 func TestToStringShouldShowItIsRegexIfPatternIsRegularExpression(t *testing.T) {
 	m := NewMatcher("/pattern/")
 	result := m.String()
