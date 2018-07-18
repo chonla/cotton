@@ -70,8 +70,10 @@ func (a *Referrable) Find(k string) ([]string, bool) {
 		if a.data.Has(match[1]) {
 			return []string{a.data.Get(match[1]).String()}, true
 		}
-		return []string{}, false
+		return nil, false
 	}
-	val, ok := a.values[k]
-	return val, ok
+	if val, ok := a.values[k]; ok {
+		return val, true
+	}
+	return nil, false
 }
