@@ -149,7 +149,7 @@ func tryColumn(data string) ([]string, bool) {
 			data = data[0 : len(data)-1]
 		}
 		cols := strings.Split(data, " | ")
-		colCount := len(cols) // len(strings.Split(data, " | "))
+		colCount := len(cols)
 
 		for i := 0; i < colCount; i++ {
 			cols[i] = strings.TrimSpace(cols[i])
