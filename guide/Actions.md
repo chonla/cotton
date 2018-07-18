@@ -50,6 +50,14 @@ Cotton provides the following HTTP methods:
 * DELETE
 * OPTION
 
+## Assertions of the action
+
+Test cases require [assertions](Assertions.md) to verify the response from the API, but not all actions requires assertions.
+
+## Actions without assertions
+
+All actions without assertions will not be executed. Action without assertions can be treated as [Test Setups](TestSetups.md) or [Test Teardowns](TestTeardowns.md) actions.
+
 | Previous | Index | Next |
 | :-: | :-: | :-: |
 | [Testcases](Testcases.md) | [Top](README.md) | [Assertions](Assertions.md) |
