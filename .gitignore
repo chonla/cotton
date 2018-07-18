@@ -3,3 +3,5 @@
 testcases/
 *.out
 !guide/*.md
+!examples/*.md
+!examples/**/*.md

@@ -20,6 +20,20 @@ Values is the name of item in response like declared in [Assertions](Assertions.
 | new-todo-uri | Header.Location |
 ```
 
+## Reference to the captured
+
+Use `{<variable-name>}` to get the captured. You can use the captured value in the request URI, header and body.
+
+## Example
+
+```
+## DELETE {new-todo-uri}
+
+| Header | Value |
+| - | - |
+| Authorization | Bearer {token} |
+```
+
 | Previous | Index | Next |
 | :-: | :-: | :-: |
 | [Test Teardowns](TestTeardowns.md) | [Top](README.md) | [Comments](Comments.md) |
