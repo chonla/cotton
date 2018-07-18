@@ -5,7 +5,7 @@
 * [Testcases](Testcases.md)
 * [Actions](Actions.md)
 * [Assertions](Assertions.md)
-* Test setups
-* Test teardown
-* Capture
-* Examples
+* [Test setups](TestSetups.md)
+* [Test teardowns](TestTeardowns.md)
+* [Captures](Captures.md)
+* [Examples](Examples.md)
