@@ -1,6 +1,6 @@
 # Examples
 
-See [Examples](./examples) for details.
+See [Examples](../examples) for details.
 
 | Previous | Index |
 | :-: | :-: |
