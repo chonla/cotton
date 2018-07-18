@@ -134,3 +134,135 @@ func TestNewReferrableFromNonJsonResponseShouldContainEmptyData(t *testing.T) {
 	assert.Nil(t, e)
 	assert.Equal(t, expected, result)
 }
+
+func TestFindDataStuffInReferrableShouldReturnCorrespondingDataAndTrueWhenFound(t *testing.T) {
+	jsonString := "{ \"data\": \"ok\", \"list\": [{ \"name\": \"john\" }, {\"name\": \"jane\" }] }"
+
+	response := &response.Response{
+		Proto:      "http",
+		Status:     "200 OK",
+		StatusCode: 200,
+		Header: map[string][]string{
+			"content-type": []string{
+				"application/json; charset=utf-8",
+			},
+		},
+		Body: jsonString,
+	}
+
+	ref, _ := NewReferrable(response)
+	result, ok := ref.Find("data.list[1].name")
+
+	assert.True(t, ok)
+	assert.Equal(t, []string{"jane"}, result)
+}
+
+func TestFindDataStuffInReferrableShouldReturnNilAndTrueWhenNotFound(t *testing.T) {
+	jsonString := "{ \"data\": \"ok\" }"
+
+	response := &response.Response{
+		Proto:      "http",
+		Status:     "200 OK",
+		StatusCode: 200,
+		Header: map[string][]string{
+			"content-type": []string{
+				"application/json; charset=utf-8",
+			},
+		},
+		Body: jsonString,
+	}
+
+	ref, _ := NewReferrable(response)
+	result, ok := ref.Find("data.result")
+
+	assert.False(t, ok)
+	assert.Nil(t, result)
+}
+
+func TestFindHeaderStuffInReferrableShouldReturnCorrespondingDataAndTrueWhenFound(t *testing.T) {
+	jsonString := "{ \"data\": \"ok\" }"
+
+	response := &response.Response{
+		Proto:      "http",
+		Status:     "200 OK",
+		StatusCode: 200,
+		Header: map[string][]string{
+			"content-type": []string{
+				"application/json; charset=utf-8",
+			},
+		},
+		Body: jsonString,
+	}
+
+	ref, _ := NewReferrable(response)
+	result, ok := ref.Find("header.content-type")
+
+	assert.True(t, ok)
+	assert.Equal(t, []string{"application/json; charset=utf-8"}, result)
+}
+
+func TestFindHeaderStuffInReferrableShouldReturnNilAndTrueWhenNotFound(t *testing.T) {
+	jsonString := "{ \"data\": \"ok\" }"
+
+	response := &response.Response{
+		Proto:      "http",
+		Status:     "200 OK",
+		StatusCode: 200,
+		Header: map[string][]string{
+			"content-type": []string{
+				"application/json; charset=utf-8",
+			},
+		},
+		Body: jsonString,
+	}
+
+	ref, _ := NewReferrable(response)
+	result, ok := ref.Find("header.content-length")
+
+	assert.False(t, ok)
+	assert.Nil(t, result)
+}
+
+func TestFindResponseStuffInReferrableShouldReturnCorrespondingDataAndTrueWhenFound(t *testing.T) {
+	jsonString := "{ \"data\": \"ok\" }"
+
+	response := &response.Response{
+		Proto:      "http",
+		Status:     "200 OK",
+		StatusCode: 200,
+		Header: map[string][]string{
+			"content-type": []string{
+				"application/json; charset=utf-8",
+			},
+		},
+		Body: jsonString,
+	}
+
+	ref, _ := NewReferrable(response)
+	result, ok := ref.Find("statuscode")
+
+	assert.True(t, ok)
+	assert.Equal(t, []string{"200"}, result)
+}
+
+func TestFindResponseStuffInReferrableShouldReturnNilAndTrueWhenNotFound(t *testing.T) {
+	jsonString := "{ \"data\": \"ok\" }"
+
+	response := &response.Response{
+		Proto:      "http",
+		Status:     "200 OK",
+		StatusCode: 200,
+		Header: map[string][]string{
+			"content-type": []string{
+				"application/json; charset=utf-8",
+			},
+		},
+		Body: jsonString,
+	}
+
+	ref, _ := NewReferrable(response)
+	result, ok := ref.Find("something")
+
+	assert.False(t, ok)
+	assert.Nil(t, result)
+}
