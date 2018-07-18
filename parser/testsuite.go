@@ -111,6 +111,11 @@ func (p *Parser) parseTestSuiteFile(file string) ([]*ts.TestCase, error) {
 			}
 		case "suite":
 			switch elm.GetType() {
+			case "H1":
+				testcases = append(testcases, tc)
+
+				tc = ts.NewTestCase(elm.(*markdown.SimpleElement).Text)
+				section = "suite"
 			case "H2":
 				se := elm.(*markdown.SimpleElement)
 				if m, ok := se.Capture("(?i)^(GET|POST|DELETE|PUT|PATCH|OPTIONS) (.+)$"); ok {
@@ -173,6 +178,11 @@ func (p *Parser) parseTestSuiteFile(file string) ([]*ts.TestCase, error) {
 						tc.Expectations[row[0]] = row[1]
 					}
 				}
+			case "H1":
+				testcases = append(testcases, tc)
+
+				tc = ts.NewTestCase(elm.(*markdown.SimpleElement).Text)
+				section = "suite"
 			case "H2":
 				se := elm.(*markdown.SimpleElement)
 				if m, ok := se.Capture("(?i)^(GET|POST|DELETE|PUT|PATCH|OPTIONS) (.+)$"); ok {
@@ -191,6 +201,11 @@ func (p *Parser) parseTestSuiteFile(file string) ([]*ts.TestCase, error) {
 			}
 		case "captures":
 			switch elm.GetType() {
+			case "H1":
+				testcases = append(testcases, tc)
+
+				tc = ts.NewTestCase(elm.(*markdown.SimpleElement).Text)
+				section = "suite"
 			case "Table":
 				te := elm.(*markdown.TableElement)
 				if te.ColumnCount() == 2 && te.MatchHeaders([]string{"(?i)^name$", "(?i)^value$"}) {
@@ -217,6 +232,11 @@ func (p *Parser) parseTestSuiteFile(file string) ([]*ts.TestCase, error) {
 			}
 		case "preconditions":
 			switch elm.GetType() {
+			case "H1":
+				testcases = append(testcases, tc)
+
+				tc = ts.NewTestCase(elm.(*markdown.SimpleElement).Text)
+				section = "suite"
 			case "Bullet":
 				se := elm.(*markdown.RichTextElement)
 				if len(se.Anchor) > 0 {
