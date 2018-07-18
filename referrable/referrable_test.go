@@ -36,7 +36,7 @@ func TestIsJsonObjectShouldReturnTrueIfArrayNotContainsContentTypeOfApplicationJ
 	assert.False(t, result)
 }
 
-func TestNewReferrableFromNonJsonResponse(t *testing.T) {
+func TestNewReferrableFromJsonResponse(t *testing.T) {
 	jsonString := "{ \"data\": \"ok\" }"
 	jsonObject, _ := objx.FromJSON(jsonString)
 
@@ -58,6 +58,72 @@ func TestNewReferrableFromNonJsonResponse(t *testing.T) {
 			"statuscode": []string{"200"},
 			"header.content-type": []string{
 				"application/json; charset=utf-8",
+			},
+		},
+		data: jsonObject,
+	}
+
+	result, e := NewReferrable(response)
+
+	assert.Nil(t, e)
+	assert.Equal(t, expected, result)
+}
+
+func TestNewReferrableFromBrokenJsonResponseShouldContainEmptyData(t *testing.T) {
+	jsonString := "{ \"data\": \"ok\""
+	jsonObject, _ := objx.FromJSON("{}")
+
+	response := &response.Response{
+		Proto:      "http",
+		Status:     "200 OK",
+		StatusCode: 200,
+		Header: map[string][]string{
+			"content-type": []string{
+				"application/json; charset=utf-8",
+			},
+		},
+		Body: jsonString,
+	}
+
+	expected := &Referrable{
+		values: map[string][]string{
+			"status":     []string{"200 OK"},
+			"statuscode": []string{"200"},
+			"header.content-type": []string{
+				"application/json; charset=utf-8",
+			},
+		},
+		data: jsonObject,
+	}
+
+	result, e := NewReferrable(response)
+
+	assert.Nil(t, e)
+	assert.Equal(t, expected, result)
+}
+
+func TestNewReferrableFromNonJsonResponseShouldContainEmptyData(t *testing.T) {
+	jsonString := "{ \"data\": \"ok\"}"
+	jsonObject, _ := objx.FromJSON("{}")
+
+	response := &response.Response{
+		Proto:      "http",
+		Status:     "200 OK",
+		StatusCode: 200,
+		Header: map[string][]string{
+			"content-type": []string{
+				"text/plain",
+			},
+		},
+		Body: jsonString,
+	}
+
+	expected := &Referrable{
+		values: map[string][]string{
+			"status":     []string{"200 OK"},
+			"statuscode": []string{"200"},
+			"header.content-type": []string{
+				"text/plain",
 			},
 		},
 		data: jsonObject,
