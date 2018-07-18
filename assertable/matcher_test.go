@@ -42,3 +42,27 @@ func TestNewMatcherShouldReturnStringMatcherIfPatternIsNotRegularExpression(t *t
 		value: "a/pattern/b",
 	}, m)
 }
+
+func TestToStringShouldShowItIsRegexIfPatternIsRegularExpression(t *testing.T) {
+	m := NewMatcher("/pattern/")
+	result := m.String()
+	assert.Equal(t, "Regex(/pattern/)", result)
+}
+
+func TestToStringShouldShowItIsRegexIfPatternIsNotRegularExpression(t *testing.T) {
+	m := NewMatcher("/pattern/a")
+	result := m.String()
+	assert.Equal(t, "/pattern/a", result)
+}
+
+func TestMatchStringShouldDoExactMatch(t *testing.T) {
+	m := NewMatcher("/pattern/a")
+	result := m.Match("/pattern/a")
+	assert.True(t, result)
+}
+
+func TestMatchStringShouldDoRegularExpressionMatch(t *testing.T) {
+	m := NewMatcher("/^pattern/")
+	result := m.Match("pattern is regular expression")
+	assert.True(t, result)
+}
