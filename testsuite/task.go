@@ -63,11 +63,7 @@ func (t *Task) Run() error {
 		return e
 	}
 
-	ref, e := referrable.NewReferrable(response.NewResponse(resp))
-	if e != nil {
-		fmt.Printf("%s: %s\n", red("Error"), e)
-		return e
-	}
+	ref := referrable.NewReferrable(response.NewResponse(resp))
 
 	for k, v := range t.Captures {
 		r, ok := ref.Find(v)

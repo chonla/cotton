@@ -97,11 +97,7 @@ func (tc *TestCase) Run() error {
 	}
 
 	if len(tc.Captures) > 0 {
-		ref, e := referrable.NewReferrable(response.NewResponse(resp))
-		if e != nil {
-			fmt.Printf("%s: %s\n", red("Error"), e)
-			return e
-		}
+		ref := referrable.NewReferrable(response.NewResponse(resp))
 
 		for k, v := range tc.Captures {
 			r, ok := ref.Find(v)
@@ -118,10 +114,7 @@ func (tc *TestCase) Run() error {
 		}
 	}
 
-	as, e := assertable.NewAssertable(response.NewResponse(resp))
-	if e != nil {
-		return e
-	}
+	as := assertable.NewAssertable(response.NewResponse(resp))
 
 	assertResult := as.Assert(tc.Expectations)
 

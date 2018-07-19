@@ -63,9 +63,8 @@ func TestNewReferrableFromJsonResponse(t *testing.T) {
 		data: jsonObject,
 	}
 
-	result, e := NewReferrable(response)
+	result := NewReferrable(response)
 
-	assert.Nil(t, e)
 	assert.Equal(t, expected, result)
 }
 
@@ -96,9 +95,8 @@ func TestNewReferrableFromBrokenJsonResponseShouldContainEmptyData(t *testing.T)
 		data: jsonObject,
 	}
 
-	result, e := NewReferrable(response)
+	result := NewReferrable(response)
 
-	assert.Nil(t, e)
 	assert.Equal(t, expected, result)
 }
 
@@ -129,9 +127,8 @@ func TestNewReferrableFromNonJsonResponseShouldContainEmptyData(t *testing.T) {
 		data: jsonObject,
 	}
 
-	result, e := NewReferrable(response)
+	result := NewReferrable(response)
 
-	assert.Nil(t, e)
 	assert.Equal(t, expected, result)
 }
 
@@ -150,7 +147,7 @@ func TestFindDataStuffInReferrableShouldReturnCorrespondingDataAndTrueWhenFound(
 		Body: jsonString,
 	}
 
-	ref, _ := NewReferrable(response)
+	ref := NewReferrable(response)
 	result, ok := ref.Find("data.list[1].name")
 
 	assert.True(t, ok)
@@ -172,7 +169,7 @@ func TestFindDataStuffInReferrableShouldReturnNilAndTrueWhenNotFound(t *testing.
 		Body: jsonString,
 	}
 
-	ref, _ := NewReferrable(response)
+	ref := NewReferrable(response)
 	result, ok := ref.Find("data.result")
 
 	assert.False(t, ok)
@@ -194,7 +191,7 @@ func TestFindHeaderStuffInReferrableShouldReturnCorrespondingDataAndTrueWhenFoun
 		Body: jsonString,
 	}
 
-	ref, _ := NewReferrable(response)
+	ref := NewReferrable(response)
 	result, ok := ref.Find("header.content-type")
 
 	assert.True(t, ok)
@@ -216,7 +213,7 @@ func TestFindHeaderStuffInReferrableShouldReturnNilAndTrueWhenNotFound(t *testin
 		Body: jsonString,
 	}
 
-	ref, _ := NewReferrable(response)
+	ref := NewReferrable(response)
 	result, ok := ref.Find("header.content-length")
 
 	assert.False(t, ok)
@@ -238,7 +235,7 @@ func TestFindResponseStuffInReferrableShouldReturnCorrespondingDataAndTrueWhenFo
 		Body: jsonString,
 	}
 
-	ref, _ := NewReferrable(response)
+	ref := NewReferrable(response)
 	result, ok := ref.Find("statuscode")
 
 	assert.True(t, ok)
@@ -260,7 +257,7 @@ func TestFindResponseStuffInReferrableShouldReturnNilAndTrueWhenNotFound(t *test
 		Body: jsonString,
 	}
 
-	ref, _ := NewReferrable(response)
+	ref := NewReferrable(response)
 	result, ok := ref.Find("something")
 
 	assert.False(t, ok)

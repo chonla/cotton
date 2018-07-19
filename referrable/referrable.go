@@ -17,7 +17,7 @@ type Referrable struct {
 }
 
 // NewReferrable creates an referrable object
-func NewReferrable(resp *response.Response) (*Referrable, error) {
+func NewReferrable(resp *response.Response) *Referrable {
 	red := color.New(color.FgRed).SprintFunc()
 	values := map[string][]string{}
 
@@ -49,7 +49,7 @@ func NewReferrable(resp *response.Response) (*Referrable, error) {
 	return &Referrable{
 		values: values,
 		data:   jsonObj,
-	}, nil
+	}
 }
 
 func isJSONContent(contenttype []string) bool {
