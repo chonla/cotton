@@ -196,6 +196,68 @@ func TestParseActionWithExpectations(t *testing.T) {
 	}, result)
 }
 
+func TestParseActionWithCaptures(t *testing.T) {
+	data := `# Test Case Name
+
+## POST /todos
+
+| Header | Value |
+| - | - |
+| Content-Type | application/json |
+| Authorization | Bearer test |
+
+` + backticks + `
+{
+	"title": "Text data"
+}
+` + backticks + `
+
+## Expectations
+
+| Assert | Expected |
+| - | - |
+| StatusCode | 200 |
+| Header.Content-Type | application/json |
+| Data.title | Some text |
+
+## Captures
+
+| Name | Value |
+| - | - |
+| status-code | StatusCode |
+| text-title | Data.title |
+`
+
+	p := NewParser()
+	result, e := p.ParseString(data, "")
+
+	assert.Nil(t, e)
+	assert.Equal(t, []*ts.TestCase{
+		&ts.TestCase{
+			Name:        "Test Case Name",
+			Method:      "POST",
+			Path:        "/todos",
+			RequestBody: "{\n\"title\": \"Text data\"\n}",
+			Headers: map[string]string{
+				"Content-Type":  "application/json",
+				"Authorization": "Bearer test",
+			},
+			Expectations: map[string]string{
+				"StatusCode":          "200",
+				"Header.Content-Type": "application/json",
+				"Data.title":          "Some text",
+			},
+			Captures: map[string]string{
+				"status-code": "StatusCode",
+				"text-title":  "Data.title",
+			},
+			Variables: map[string]string{},
+			Setups:    []*ts.Task{},
+			Teardowns: []*ts.Task{},
+		},
+	}, result)
+}
+
 // func TestParseTestSuiteFileName(t *testing.T) {
 // 	p := NewParser()
 // 	result := p.parseTestSuiteFileName("login-should-success.md")
