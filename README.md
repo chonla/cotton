@@ -17,7 +17,7 @@ cotton -u <base-api-url> [directory or file]
 ```
 
 ```
-cotton
+$ cotton
 
 Usage of cotton:
 
