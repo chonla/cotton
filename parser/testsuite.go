@@ -141,6 +141,10 @@ func (p *Parser) ParseString(content, filePath string) ([]*ts.TestCase, error) {
 						} else {
 							if se.Match("(?i)^captures?$") {
 								section = "captures"
+							} else {
+								if se.Match("(?i)^finally$") {
+									section = "finally"
+								}
 							}
 						}
 					}
@@ -252,12 +256,13 @@ func (p *Parser) ParseString(content, filePath string) ([]*ts.TestCase, error) {
 				if len(se.Anchor) > 0 {
 					for _, anc := range se.Anchor {
 						setupParser := NewParser()
-						setup, e := setupParser.Parse(filepath.Clean(fmt.Sprintf("%s/%s", filePath, anc.Link)))
+						setup, e := setupParser.ParseFile(filepath.Clean(fmt.Sprintf("%s/%s", filePath, anc.Link)))
 						if e != nil {
 							return []*ts.TestCase{}, e
 						}
-						if len(setup.Suites) > 0 {
-							tc.Setups = append(tc.Setups, ts.NewTask(setup.Suites[0].TestCases[0]))
+						// if len(setup.Suites) > 0 {
+						if len(setup.TestCases) > 0 {
+							tc.Setups = append(tc.Setups, ts.NewTask(setup.TestCases[0]))
 						}
 					}
 				}
