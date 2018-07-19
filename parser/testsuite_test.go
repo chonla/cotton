@@ -340,6 +340,18 @@ func TestParseActionWithFullSections(t *testing.T) {
 			| - | - |
 			| location | Header.Location |
 			`
+
+		case "/DeleteTodo.md":
+			data = `# Delete ToDo
+
+			## DELETE /todos/3
+			`
+
+		case "/Logout.md":
+			data = `# Logout
+
+			## GET /logout
+			`
 		}
 		return []byte(data), nil
 	}
@@ -394,7 +406,26 @@ func TestParseActionWithFullSections(t *testing.T) {
 					Captured:  map[string]string{},
 				},
 			},
-			Teardowns: []*ts.Task{},
+			Teardowns: []*ts.Task{
+				&ts.Task{
+					Name:      "Delete ToDo",
+					Method:    "DELETE",
+					Path:      "/todos/3",
+					Headers:   map[string]string{},
+					Captures:  map[string]string{},
+					Variables: map[string]string{},
+					Captured:  map[string]string{},
+				},
+				&ts.Task{
+					Name:      "Logout",
+					Method:    "GET",
+					Path:      "/logout",
+					Headers:   map[string]string{},
+					Captures:  map[string]string{},
+					Variables: map[string]string{},
+					Captured:  map[string]string{},
+				},
+			},
 		},
 	}, result)
 }

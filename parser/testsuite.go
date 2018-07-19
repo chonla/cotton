@@ -167,6 +167,10 @@ func (p *Parser) ParseString(content, filePath string) ([]*ts.TestCase, error) {
 					} else {
 						if se.Match("(?i)^captures?$") {
 							section = "captures"
+						} else {
+							if se.Match("(?i)^finally$") {
+								section = "finally"
+							}
 						}
 					}
 				}
@@ -209,6 +213,10 @@ func (p *Parser) ParseString(content, filePath string) ([]*ts.TestCase, error) {
 					} else {
 						if se.Match("(?i)^captures?$") {
 							section = "captures"
+						} else {
+							if se.Match("(?i)^finally$") {
+								section = "finally"
+							}
 						}
 					}
 				}
@@ -240,6 +248,10 @@ func (p *Parser) ParseString(content, filePath string) ([]*ts.TestCase, error) {
 					} else {
 						if se.Match("(?i)^expectations?$") {
 							section = "expectations"
+						} else {
+							if se.Match("(?i)^finally$") {
+								section = "finally"
+							}
 						}
 					}
 				}
@@ -278,6 +290,51 @@ func (p *Parser) ParseString(content, filePath string) ([]*ts.TestCase, error) {
 					} else {
 						if se.Match("(?i)^expectations?$") {
 							section = "expectations"
+						} else {
+							if se.Match("(?i)^finally$") {
+								section = "finally"
+							}
+						}
+					}
+				}
+			}
+		case "finally":
+			switch elm.GetType() {
+			case "H1":
+				testcases = append(testcases, tc)
+
+				tc = ts.NewTestCase(elm.(*markdown.SimpleElement).Text)
+				section = "suite"
+			case "Bullet":
+				se := elm.(*markdown.RichTextElement)
+				if len(se.Anchor) > 0 {
+					for _, anc := range se.Anchor {
+						teardownParser := NewParser()
+						teardown, e := teardownParser.ParseFile(filepath.Clean(fmt.Sprintf("%s/%s", filePath, anc.Link)))
+						if e != nil {
+							return []*ts.TestCase{}, e
+						}
+						if len(teardown.TestCases) > 0 {
+							tc.Teardowns = append(tc.Teardowns, ts.NewTask(teardown.TestCases[0]))
+						}
+					}
+				}
+			case "H2":
+				se := elm.(*markdown.SimpleElement)
+				if m, ok := se.Capture("(?i)^(GET|POST|DELETE|PUT|PATCH|OPTIONS) (.+)$"); ok {
+					tc.Method = m[0]
+					tc.Path = m[1]
+					section = "request"
+				} else {
+					if se.Match("(?i)^captures?$") {
+						section = "captures"
+					} else {
+						if se.Match("(?i)^expectations?$") {
+							section = "expectations"
+						} else {
+							if se.Match("(?i)^preconditions?$") {
+								section = "precondition"
+							}
 						}
 					}
 				}
