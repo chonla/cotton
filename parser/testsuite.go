@@ -112,53 +112,20 @@ func (p *Parser) ParseString(content, filePath string) ([]*ts.TestCase, error) {
 	for md.Next() {
 		elm := md.Value()
 
-		switch section {
-		case "":
-			switch elm.GetType() {
-			case "H1":
-				tc = ts.NewTestCase(elm.(*markdown.SimpleElement).Text)
-				section = "suite"
-			}
-		case "suite":
-			switch elm.GetType() {
-			case "H1":
+		switch elm.GetType() {
+		case "H1":
+			if tc != nil {
 				testcases = append(testcases, tc)
-
-				tc = ts.NewTestCase(elm.(*markdown.SimpleElement).Text)
-				section = "suite"
-			case "H2":
-				se := elm.(*markdown.SimpleElement)
-				if m, ok := se.Capture("(?i)^(GET|POST|DELETE|PUT|PATCH|OPTIONS) (.+)$"); ok {
-					tc.Method = m[0]
-					tc.Path = m[1]
-					section = "request"
-				} else {
-					if se.Match("(?i)^expectations?$") {
-						section = "expectations"
-					} else {
-						if se.Match("(?i)^preconditions?$") {
-							section = "preconditions"
-						} else {
-							if se.Match("(?i)^captures?$") {
-								section = "captures"
-							} else {
-								if se.Match("(?i)^finally$") {
-									section = "finally"
-								}
-							}
-						}
-					}
-				}
 			}
-		case "request":
-			switch elm.GetType() {
-			case "H1":
-				testcases = append(testcases, tc)
-
-				tc = ts.NewTestCase(elm.(*markdown.SimpleElement).Text)
-				section = "suite"
-			case "H2":
-				se := elm.(*markdown.SimpleElement)
+			tc = ts.NewTestCase(elm.(*markdown.SimpleElement).Text)
+			section = "suite"
+		case "H2":
+			se := elm.(*markdown.SimpleElement)
+			if m, ok := se.Capture("(?i)^(GET|POST|DELETE|PUT|PATCH|OPTIONS) (.+)$"); ok {
+				tc.Method = m[0]
+				tc.Path = m[1]
+				section = "request"
+			} else {
 				if se.Match("(?i)^expectations?$") {
 					section = "expectations"
 				} else {
@@ -170,14 +137,21 @@ func (p *Parser) ParseString(content, filePath string) ([]*ts.TestCase, error) {
 						} else {
 							if se.Match("(?i)^finally$") {
 								section = "finally"
+							} else {
+								section = ""
 							}
 						}
 					}
 				}
-			case "Code":
+			}
+		case "Code":
+			if section == "request" {
 				se := elm.(*markdown.SimpleElement)
 				tc.RequestBody = se.Text
-			case "Table":
+			}
+		case "Table":
+			switch section {
+			case "request":
 				te := elm.(*markdown.TableElement)
 				if te.ColumnCount() == 2 && te.MatchHeaders([]string{"(?i)^header$", "(?i)^value$"}) {
 					for te.Next() {
@@ -185,10 +159,7 @@ func (p *Parser) ParseString(content, filePath string) ([]*ts.TestCase, error) {
 						tc.Headers[row[0]] = row[1]
 					}
 				}
-			}
-		case "expectations":
-			switch elm.GetType() {
-			case "Table":
+			case "expectations":
 				te := elm.(*markdown.TableElement)
 				if te.ColumnCount() == 2 && te.MatchHeaders([]string{"(?i)^assert$", "(?i)^expected$"}) {
 					for te.Next() {
@@ -196,39 +167,7 @@ func (p *Parser) ParseString(content, filePath string) ([]*ts.TestCase, error) {
 						tc.Expectations[row[0]] = row[1]
 					}
 				}
-			case "H1":
-				testcases = append(testcases, tc)
-
-				tc = ts.NewTestCase(elm.(*markdown.SimpleElement).Text)
-				section = "suite"
-			case "H2":
-				se := elm.(*markdown.SimpleElement)
-				if m, ok := se.Capture("(?i)^(GET|POST|DELETE|PUT|PATCH|OPTIONS) (.+)$"); ok {
-					tc.Method = m[0]
-					tc.Path = m[1]
-					section = "request"
-				} else {
-					if se.Match("(?i)^preconditions?$") {
-						section = "preconditions"
-					} else {
-						if se.Match("(?i)^captures?$") {
-							section = "captures"
-						} else {
-							if se.Match("(?i)^finally$") {
-								section = "finally"
-							}
-						}
-					}
-				}
-			}
-		case "captures":
-			switch elm.GetType() {
-			case "H1":
-				testcases = append(testcases, tc)
-
-				tc = ts.NewTestCase(elm.(*markdown.SimpleElement).Text)
-				section = "suite"
-			case "Table":
+			case "captures":
 				te := elm.(*markdown.TableElement)
 				if te.ColumnCount() == 2 && te.MatchHeaders([]string{"(?i)^name$", "(?i)^value$"}) {
 					for te.Next() {
@@ -236,34 +175,11 @@ func (p *Parser) ParseString(content, filePath string) ([]*ts.TestCase, error) {
 						tc.Captures[row[0]] = row[1]
 					}
 				}
-			case "H2":
-				se := elm.(*markdown.SimpleElement)
-				if m, ok := se.Capture("(?i)^(GET|POST|DELETE|PUT|PATCH|OPTIONS) (.+)$"); ok {
-					tc.Method = m[0]
-					tc.Path = m[1]
-					section = "request"
-				} else {
-					if se.Match("(?i)^preconditions?$") {
-						section = "preconditions"
-					} else {
-						if se.Match("(?i)^expectations?$") {
-							section = "expectations"
-						} else {
-							if se.Match("(?i)^finally$") {
-								section = "finally"
-							}
-						}
-					}
-				}
+				fmt.Println(te)
 			}
-		case "preconditions":
-			switch elm.GetType() {
-			case "H1":
-				testcases = append(testcases, tc)
-
-				tc = ts.NewTestCase(elm.(*markdown.SimpleElement).Text)
-				section = "suite"
-			case "Bullet":
+		case "Bullet":
+			switch section {
+			case "preconditions":
 				se := elm.(*markdown.RichTextElement)
 				if len(se.Anchor) > 0 {
 					for _, anc := range se.Anchor {
@@ -272,40 +188,12 @@ func (p *Parser) ParseString(content, filePath string) ([]*ts.TestCase, error) {
 						if e != nil {
 							return []*ts.TestCase{}, e
 						}
-						// if len(setup.Suites) > 0 {
 						if len(setup.TestCases) > 0 {
 							tc.Setups = append(tc.Setups, ts.NewTask(setup.TestCases[0]))
 						}
 					}
 				}
-			case "H2":
-				se := elm.(*markdown.SimpleElement)
-				if m, ok := se.Capture("(?i)^(GET|POST|DELETE|PUT|PATCH|OPTIONS) (.+)$"); ok {
-					tc.Method = m[0]
-					tc.Path = m[1]
-					section = "request"
-				} else {
-					if se.Match("(?i)^captures?$") {
-						section = "captures"
-					} else {
-						if se.Match("(?i)^expectations?$") {
-							section = "expectations"
-						} else {
-							if se.Match("(?i)^finally$") {
-								section = "finally"
-							}
-						}
-					}
-				}
-			}
-		case "finally":
-			switch elm.GetType() {
-			case "H1":
-				testcases = append(testcases, tc)
-
-				tc = ts.NewTestCase(elm.(*markdown.SimpleElement).Text)
-				section = "suite"
-			case "Bullet":
+			case "finally":
 				se := elm.(*markdown.RichTextElement)
 				if len(se.Anchor) > 0 {
 					for _, anc := range se.Anchor {
@@ -319,27 +207,237 @@ func (p *Parser) ParseString(content, filePath string) ([]*ts.TestCase, error) {
 						}
 					}
 				}
-			case "H2":
-				se := elm.(*markdown.SimpleElement)
-				if m, ok := se.Capture("(?i)^(GET|POST|DELETE|PUT|PATCH|OPTIONS) (.+)$"); ok {
-					tc.Method = m[0]
-					tc.Path = m[1]
-					section = "request"
-				} else {
-					if se.Match("(?i)^captures?$") {
-						section = "captures"
-					} else {
-						if se.Match("(?i)^expectations?$") {
-							section = "expectations"
-						} else {
-							if se.Match("(?i)^preconditions?$") {
-								section = "precondition"
-							}
-						}
-					}
-				}
 			}
 		}
+
+		// switch section {
+		// case "":
+		// 	switch elm.GetType() {
+		// 	case "H1":
+		// 		tc = ts.NewTestCase(elm.(*markdown.SimpleElement).Text)
+		// 		section = "suite"
+		// 	}
+		// case "suite":
+		// 	switch elm.GetType() {
+		// 	case "H1":
+		// 		testcases = append(testcases, tc)
+
+		// 		tc = ts.NewTestCase(elm.(*markdown.SimpleElement).Text)
+		// 		section = "suite"
+		// 	case "H2":
+		// 		se := elm.(*markdown.SimpleElement)
+		// 		if m, ok := se.Capture("(?i)^(GET|POST|DELETE|PUT|PATCH|OPTIONS) (.+)$"); ok {
+		// 			tc.Method = m[0]
+		// 			tc.Path = m[1]
+		// 			section = "request"
+		// 		} else {
+		// 			if se.Match("(?i)^expectations?$") {
+		// 				section = "expectations"
+		// 			} else {
+		// 				if se.Match("(?i)^preconditions?$") {
+		// 					section = "preconditions"
+		// 				} else {
+		// 					if se.Match("(?i)^captures?$") {
+		// 						section = "captures"
+		// 					} else {
+		// 						if se.Match("(?i)^finally$") {
+		// 							section = "finally"
+		// 						}
+		// 					}
+		// 				}
+		// 			}
+		// 		}
+		// 	}
+		// case "request":
+		// 	switch elm.GetType() {
+		// 	case "H1":
+		// 		testcases = append(testcases, tc)
+
+		// 		tc = ts.NewTestCase(elm.(*markdown.SimpleElement).Text)
+		// 		section = "suite"
+		// 	case "H2":
+		// 		se := elm.(*markdown.SimpleElement)
+		// 		if se.Match("(?i)^expectations?$") {
+		// 			section = "expectations"
+		// 		} else {
+		// 			if se.Match("(?i)^preconditions?$") {
+		// 				section = "preconditions"
+		// 			} else {
+		// 				if se.Match("(?i)^captures?$") {
+		// 					section = "captures"
+		// 				} else {
+		// 					if se.Match("(?i)^finally$") {
+		// 						section = "finally"
+		// 					}
+		// 				}
+		// 			}
+		// 		}
+		// 	case "Code":
+		// 		se := elm.(*markdown.SimpleElement)
+		// 		tc.RequestBody = se.Text
+		// 	case "Table":
+		// 		te := elm.(*markdown.TableElement)
+		// 		if te.ColumnCount() == 2 && te.MatchHeaders([]string{"(?i)^header$", "(?i)^value$"}) {
+		// 			for te.Next() {
+		// 				row := te.Value()
+		// 				tc.Headers[row[0]] = row[1]
+		// 			}
+		// 		}
+		// 	}
+		// case "expectations":
+		// 	switch elm.GetType() {
+		// 	case "Table":
+		// 		te := elm.(*markdown.TableElement)
+		// 		if te.ColumnCount() == 2 && te.MatchHeaders([]string{"(?i)^assert$", "(?i)^expected$"}) {
+		// 			for te.Next() {
+		// 				row := te.Value()
+		// 				tc.Expectations[row[0]] = row[1]
+		// 			}
+		// 		}
+		// 	case "H1":
+		// 		testcases = append(testcases, tc)
+
+		// 		tc = ts.NewTestCase(elm.(*markdown.SimpleElement).Text)
+		// 		section = "suite"
+		// 	case "H2":
+		// 		se := elm.(*markdown.SimpleElement)
+		// 		if m, ok := se.Capture("(?i)^(GET|POST|DELETE|PUT|PATCH|OPTIONS) (.+)$"); ok {
+		// 			tc.Method = m[0]
+		// 			tc.Path = m[1]
+		// 			section = "request"
+		// 		} else {
+		// 			if se.Match("(?i)^preconditions?$") {
+		// 				section = "preconditions"
+		// 			} else {
+		// 				if se.Match("(?i)^captures?$") {
+		// 					section = "captures"
+		// 				} else {
+		// 					if se.Match("(?i)^finally$") {
+		// 						section = "finally"
+		// 					}
+		// 				}
+		// 			}
+		// 		}
+		// 	}
+		// case "captures":
+		// 	switch elm.GetType() {
+		// 	case "H1":
+		// 		testcases = append(testcases, tc)
+
+		// 		tc = ts.NewTestCase(elm.(*markdown.SimpleElement).Text)
+		// 		section = "suite"
+		// 	case "Table":
+		// 		te := elm.(*markdown.TableElement)
+		// 		if te.ColumnCount() == 2 && te.MatchHeaders([]string{"(?i)^name$", "(?i)^value$"}) {
+		// 			for te.Next() {
+		// 				row := te.Value()
+		// 				tc.Captures[row[0]] = row[1]
+		// 			}
+		// 		}
+		// 	case "H2":
+		// 		se := elm.(*markdown.SimpleElement)
+		// 		if m, ok := se.Capture("(?i)^(GET|POST|DELETE|PUT|PATCH|OPTIONS) (.+)$"); ok {
+		// 			tc.Method = m[0]
+		// 			tc.Path = m[1]
+		// 			section = "request"
+		// 		} else {
+		// 			if se.Match("(?i)^preconditions?$") {
+		// 				section = "preconditions"
+		// 			} else {
+		// 				if se.Match("(?i)^expectations?$") {
+		// 					section = "expectations"
+		// 				} else {
+		// 					if se.Match("(?i)^finally$") {
+		// 						section = "finally"
+		// 					}
+		// 				}
+		// 			}
+		// 		}
+		// 	}
+		// case "preconditions":
+		// 	switch elm.GetType() {
+		// 	case "H1":
+		// 		testcases = append(testcases, tc)
+
+		// 		tc = ts.NewTestCase(elm.(*markdown.SimpleElement).Text)
+		// 		section = "suite"
+		// 	case "Bullet":
+		// 		se := elm.(*markdown.RichTextElement)
+		// 		if len(se.Anchor) > 0 {
+		// 			for _, anc := range se.Anchor {
+		// 				setupParser := NewParser()
+		// 				setup, e := setupParser.ParseFile(filepath.Clean(fmt.Sprintf("%s/%s", filePath, anc.Link)))
+		// 				if e != nil {
+		// 					return []*ts.TestCase{}, e
+		// 				}
+		// 				// if len(setup.Suites) > 0 {
+		// 				if len(setup.TestCases) > 0 {
+		// 					tc.Setups = append(tc.Setups, ts.NewTask(setup.TestCases[0]))
+		// 				}
+		// 			}
+		// 		}
+		// 	case "H2":
+		// 		se := elm.(*markdown.SimpleElement)
+		// 		if m, ok := se.Capture("(?i)^(GET|POST|DELETE|PUT|PATCH|OPTIONS) (.+)$"); ok {
+		// 			tc.Method = m[0]
+		// 			tc.Path = m[1]
+		// 			section = "request"
+		// 		} else {
+		// 			if se.Match("(?i)^captures?$") {
+		// 				section = "captures"
+		// 			} else {
+		// 				if se.Match("(?i)^expectations?$") {
+		// 					section = "expectations"
+		// 				} else {
+		// 					if se.Match("(?i)^finally$") {
+		// 						section = "finally"
+		// 					}
+		// 				}
+		// 			}
+		// 		}
+		// 	}
+		// case "finally":
+		// 	switch elm.GetType() {
+		// 	case "H1":
+		// 		testcases = append(testcases, tc)
+
+		// 		tc = ts.NewTestCase(elm.(*markdown.SimpleElement).Text)
+		// 		section = "suite"
+		// 	case "Bullet":
+		// 		se := elm.(*markdown.RichTextElement)
+		// 		if len(se.Anchor) > 0 {
+		// 			for _, anc := range se.Anchor {
+		// 				teardownParser := NewParser()
+		// 				teardown, e := teardownParser.ParseFile(filepath.Clean(fmt.Sprintf("%s/%s", filePath, anc.Link)))
+		// 				if e != nil {
+		// 					return []*ts.TestCase{}, e
+		// 				}
+		// 				if len(teardown.TestCases) > 0 {
+		// 					tc.Teardowns = append(tc.Teardowns, ts.NewTask(teardown.TestCases[0]))
+		// 				}
+		// 			}
+		// 		}
+		// 	case "H2":
+		// 		se := elm.(*markdown.SimpleElement)
+		// 		if m, ok := se.Capture("(?i)^(GET|POST|DELETE|PUT|PATCH|OPTIONS) (.+)$"); ok {
+		// 			tc.Method = m[0]
+		// 			tc.Path = m[1]
+		// 			section = "request"
+		// 		} else {
+		// 			if se.Match("(?i)^captures?$") {
+		// 				section = "captures"
+		// 			} else {
+		// 				if se.Match("(?i)^expectations?$") {
+		// 					section = "expectations"
+		// 				} else {
+		// 					if se.Match("(?i)^preconditions?$") {
+		// 						section = "precondition"
+		// 					}
+		// 				}
+		// 			}
+		// 		}
+		// 	}
+		// }
 	}
 
 	if tc != nil {

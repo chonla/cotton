@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/chonla/cotton/assertable"
+	"github.com/chonla/cotton/referrable"
 	"github.com/chonla/cotton/request"
 	"github.com/chonla/cotton/response"
 	"github.com/fatih/color"
@@ -24,6 +25,7 @@ type TestCase struct {
 	Setups       []*Task
 	Teardowns    []*Task
 	Variables    map[string]string
+	Captured     map[string]string
 }
 
 // NewTestCase creates a new testcase
@@ -36,6 +38,7 @@ func NewTestCase(name string) *TestCase {
 		Setups:       []*Task{},
 		Teardowns:    []*Task{},
 		Variables:    map[string]string{},
+		Captured:     map[string]string{},
 	}
 }
 
@@ -91,6 +94,28 @@ func (tc *TestCase) Run() error {
 	if e != nil {
 		fmt.Printf("%s: %s\n", red("Error"), e)
 		return e
+	}
+
+	if len(tc.Captures) > 0 {
+		ref, e := referrable.NewReferrable(response.NewResponse(resp))
+		if e != nil {
+			fmt.Printf("%s: %s\n", red("Error"), e)
+			return e
+		}
+
+		for k, v := range tc.Captures {
+			r, ok := ref.Find(v)
+			if ok {
+				tc.Captured[k] = r[0]
+			} else {
+				e = fmt.Errorf("unable to capture data from response: %s", k)
+				return e
+			}
+		}
+
+		for k, v := range tc.Captured {
+			tc.Variables[k] = v
+		}
 	}
 
 	as, e := assertable.NewAssertable(response.NewResponse(resp))
