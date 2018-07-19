@@ -2,7 +2,6 @@ package markdown
 
 import (
 	"io/ioutil"
-	"regexp"
 	"strings"
 )
 
@@ -50,15 +49,6 @@ func (md *Markdown) parse(lines []string) error {
 	md.length = len(md.elm)
 
 	return nil
-}
-
-func (md *Markdown) isSingleLineElement(line string) bool {
-	re := regexp.MustCompile("^#{1,6} .+")
-	if re.MatchString(line) {
-		return true
-	}
-
-	return false
 }
 
 func (md *Markdown) toLines(contents string) []string {
