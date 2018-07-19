@@ -123,10 +123,7 @@ func (tc *TestCase) Run() error {
 		return e
 	}
 
-	e = as.Assert(tc.Expectations)
-	if e != nil {
-		return e
-	}
+	assertResult := as.Assert(tc.Expectations)
 
 	if len(tc.Teardowns) > 0 {
 		for _, s := range tc.Teardowns {
@@ -144,7 +141,7 @@ func (tc *TestCase) Run() error {
 		}
 	}
 
-	return e
+	return assertResult
 }
 
 func (tc *TestCase) applyVarsToMap(data map[string]string) map[string]string {
