@@ -1,5 +1,77 @@
 package parser
 
+import (
+	"testing"
+
+	ts "github.com/chonla/cotton/testsuite"
+	"github.com/stretchr/testify/assert"
+)
+
+func TestParseSimpleAction(t *testing.T) {
+	data := `# Test Case Name
+
+## GET /todos
+`
+
+	p := NewParser()
+	result, e := p.ParseString(data, "")
+
+	assert.Nil(t, e)
+	assert.Equal(t, []*ts.TestCase{
+		&ts.TestCase{
+			Name:         "Test Case Name",
+			Method:       "GET",
+			Path:         "/todos",
+			Headers:      map[string]string{},
+			Expectations: map[string]string{},
+			Captures:     map[string]string{},
+			Variables:    map[string]string{},
+			Setups:       []*ts.Task{},
+			Teardowns:    []*ts.Task{},
+		},
+	}, result)
+}
+
+func TestParseMultipleSimpleAction(t *testing.T) {
+	data := `# Test Case Name
+
+## GET /todos
+
+# Another Test Case Name
+
+## GET /list
+`
+
+	p := NewParser()
+	result, e := p.ParseString(data, "")
+
+	assert.Nil(t, e)
+	assert.Equal(t, []*ts.TestCase{
+		&ts.TestCase{
+			Name:         "Test Case Name",
+			Method:       "GET",
+			Path:         "/todos",
+			Headers:      map[string]string{},
+			Expectations: map[string]string{},
+			Captures:     map[string]string{},
+			Variables:    map[string]string{},
+			Setups:       []*ts.Task{},
+			Teardowns:    []*ts.Task{},
+		},
+		&ts.TestCase{
+			Name:         "Another Test Case Name",
+			Method:       "GET",
+			Path:         "/list",
+			Headers:      map[string]string{},
+			Expectations: map[string]string{},
+			Captures:     map[string]string{},
+			Variables:    map[string]string{},
+			Setups:       []*ts.Task{},
+			Teardowns:    []*ts.Task{},
+		},
+	}, result)
+}
+
 // func TestParseTestSuiteFileName(t *testing.T) {
 // 	p := NewParser()
 // 	result := p.parseTestSuiteFileName("login-should-success.md")

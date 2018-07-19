@@ -88,13 +88,23 @@ func (p *Parser) parseTestSuiteFileName(file string) string {
 }
 
 func (p *Parser) parseTestSuiteFile(file string) ([]*ts.TestCase, error) {
+	filePath := filepath.Dir(file)
+	content, e := readFileFn(file)
+	if e != nil {
+		return []*ts.TestCase{}, e
+	}
+
+	return p.ParseString(string(content), filePath)
+}
+
+// ParseString to parse string content on working path
+func (p *Parser) ParseString(content, filePath string) ([]*ts.TestCase, error) {
 	testcases := []*ts.TestCase{}
 	var tc *ts.TestCase
 	section := ""
-	filePath := filepath.Dir(file)
 
 	md := markdown.NewMD()
-	e := md.Parse(file)
+	e := md.ParseString(content)
 	if e != nil {
 		return []*ts.TestCase{}, e
 	}

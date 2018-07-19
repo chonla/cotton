@@ -24,6 +24,13 @@ func NewMD() *Markdown {
 	}
 }
 
+// ParseString to parse string content
+func (md *Markdown) ParseString(content string) error {
+	lines := md.toLines(content)
+
+	return md.parse(lines)
+}
+
 // Parse md file
 func (md *Markdown) Parse(file string) error {
 	lines, e := md.read(file)
@@ -31,6 +38,10 @@ func (md *Markdown) Parse(file string) error {
 		return e
 	}
 
+	return md.parse(lines)
+}
+
+func (md *Markdown) parse(lines []string) error {
 	iterator := NewIterator(lines)
 	for iterator.Next() {
 		md.elm = append(md.elm, NewElement(iterator.Value()))
