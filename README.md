@@ -31,7 +31,7 @@ Usage of cotton:
   -v	show cotton version
 ```
 
-## Markdown specfication
+## Executable markdown specfication
 
 See [Guide](./guide) for more information.
 
