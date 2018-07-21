@@ -175,7 +175,6 @@ func (p *Parser) ParseString(content, filePath string) ([]*ts.TestCase, error) {
 						tc.Captures[row[0]] = row[1]
 					}
 				}
-				fmt.Println(te)
 			}
 		case "Bullet":
 			switch section {

@@ -16,6 +16,7 @@ type Task struct {
 	Name        string
 	Method      string
 	BaseURL     string
+	Insecure    bool
 	Path        string
 	ContentType string
 	RequestBody string
@@ -51,7 +52,7 @@ func (t *Task) Run() error {
 	fmt.Printf("Task: %s\n", white(t.Name))
 	fmt.Printf("%s\n", white(".........."))
 
-	req, e := request.NewRequester(t.Method)
+	req, e := request.NewRequester(t.Method, t.Insecure)
 	if e != nil {
 		fmt.Printf("%s: %s\n", red("Error"), e)
 		return e

@@ -1,11 +1,13 @@
 package request
 
 import (
+	"crypto/tls"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strings"
 
 	"github.com/fatih/color"
 )
@@ -18,16 +20,28 @@ type RequesterInterface interface {
 
 // Requester is base class for all requester
 type Requester struct {
-	headers map[string]string
-	client  *http.Client
+	headers  map[string]string
+	client   *http.Client
+	insecure bool
 }
 
 // NewRequester creates a new request
-func NewRequester(method string) (RequesterInterface, error) {
+func NewRequester(method string, insecure bool) (RequesterInterface, error) {
+	var client *http.Client
+	if insecure {
+		client = &http.Client{
+			Transport: &http.Transport{
+				TLSClientConfig: &tls.Config{InsecureSkipVerify: insecure},
+			},
+		}
+	} else {
+		client = &http.Client{}
+	}
 	var req RequesterInterface
 	reqer := &Requester{
-		headers: map[string]string{},
-		client:  &http.Client{},
+		headers:  map[string]string{},
+		client:   client,
+		insecure: insecure,
 	}
 	var e error
 	switch method {
@@ -61,8 +75,14 @@ func (r *Requester) LogRequest(req *http.Request) {
 	green := color.New(color.FgGreen).SprintFunc()
 	yellow := color.New(color.FgYellow).SprintFunc()
 	magenta := color.New(color.FgMagenta, color.Bold).SprintFunc()
+	red := color.New(color.FgHiRed).SprintFunc()
 
-	fmt.Printf("%s\n", magenta("<<--"))
+	insecureLabel := ""
+	if strings.ToLower(req.URL.Scheme) == "https" && r.insecure {
+		insecureLabel = fmt.Sprintf("%s", red(" (insecure)"))
+	}
+
+	fmt.Printf("%s%s\n", magenta("<<--"), insecureLabel)
 	fmt.Printf("%s %s %s\n", green(req.Method), req.URL, req.Proto)
 	for k, v := range req.Header {
 		for _, t := range v {

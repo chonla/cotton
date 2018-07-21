@@ -16,6 +16,7 @@ type TestCase struct {
 	Name         string
 	Method       string
 	BaseURL      string
+	Insecure     bool
 	Path         string
 	ContentType  string
 	RequestBody  string
@@ -37,6 +38,7 @@ func NewTestCase(name string) *TestCase {
 		Captures:     map[string]string{},
 		Setups:       []*Task{},
 		Teardowns:    []*Task{},
+		Insecure:     false,
 		Variables:    map[string]string{},
 		Captured:     map[string]string{},
 	}
@@ -71,6 +73,7 @@ func (tc *TestCase) Run() error {
 	if len(tc.Setups) > 0 {
 		for _, s := range tc.Setups {
 			s.BaseURL = tc.BaseURL
+			s.Insecure = tc.Insecure
 			s.MergeVariables(tc.Variables)
 			e := s.Run()
 			if e != nil {
@@ -84,7 +87,7 @@ func (tc *TestCase) Run() error {
 		}
 	}
 
-	req, e := request.NewRequester(tc.Method)
+	req, e := request.NewRequester(tc.Method, tc.Insecure)
 	if e != nil {
 		return e
 	}
@@ -121,6 +124,7 @@ func (tc *TestCase) Run() error {
 	if len(tc.Teardowns) > 0 {
 		for _, s := range tc.Teardowns {
 			s.BaseURL = tc.BaseURL
+			s.Insecure = tc.Insecure
 			s.MergeVariables(tc.Variables)
 			e := s.Run()
 			if e != nil {

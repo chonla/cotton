@@ -8,15 +8,17 @@ import (
 
 // TestSuites is several test suites
 type TestSuites struct {
-	Suites  []*TestSuite
-	BaseURL string
-	Stat    TestStat
+	Suites   []*TestSuite
+	BaseURL  string
+	Insecure bool
+	Stat     TestStat
 }
 
 // Run executes test suite
 func (ts *TestSuites) Run() {
 	for _, suite := range ts.Suites {
 		suite.BaseURL = ts.BaseURL
+		suite.Insecure = ts.Insecure
 		suite.Run()
 		ts.Stat.Total += suite.Stat.Total
 		ts.Stat.Success += suite.Stat.Success

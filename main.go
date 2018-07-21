@@ -9,17 +9,19 @@ import (
 )
 
 // VERSION of cotton
-const VERSION = "0.1.5"
+const VERSION = "0.1.7"
 
 func main() {
 	parser := parser.NewParser()
 	var url string
 	var help bool
 	var ver bool
+	var insecure bool
 
 	flag.Usage = usage
 
 	flag.StringVar(&url, "u", "http://localhost:8080", "set base url")
+	flag.BoolVar(&insecure, "i", false, "insecure mode -- to disable certificate verification")
 	flag.BoolVar(&ver, "v", false, "show cotton version")
 	flag.BoolVar(&help, "h", false, "show this help")
 	flag.Parse()
@@ -41,6 +43,7 @@ func main() {
 		os.Exit(1)
 	}
 	ts.BaseURL = url
+	ts.Insecure = insecure
 
 	ts.Run()
 	exitCode := ts.Summary()
