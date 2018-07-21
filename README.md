@@ -13,7 +13,7 @@ go get github.com/chonla/cotton
 ## Usage
 
 ```
-cotton -u <base-api-url> [directory or file]
+cotton [-u <base-api-url>] [-i] <directory or file>
 ```
 
 ```
@@ -25,10 +25,11 @@ Usage of cotton:
 
   test-cases can be a markdown file or a directory contain markdowns.
 
-  -h	show this help
+  -h  show this help
+  -i  insecure mode -- to disable certificate verification
   -u string
-    	set base url (default "http://localhost:8080")
-  -v	show cotton version
+      set base url (default "http://localhost:8080")
+  -v  show cotton version
 ```
 
 ## Executable markdown specfication
