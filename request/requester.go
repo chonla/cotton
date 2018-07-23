@@ -20,13 +20,14 @@ type RequesterInterface interface {
 
 // Requester is base class for all requester
 type Requester struct {
-	headers  map[string]string
-	client   *http.Client
-	insecure bool
+	headers     map[string]string
+	client      *http.Client
+	insecure    bool
+	printDetail bool
 }
 
 // NewRequester creates a new request
-func NewRequester(method string, insecure bool) (RequesterInterface, error) {
+func NewRequester(method string, insecure, detail bool) (RequesterInterface, error) {
 	var client *http.Client
 	if insecure {
 		client = &http.Client{
@@ -39,9 +40,10 @@ func NewRequester(method string, insecure bool) (RequesterInterface, error) {
 	}
 	var req RequesterInterface
 	reqer := &Requester{
-		headers:  map[string]string{},
-		client:   client,
-		insecure: insecure,
+		headers:     map[string]string{},
+		client:      client,
+		insecure:    insecure,
+		printDetail: detail,
 	}
 	var e error
 	switch method {
@@ -72,7 +74,12 @@ func (r *Requester) SetHeaders(h map[string]string) {
 
 // LogRequest prints request data
 func (r *Requester) LogRequest(req *http.Request) {
+	if !r.printDetail {
+		return
+	}
+
 	green := color.New(color.FgGreen).SprintFunc()
+	white := color.New(color.FgWhite, color.Bold).SprintFunc()
 	yellow := color.New(color.FgYellow).SprintFunc()
 	magenta := color.New(color.FgMagenta, color.Bold).SprintFunc()
 	red := color.New(color.FgHiRed).SprintFunc()
@@ -82,7 +89,7 @@ func (r *Requester) LogRequest(req *http.Request) {
 		insecureLabel = fmt.Sprintf("%s", red(" (insecure)"))
 	}
 
-	fmt.Printf("%s%s\n", magenta("<<--"), insecureLabel)
+	fmt.Printf("%s %s%s\n", magenta("<<--"), white("REQUEST"), insecureLabel)
 	fmt.Printf("%s %s %s\n", green(req.Method), req.URL, req.Proto)
 	for k, v := range req.Header {
 		for _, t := range v {
@@ -95,6 +102,7 @@ func (r *Requester) LogRequest(req *http.Request) {
 		body, _ := ioutil.ReadAll(bodyCopy)
 		r.LogBody(string(body))
 	}
+	fmt.Printf("%s\n", magenta("<<--"))
 }
 
 // LogBody prints request body

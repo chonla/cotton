@@ -67,43 +67,77 @@ func (tc *TestCase) Run() error {
 
 	white := color.New(color.FgHiWhite, color.Bold).SprintFunc()
 	red := color.New(color.FgRed).SprintFunc()
+	green := color.New(color.FgGreen).SprintFunc()
 	url := fmt.Sprintf("%s%s", tc.BaseURL, tc.Path)
+	blue := color.New(color.FgBlue).SprintFunc()
+	yellow := color.New(color.FgYellow).SprintFunc()
+	grey := color.New(color.FgWhite, color.Faint).SprintfFunc()
 
 	fmt.Printf("%s\n", white("================================================================================"))
 	fmt.Printf("Testcase: %s\n", white(tc.Name))
 	fmt.Printf("%s\n", white("================================================================================"))
 
 	if len(tc.Setups) > 0 {
+		fmt.Printf("Setup:\n")
 		for _, s := range tc.Setups {
+
+			fmt.Printf("* %s...", blue(s.Name))
+
 			s.BaseURL = tc.BaseURL
 			s.Config = tc.Config
 			s.MergeVariables(tc.Variables)
+
+			if s.Config.Detail {
+				fmt.Println()
+			}
+
 			e := s.Run()
+
+			if s.Config.Detail {
+				fmt.Printf("...%s...", grey(fmt.Sprintf("(%s)", s.Name)))
+			}
+
 			if e != nil {
-				fmt.Printf("%s: %s\n", red("Error"), e)
+				fmt.Printf("%s: %s\n", red("FAILED"), e)
 				return e
 			}
+			fmt.Printf("%s\n", green("PASSED"))
 
 			for k, v := range s.Captured {
 				tc.Variables[k] = v
 			}
 		}
+
+		fmt.Println()
 	}
 
-	req, e := request.NewRequester(tc.Method, tc.Config.Insecure)
+	req, e := request.NewRequester(tc.Method, tc.Config.Insecure, tc.Config.Detail)
 	if e != nil {
 		return e
 	}
 
 	req.SetHeaders(tc.applyVarsToMap(tc.Headers))
-	resp, e := req.Request(tc.applyVars(url), tc.applyVars(tc.RequestBody))
+
+	targetURL := tc.applyVars(url)
+	fmt.Printf("Actions: %s %s\n", white(tc.Method), yellow(targetURL))
+	resp, e := req.Request(targetURL, tc.applyVars(tc.RequestBody))
 	if e != nil {
 		fmt.Printf("%s: %s\n", red("Error"), e)
 		return e
 	}
 
+	r := response.NewResponse(resp, tc.Config.Detail)
+
+	if tc.Config.Detail {
+		r.LogResponse()
+	}
+
+	// if tc.Config.Detail {
+	// 	fmt.Print("...")
+	// }
+
 	if len(tc.Captures) > 0 {
-		ref := referrable.NewReferrable(response.NewResponse(resp))
+		ref := referrable.NewReferrable(r)
 
 		for k, v := range tc.Captures {
 			r, ok := ref.Find(v)
@@ -120,20 +154,35 @@ func (tc *TestCase) Run() error {
 		}
 	}
 
-	as := assertable.NewAssertable(response.NewResponse(resp))
+	as := assertable.NewAssertable(r)
 
 	assertResult := as.Assert(tc.Expectations)
 
 	if len(tc.Teardowns) > 0 {
+		fmt.Printf("\nTeardown:\n")
 		for _, s := range tc.Teardowns {
+
+			fmt.Printf("* %s...", blue(s.Name))
+
 			s.BaseURL = tc.BaseURL
 			s.Config = tc.Config
 			s.MergeVariables(tc.Variables)
+
+			if s.Config.Detail {
+				fmt.Println()
+			}
+
 			e := s.Run()
+
+			if s.Config.Detail {
+				fmt.Printf("...%s...", grey(fmt.Sprintf("(%s)", s.Name)))
+			}
+
 			if e != nil {
-				fmt.Printf("%s: %s\n", red("Error"), e)
+				fmt.Printf("%s: %s\n", red("FAILED"), e)
 				return e
 			}
+			fmt.Printf("%s\n", green("PASSED"))
 
 			for k, v := range s.Captured {
 				tc.Variables[k] = v

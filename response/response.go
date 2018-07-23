@@ -10,15 +10,16 @@ import (
 
 // Response is response from http
 type Response struct {
-	Proto      string
-	Status     string
-	StatusCode int
-	Header     map[string][]string
-	Body       string
+	Proto       string
+	Status      string
+	StatusCode  int
+	Header      map[string][]string
+	Body        string
+	printDetail bool
 }
 
 // NewResponse creates a new parsed response
-func NewResponse(resp *http.Response) *Response {
+func NewResponse(resp *http.Response, detail bool) *Response {
 	headers := map[string][]string{}
 
 	for k, v := range resp.Header {
@@ -34,14 +35,13 @@ func NewResponse(resp *http.Response) *Response {
 	defer resp.Body.Close()
 
 	r := &Response{
-		Proto:      resp.Proto,
-		Status:     resp.Status,
-		StatusCode: resp.StatusCode,
-		Header:     headers,
-		Body:       string(body),
+		Proto:       resp.Proto,
+		Status:      resp.Status,
+		StatusCode:  resp.StatusCode,
+		Header:      headers,
+		Body:        string(body),
+		printDetail: detail,
 	}
-
-	r.LogResponse()
 
 	return r
 }
@@ -49,11 +49,12 @@ func NewResponse(resp *http.Response) *Response {
 // LogResponse prints response body
 func (r *Response) LogResponse() {
 	magenta := color.New(color.FgMagenta, color.Bold).SprintFunc()
+	white := color.New(color.FgWhite, color.Bold).SprintFunc()
 	yellow := color.New(color.FgYellow).SprintFunc()
 	green := color.New(color.FgGreen).SprintFunc()
 	blue := color.New(color.FgBlue).SprintFunc()
 
-	fmt.Printf("%s\n", magenta("-->>"))
+	fmt.Printf("%s %s\n", magenta("-->>"), white("RESPONSE"))
 	fmt.Printf("%s %s\n", r.Proto, green(r.Status))
 	for k, v := range r.Header {
 		for _, t := range v {
@@ -65,4 +66,5 @@ func (r *Response) LogResponse() {
 	if r.Body != "" {
 		fmt.Printf("%s\n", blue(r.Body))
 	}
+	fmt.Printf("%s\n", magenta("-->>"))
 }

@@ -48,15 +48,19 @@ func NewTask(t *TestCase) *Task {
 
 // Run executes test case
 func (t *Task) Run() error {
-	white := color.New(color.FgHiWhite, color.Bold).SprintFunc()
+	// white := color.New(color.FgHiWhite, color.Bold).SprintFunc()
 	red := color.New(color.FgRed).SprintFunc()
 	url := fmt.Sprintf("%s%s", t.BaseURL, t.Path)
 
-	fmt.Printf("%s\n", white(".........."))
-	fmt.Printf("Task: %s\n", white(t.Name))
-	fmt.Printf("%s\n", white(".........."))
+	// if t.Config.Detail {
+	// 	// fmt.Printf("%s\n", white(".........."))
+	// 	fmt.Printf("Task: %s\n", white(t.Name))
+	// 	fmt.Printf("%s\n", white(".........."))
+	// } else {
+	// 	fmt.Printf("- Task: %s\n", white(t.Name))
+	// }
 
-	req, e := request.NewRequester(t.Method, t.Config.Insecure)
+	req, e := request.NewRequester(t.Method, t.Config.Insecure, t.Config.Detail)
 	if e != nil {
 		fmt.Printf("%s: %s\n", red("Error"), e)
 		return e
@@ -68,7 +72,12 @@ func (t *Task) Run() error {
 		return e
 	}
 
-	ref := referrable.NewReferrable(response.NewResponse(resp))
+	r := response.NewResponse(resp, t.Config.Detail)
+	if t.Config.Detail {
+		r.LogResponse()
+	}
+
+	ref := referrable.NewReferrable(r)
 
 	for k, v := range t.Captures {
 		r, ok := ref.Find(v)
