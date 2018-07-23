@@ -119,7 +119,7 @@ func (tc *TestCase) Run() error {
 	req.SetHeaders(tc.applyVarsToMap(tc.Headers))
 
 	targetURL := tc.applyVars(url)
-	fmt.Printf("Actions: %s %s\n", white(tc.Method), yellow(targetURL))
+	fmt.Printf("Action: %s %s\n", white(tc.Method), yellow(targetURL))
 	resp, e := req.Request(targetURL, tc.applyVars(tc.RequestBody))
 	if e != nil {
 		fmt.Printf("%s: %s\n", red("Error"), e)
