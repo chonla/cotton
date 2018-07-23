@@ -13,7 +13,7 @@ go get github.com/chonla/cotton
 ## Usage
 
 ```
-cotton [-u <base-api-url>] [-i] <directory or file>
+cotton [-u <base-api-url>] [-i] [-d] <directory or file>
 ```
 
 ```
@@ -27,6 +27,7 @@ Usage of cotton:
 
   -h  show this help
   -i  insecure mode -- to disable certificate verification
+  -d  detail mode -- to dump test detail
   -u string
       set base url (default "http://localhost:8080")
   -v  show cotton version
