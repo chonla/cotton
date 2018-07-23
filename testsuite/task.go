@@ -16,7 +16,7 @@ type Task struct {
 	Name        string
 	Method      string
 	BaseURL     string
-	Insecure    bool
+	Config      *Config
 	Path        string
 	ContentType string
 	RequestBody string
@@ -29,9 +29,13 @@ type Task struct {
 // NewTask to create a new task
 func NewTask(t *TestCase) *Task {
 	return &Task{
-		Name:        t.Name,
-		Method:      t.Method,
-		BaseURL:     t.BaseURL,
+		Name:    t.Name,
+		Method:  t.Method,
+		BaseURL: t.BaseURL,
+		Config: &Config{
+			Insecure: true,
+			Detail:   false,
+		},
 		Path:        t.Path,
 		ContentType: t.ContentType,
 		RequestBody: t.RequestBody,
@@ -52,7 +56,7 @@ func (t *Task) Run() error {
 	fmt.Printf("Task: %s\n", white(t.Name))
 	fmt.Printf("%s\n", white(".........."))
 
-	req, e := request.NewRequester(t.Method, t.Insecure)
+	req, e := request.NewRequester(t.Method, t.Config.Insecure)
 	if e != nil {
 		fmt.Printf("%s: %s\n", red("Error"), e)
 		return e

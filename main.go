@@ -6,10 +6,11 @@ import (
 	"os"
 
 	"github.com/chonla/cotton/parser"
+	"github.com/chonla/cotton/testsuite"
 )
 
 // VERSION of cotton
-const VERSION = "0.1.7"
+const VERSION = "0.1.8"
 
 func main() {
 	parser := parser.NewParser()
@@ -17,10 +18,12 @@ func main() {
 	var help bool
 	var ver bool
 	var insecure bool
+	var detail bool
 
 	flag.Usage = usage
 
 	flag.StringVar(&url, "u", "http://localhost:8080", "set base url")
+	flag.BoolVar(&detail, "d", false, "detail mode -- to dump test detail")
 	flag.BoolVar(&insecure, "i", false, "insecure mode -- to disable certificate verification")
 	flag.BoolVar(&ver, "v", false, "show cotton version")
 	flag.BoolVar(&help, "h", false, "show this help")
@@ -43,7 +46,10 @@ func main() {
 		os.Exit(1)
 	}
 	ts.BaseURL = url
-	ts.Insecure = insecure
+	ts.Config = &testsuite.Config{
+		Insecure: insecure,
+		Detail:   detail,
+	}
 
 	ts.Run()
 	exitCode := ts.Summary()

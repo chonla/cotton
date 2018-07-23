@@ -4,7 +4,7 @@ package testsuite
 type TestSuite struct {
 	Name      string
 	BaseURL   string
-	Insecure  bool
+	Config    *Config
 	TestCases []*TestCase
 	Stat      TestStat
 }
@@ -14,7 +14,7 @@ func (ts *TestSuite) Run() {
 	for _, tc := range ts.TestCases {
 		if len(tc.Expectations) > 0 {
 			tc.BaseURL = ts.BaseURL
-			tc.Insecure = ts.Insecure
+			tc.Config = ts.Config
 			ts.Stat.Total++
 			e := tc.Run()
 			if e == nil {
