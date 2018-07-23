@@ -31,6 +31,10 @@ func TestParseSimpleAction(t *testing.T) {
 			Captured:     map[string]string{},
 			Setups:       []*ts.Task{},
 			Teardowns:    []*ts.Task{},
+			Config: &ts.Config{
+				Insecure: false,
+				Detail:   false,
+			},
 		},
 	}, result)
 }
@@ -61,6 +65,10 @@ func TestParseMultipleSimpleAction(t *testing.T) {
 			Captured:     map[string]string{},
 			Setups:       []*ts.Task{},
 			Teardowns:    []*ts.Task{},
+			Config: &ts.Config{
+				Insecure: false,
+				Detail:   false,
+			},
 		},
 		&ts.TestCase{
 			Name:         "Another Test Case Name",
@@ -73,6 +81,10 @@ func TestParseMultipleSimpleAction(t *testing.T) {
 			Captured:     map[string]string{},
 			Setups:       []*ts.Task{},
 			Teardowns:    []*ts.Task{},
+			Config: &ts.Config{
+				Insecure: false,
+				Detail:   false,
+			},
 		},
 	}, result)
 }
@@ -105,6 +117,10 @@ func TestParsePostAction(t *testing.T) {
 			Captured:     map[string]string{},
 			Setups:       []*ts.Task{},
 			Teardowns:    []*ts.Task{},
+			Config: &ts.Config{
+				Insecure: false,
+				Detail:   false,
+			},
 		},
 	}, result)
 }
@@ -145,6 +161,10 @@ func TestParseActionWithHeader(t *testing.T) {
 			Captured:     map[string]string{},
 			Setups:       []*ts.Task{},
 			Teardowns:    []*ts.Task{},
+			Config: &ts.Config{
+				Insecure: false,
+				Detail:   false,
+			},
 		},
 	}, result)
 }
@@ -198,6 +218,10 @@ func TestParseActionWithExpectations(t *testing.T) {
 			Captured:  map[string]string{},
 			Setups:    []*ts.Task{},
 			Teardowns: []*ts.Task{},
+			Config: &ts.Config{
+				Insecure: false,
+				Detail:   false,
+			},
 		},
 	}, result)
 }
@@ -261,6 +285,10 @@ func TestParseActionWithCaptures(t *testing.T) {
 			Variables: map[string]string{},
 			Setups:    []*ts.Task{},
 			Teardowns: []*ts.Task{},
+			Config: &ts.Config{
+				Insecure: false,
+				Detail:   false,
+			},
 		},
 	}, result)
 }
@@ -388,6 +416,10 @@ func TestParseActionWithFullSections(t *testing.T) {
 			},
 			Captured:  map[string]string{},
 			Variables: map[string]string{},
+			Config: &ts.Config{
+				Insecure: false,
+				Detail:   false,
+			},
 			Setups: []*ts.Task{
 				&ts.Task{
 					Name:        "Login",
@@ -400,6 +432,10 @@ func TestParseActionWithFullSections(t *testing.T) {
 					},
 					Variables: map[string]string{},
 					Captured:  map[string]string{},
+					Config: &ts.Config{
+						Insecure: false,
+						Detail:   false,
+					},
 				},
 				&ts.Task{
 					Name:        "Create ToDo",
@@ -412,6 +448,10 @@ func TestParseActionWithFullSections(t *testing.T) {
 					},
 					Variables: map[string]string{},
 					Captured:  map[string]string{},
+					Config: &ts.Config{
+						Insecure: false,
+						Detail:   false,
+					},
 				},
 			},
 			Teardowns: []*ts.Task{
@@ -423,6 +463,10 @@ func TestParseActionWithFullSections(t *testing.T) {
 					Captures:  map[string]string{},
 					Variables: map[string]string{},
 					Captured:  map[string]string{},
+					Config: &ts.Config{
+						Insecure: false,
+						Detail:   false,
+					},
 				},
 				&ts.Task{
 					Name:      "Logout",
@@ -432,6 +476,10 @@ func TestParseActionWithFullSections(t *testing.T) {
 					Captures:  map[string]string{},
 					Variables: map[string]string{},
 					Captured:  map[string]string{},
+					Config: &ts.Config{
+						Insecure: false,
+						Detail:   false,
+					},
 				},
 			},
 		},

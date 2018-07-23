@@ -33,7 +33,7 @@ func NewTask(t *TestCase) *Task {
 		Method:  t.Method,
 		BaseURL: t.BaseURL,
 		Config: &Config{
-			Insecure: true,
+			Insecure: false,
 			Detail:   false,
 		},
 		Path:        t.Path,
