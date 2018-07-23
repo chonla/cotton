@@ -64,6 +64,7 @@ func isJSONContent(contenttype []string) bool {
 
 // Find to find a value of given key
 func (a *Referrable) Find(k string) ([]string, bool) {
+	k = strings.ToLower(k)
 	re := regexp.MustCompile("(?i)^data\\.(.+)")
 	match := re.FindStringSubmatch(strings.ToLower(k))
 	if len(match) > 1 {
