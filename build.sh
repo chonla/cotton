@@ -2,7 +2,7 @@
 
 set -eux
 
-export GOPATH="${pwd}/.gobuild"
+export GOPATH="/tmp/.gobuild"
 SRCDIR="${GOPATH}/src/github.com/chonla/cotton"
 
 [ -d ${GOPATH} ] && rm -rf ${GOPATH}
