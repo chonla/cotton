@@ -132,10 +132,6 @@ func (tc *TestCase) Run() error {
 		r.LogResponse()
 	}
 
-	// if tc.Config.Detail {
-	// 	fmt.Print("...")
-	// }
-
 	if len(tc.Captures) > 0 {
 		ref := referrable.NewReferrable(r)
 

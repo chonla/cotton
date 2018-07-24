@@ -48,17 +48,8 @@ func NewTask(t *TestCase) *Task {
 
 // Run executes test case
 func (t *Task) Run() error {
-	// white := color.New(color.FgHiWhite, color.Bold).SprintFunc()
 	red := color.New(color.FgRed).SprintFunc()
 	url := fmt.Sprintf("%s%s", t.BaseURL, t.Path)
-
-	// if t.Config.Detail {
-	// 	// fmt.Printf("%s\n", white(".........."))
-	// 	fmt.Printf("Task: %s\n", white(t.Name))
-	// 	fmt.Printf("%s\n", white(".........."))
-	// } else {
-	// 	fmt.Printf("- Task: %s\n", white(t.Name))
-	// }
 
 	req, e := request.NewRequester(t.Method, t.Config.Insecure, t.Config.Detail)
 	if e != nil {
