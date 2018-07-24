@@ -6,6 +6,8 @@ Markdown Test Specification Runner. This project is originally inspired by [silk
 
 ## Installation
 
+### From source
+
 ```
 go get github.com/chonla/cotton
 ```

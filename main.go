@@ -10,7 +10,7 @@ import (
 )
 
 // VERSION of cotton
-const VERSION = "0.1.9"
+const VERSION = "0.1.15"
 
 func main() {
 	parser := parser.NewParser()
