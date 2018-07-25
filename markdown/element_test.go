@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestTryHeader(t *testing.T) {
+func TestNewElementWithKnownElements(t *testing.T) {
 	data := [][]string{
 		[]string{"# Title 1"},
 		[]string{"## Title 2"},
@@ -14,8 +14,10 @@ func TestTryHeader(t *testing.T) {
 		[]string{"#### Title 4"},
 		[]string{"##### Title 5"},
 		[]string{"###### Title 6"},
+		[]string{"* Bullet 1"},
+		[]string{"```", "text in code block", "another text", "```"},
 	}
-	expected := []*SimpleElement{
+	expected := []ElementInterface{
 		&SimpleElement{
 			BaseElement: &BaseElement{
 				Type: "H1",
@@ -52,12 +54,24 @@ func TestTryHeader(t *testing.T) {
 			},
 			Text: "Title 6",
 		},
+		&RichTextElement{
+			BaseElement: &BaseElement{
+				Type: "Bullet",
+			},
+			Text:   "Bullet 1",
+			Anchor: []AnchorElement{},
+		},
+		&SimpleElement{
+			BaseElement: &BaseElement{
+				Type: "Code",
+			},
+			Text: "text in code block\nanother text",
+		},
 	}
 
-	for i := 0; i < 6; i++ {
-		r, ok := tryHeader(data[i], i+1)
+	for i := 0; i < len(data); i++ {
+		r := NewElement(data[i])
 
-		assert.True(t, ok)
 		assert.Equal(t, expected[i], r)
 	}
 }
