@@ -88,3 +88,21 @@ func TestTryHeaderWithOutOfRange(t *testing.T) {
 	assert.False(t, ok)
 	assert.Nil(t, r)
 }
+
+func TestTryHeaderWithUnmatchedHeader(t *testing.T) {
+	data := []string{"## Title"}
+
+	r, ok := tryHeader(data, 1)
+
+	assert.False(t, ok)
+	assert.Nil(t, r)
+}
+
+func TestTryHeaderWithNotAHeaderElement(t *testing.T) {
+	data := []string{"Not a header"}
+
+	r, ok := tryHeader(data, 1)
+
+	assert.False(t, ok)
+	assert.Nil(t, r)
+}
