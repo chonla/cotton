@@ -62,7 +62,7 @@ func TestParseErrorMarkdownFile(t *testing.T) {
 			## POST /login
 		`
 
-		return []byte(markdown), errors.New("oh!")
+		return []byte(markdown), errors.New("oh")
 	}
 
 	md := NewMD()
