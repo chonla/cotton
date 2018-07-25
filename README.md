@@ -6,7 +6,7 @@ Markdown Test Specification Runner. This project is originally inspired by [silk
 
 ## Installation
 
-### Brew
+### Homebrew/Linuxbrew
 
 ```
 brew tap chonla/universe
