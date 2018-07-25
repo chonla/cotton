@@ -15,6 +15,8 @@ func TestNewElementWithKnownElements(t *testing.T) {
 		[]string{"##### Title 5"},
 		[]string{"###### Title 6"},
 		[]string{"* Bullet 1"},
+		[]string{"* Bullet 1 with [Anchor Text](Anchor Link)"},
+		[]string{"* [Anchor Text](Anchor Link)"},
 		[]string{"```", "text in code block", "another text", "```"},
 	}
 	expected := []ElementInterface{
@@ -60,6 +62,30 @@ func TestNewElementWithKnownElements(t *testing.T) {
 			},
 			Text:   "Bullet 1",
 			Anchor: []AnchorElement{},
+		},
+		&RichTextElement{
+			BaseElement: &BaseElement{
+				Type: "Bullet",
+			},
+			Text: "Bullet 1 with [Anchor Text](Anchor Link)",
+			Anchor: []AnchorElement{
+				AnchorElement{
+					Text: "Anchor Text",
+					Link: "Anchor Link",
+				},
+			},
+		},
+		&RichTextElement{
+			BaseElement: &BaseElement{
+				Type: "Bullet",
+			},
+			Text: "[Anchor Text](Anchor Link)",
+			Anchor: []AnchorElement{
+				AnchorElement{
+					Text: "Anchor Text",
+					Link: "Anchor Link",
+				},
+			},
 		},
 		&SimpleElement{
 			BaseElement: &BaseElement{
