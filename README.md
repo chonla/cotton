@@ -6,6 +6,13 @@ Markdown Test Specification Runner. This project is originally inspired by [silk
 
 ## Installation
 
+### Brew
+
+```
+brew tap chonla/universe
+brew install cotton
+```
+
 ### From source
 
 ```
