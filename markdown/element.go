@@ -46,6 +46,9 @@ type AnchorElement struct {
 }
 
 func tryHeader(data []string, level int) (ElementInterface, bool) {
+	if len(data) == 0 {
+		return nil, false
+	}
 	if len(data) > 1 {
 		return nil, false
 	}
