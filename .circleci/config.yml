@@ -25,3 +25,6 @@ jobs:
       - run: go get -v -t -d ./...
       - run: go test -v ./...
       - run: GOOS=windows GOARCH=amd64 go build -o cotton.exe .
+    persist_to_workspace:
+      paths:
+        - cotton.exe
