@@ -87,10 +87,7 @@ func (md *Markdown) Len() int {
 // Next move cursor to next position
 func (md *Markdown) Next() bool {
 	md.cursor++
-	if md.cursor >= md.length {
-		return false
-	}
-	return true
+	return md.cursor < md.length
 }
 
 // Value get current value
