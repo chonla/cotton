@@ -3,7 +3,6 @@ package assertable
 import (
 	"errors"
 	"fmt"
-	"strings"
 
 	"github.com/chonla/cotton/referrable"
 	"github.com/chonla/cotton/response"
@@ -34,33 +33,17 @@ func (a *Assertable) Assert(ex map[string]string) error {
 		return errors.New("no assertion given")
 	}
 
-	// fmt.Printf("%s\n", magenta("----"))
-
 	for k, v := range ex {
-		m := NewMatcher(v)
+		m := NewMatcher(k, v)
 		fmt.Printf("* Assert %s with %s...", blue(k), blue(m))
-		k = strings.ToLower(k)
-		if val, ok := a.Find(k); ok {
-			match := false
-			for _, t := range val {
-				if m.Match(t) {
-					match = true
-					break
-				}
-			}
-			if match {
-				fmt.Printf("%s\n", green("PASSED"))
-			} else {
-				fmt.Printf("%s\n", red("FAILED"))
-				return fmt.Errorf("expect %s in %s, but not", red(v), red(k))
-			}
+		r, e := m.Match(a)
+		if r {
+			fmt.Printf("%s\n", green("PASSED"))
 		} else {
 			fmt.Printf("%s\n", red("FAILED"))
-			return fmt.Errorf("response does not contain %s", k)
+			return e
 		}
 	}
-
-	// fmt.Printf("%s\n", magenta("----"))
 
 	return nil
 }
