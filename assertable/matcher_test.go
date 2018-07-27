@@ -73,13 +73,19 @@ func TestMatcherWithRegularExpressionShouldFailure(t *testing.T) {
 func TestToStringShouldShowItIsRegexIfPatternIsRegularExpression(t *testing.T) {
 	m := NewMatcher("key", "/pattern/")
 	result := m.String()
-	assert.Equal(t, "Regex(/pattern/)", result)
+	assert.Equal(t, "with Regex(/pattern/)", result)
+}
+
+func TestToStringShouldShowBuiltinKeywordIfItIsBuiltIn(t *testing.T) {
+	m := NewMatcher("key", "*pattern*")
+	result := m.String()
+	assert.Equal(t, "pattern", result)
 }
 
 func TestToStringShouldShowItIsRegexIfPatternIsNotRegularExpression(t *testing.T) {
 	m := NewMatcher("key", "/pattern/a")
 	result := m.String()
-	assert.Equal(t, "/pattern/a", result)
+	assert.Equal(t, "with /pattern/a", result)
 }
 
 func TestMatchStringShouldDoExactMatch(t *testing.T) {

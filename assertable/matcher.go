@@ -32,7 +32,7 @@ func NewMatcher(k, v string) *Matcher {
 				reg:     nil,
 				builtIn: true,
 				key:     k,
-				value:   v,
+				value:   v[1 : len(v)-1],
 			}
 		} else {
 			m = &Matcher{
@@ -47,10 +47,14 @@ func NewMatcher(k, v string) *Matcher {
 }
 
 func (m *Matcher) String() string {
+	magenta := color.New(color.FgMagenta).SprintFunc()
 	if m.reg != nil {
-		return fmt.Sprintf("Regex(%s)", m.value)
+		return fmt.Sprintf("with Regex(%s)", magenta(m.value))
 	}
-	return m.value
+	if m.builtIn {
+		return fmt.Sprintf("%s", magenta(m.value))
+	}
+	return fmt.Sprintf("with %s", magenta(m.value))
 }
 
 func isBuiltIn(v string) bool {
@@ -73,7 +77,22 @@ func (m *Matcher) Match(a *Assertable) (bool, error) {
 	red := color.New(color.FgRed).SprintFunc()
 
 	k := strings.ToLower(m.key)
-	if val, ok := a.Find(k); ok {
+	val, ok := a.Find(k)
+	if m.builtIn {
+		switch strings.ToLower(m.value) {
+		case "should not exist":
+			if ok {
+				return false, fmt.Errorf("expect %s not to exist, but it exists", red(m.key))
+			}
+			return true, nil
+		case "should exist":
+			if ok {
+				return true, nil
+			}
+			return false, fmt.Errorf("expect %s to exist, but it does not", red(m.key))
+		}
+	}
+	if ok {
 		match := false
 		for _, t := range val {
 			if m.match(t) {

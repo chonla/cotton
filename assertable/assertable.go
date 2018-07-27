@@ -35,7 +35,7 @@ func (a *Assertable) Assert(ex map[string]string) error {
 
 	for k, v := range ex {
 		m := NewMatcher(k, v)
-		fmt.Printf("* Assert %s with %s...", blue(k), blue(m))
+		fmt.Printf("* Assert %s %s...", blue(k), m)
 		r, e := m.Match(a)
 		if r {
 			fmt.Printf("%s\n", green("PASSED"))
