@@ -15,6 +15,15 @@ All variable names are case-insensitive.
 | Header.&lt;header-name&gt; | Value in header corresponding to the `header-name` given |
 | Data.&lt;data-name&gt; | Data in response body, available only when data is JSON (data must be JSON parsable and content-type must be `application/json`) |
 
+## Predefined Expectation
+
+Cotton provide some predefined expectation to help assertion. The following expected value can be used as to assert some response value.
+
+| Predefined value | Description |
+| - | - |
+| `*should exists*` | The asserted variable should present in the response. |
+| `*should not exist*` | The asserted variable should not present in the response. |
+
 ## Example
 
 ```
@@ -25,6 +34,7 @@ All variable names are case-insensitive.
 | StatusCode | 200 |
 | Header.Content-Type | application/json |
 | Data.title | Buy milk |
+| Data.credential | *should not exist* |
 ```
 
 | Previous | Index | Next |
