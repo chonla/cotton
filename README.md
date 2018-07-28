@@ -4,6 +4,8 @@ Markdown Test Specification Runner. This project is originally inspired by [silk
 
 * Executable RESTful API Markdown-based Document Specification.
 
+[![https://img.shields.io/badge/release-0.1.20-green.svg]()](https://github.com/chonla/cotton/releases)
+
 ## Installation
 
 ### Homebrew/Linuxbrew
