@@ -46,7 +46,7 @@ Usage of cotton:
 
 ## Executable markdown specfication
 
-See [Guide](./guide) for more information.
+See [Guide](./docs) for more information.
 
 ## License
 
