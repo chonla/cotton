@@ -46,7 +46,7 @@ Usage of cotton:
 
 ## Executable markdown specfication
 
-See [Guide](./docs) for more information.
+See [Guide](https://chonla.github.io/cotton/) for more information.
 
 ## License
 
