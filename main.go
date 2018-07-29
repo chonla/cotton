@@ -43,7 +43,7 @@ func main() {
 	flag.BoolVar(&insecure, "i", false, "insecure mode -- to disable certificate verification")
 	flag.BoolVar(&ver, "v", false, "show cotton version")
 	flag.BoolVar(&help, "h", false, "show this help")
-	flag.Var(&vars, "p", "to inject predefined variable")
+	flag.Var(&vars, "p", "to inject predefined in variable-name=variable-value format")
 	flag.Parse()
 
 	if ver {

@@ -40,7 +40,7 @@ Usage of cotton:
   -h	show this help
   -i	insecure mode -- to disable certificate verification
   -p value
-    	to inject predefined variable
+    	to inject predefined variable in variable-name=variable-value format
   -u string
     	set base url (default "http://localhost:8080")
   -v	show cotton version
