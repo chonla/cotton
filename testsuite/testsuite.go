@@ -7,6 +7,7 @@ type TestSuite struct {
 	Config    *Config
 	TestCases []*TestCase
 	Stat      TestStat
+	Variables map[string]string
 }
 
 // Run executes test case
@@ -15,6 +16,7 @@ func (ts *TestSuite) Run() {
 		if len(tc.Expectations) > 0 {
 			tc.BaseURL = ts.BaseURL
 			tc.Config = ts.Config
+			tc.Variables = ts.Variables
 			ts.Stat.Total++
 			e := tc.Run()
 			if e == nil {

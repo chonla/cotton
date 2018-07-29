@@ -8,10 +8,11 @@ import (
 
 // TestSuites is several test suites
 type TestSuites struct {
-	Suites  []*TestSuite
-	BaseURL string
-	Config  *Config
-	Stat    TestStat
+	Suites    []*TestSuite
+	BaseURL   string
+	Config    *Config
+	Stat      TestStat
+	Variables map[string]string
 }
 
 // Run executes test suite
@@ -19,6 +20,7 @@ func (ts *TestSuites) Run() {
 	for _, suite := range ts.Suites {
 		suite.BaseURL = ts.BaseURL
 		suite.Config = ts.Config
+		suite.Variables = ts.Variables
 		suite.Run()
 		ts.Stat.Total += suite.Stat.Total
 		ts.Stat.Success += suite.Stat.Success

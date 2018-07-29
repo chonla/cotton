@@ -4,13 +4,28 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/chonla/cotton/parser"
 	"github.com/chonla/cotton/testsuite"
+	"github.com/fatih/color"
 )
 
 // VERSION of cotton
-const VERSION = "0.1.23"
+const VERSION = "0.1.24"
+
+// Vars are injected variables from command line
+type Vars []string
+
+// Set to set vars, can be multiple times
+func (v *Vars) Set(value string) error {
+	*v = append(*v, value)
+	return nil
+}
+
+func (v *Vars) String() string {
+	return fmt.Sprint(*v)
+}
 
 func main() {
 	parser := parser.NewParser()
@@ -19,6 +34,7 @@ func main() {
 	var ver bool
 	var insecure bool
 	var detail bool
+	var vars Vars
 
 	flag.Usage = usage
 
@@ -27,6 +43,7 @@ func main() {
 	flag.BoolVar(&insecure, "i", false, "insecure mode -- to disable certificate verification")
 	flag.BoolVar(&ver, "v", false, "show cotton version")
 	flag.BoolVar(&help, "h", false, "show this help")
+	flag.Var(&vars, "p", "to inject predefined variable")
 	flag.Parse()
 
 	if ver {
@@ -49,6 +66,26 @@ func main() {
 	ts.Config = &testsuite.Config{
 		Insecure: insecure,
 		Detail:   detail,
+	}
+
+	if len(vars) > 0 {
+		preVars := map[string]string{}
+		for _, v := range vars {
+			s := strings.SplitN(v, "=", 2)
+			if len(s) == 2 {
+				preVars[s[0]] = s[1]
+			}
+		}
+
+		if detail && len(preVars) > 0 {
+			blue := color.New(color.FgBlue).SprintFunc()
+
+			fmt.Printf("Injected variables:\n")
+			for k := range preVars {
+				fmt.Printf("* %s\n", blue(k))
+			}
+		}
+		ts.Variables = preVars
 	}
 
 	ts.Run()
