@@ -154,6 +154,50 @@ func TestFindDataStuffInReferrableShouldReturnCorrespondingDataAndTrueWhenFound(
 	assert.Equal(t, []string{"jane"}, result)
 }
 
+func TestFindDataStuffInReferrableShouldReturnCorrespondingDataAndTrueWhenFoundWithCaseInsensitiveHeaderAccess(t *testing.T) {
+	jsonString := "{ \"data\": \"ok\", \"list\": [{ \"Name\": \"john\" }, {\"Name\": \"jane\" }] }"
+
+	response := &response.Response{
+		Proto:      "http",
+		Status:     "200 OK",
+		StatusCode: 200,
+		Header: map[string][]string{
+			"content-type": []string{
+				"application/json; charset=utf-8",
+			},
+		},
+		Body: jsonString,
+	}
+
+	ref := NewReferrable(response)
+	result, ok := ref.Find("header.Content-TYPE")
+
+	assert.True(t, ok)
+	assert.Equal(t, []string{"application/json; charset=utf-8"}, result)
+}
+
+func TestFindDataStuffInReferrableShouldReturnCorrespondingDataAndTrueWhenFoundWithCaseSensitiveJsonAccess(t *testing.T) {
+	jsonString := "{ \"data\": \"ok\", \"list\": [{ \"Name\": \"john\" }, {\"Name\": \"jane\" }] }"
+
+	response := &response.Response{
+		Proto:      "http",
+		Status:     "200 OK",
+		StatusCode: 200,
+		Header: map[string][]string{
+			"content-type": []string{
+				"application/json; charset=utf-8",
+			},
+		},
+		Body: jsonString,
+	}
+
+	ref := NewReferrable(response)
+	result, ok := ref.Find("data.list[1].Name")
+
+	assert.True(t, ok)
+	assert.Equal(t, []string{"jane"}, result)
+}
+
 func TestFindDataStuffInReferrableShouldReturnNilAndTrueWhenNotFound(t *testing.T) {
 	jsonString := "{ \"data\": \"ok\" }"
 
