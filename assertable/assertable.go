@@ -7,7 +7,6 @@ import (
 	"github.com/chonla/cotton/referrable"
 	"github.com/chonla/cotton/response"
 	"github.com/fatih/color"
-	"github.com/kr/pretty"
 )
 
 // Assertable is something assertable
@@ -19,7 +18,6 @@ type Assertable struct {
 func NewAssertable(resp *response.Response) *Assertable {
 	ref := referrable.NewReferrable(resp)
 
-	pretty.Print(ref)
 	return &Assertable{
 		Referrable: ref,
 	}
