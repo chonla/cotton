@@ -76,8 +76,7 @@ func (m *Matcher) match(v string) bool {
 func (m *Matcher) Match(a *Assertable) (bool, error) {
 	red := color.New(color.FgRed).SprintFunc()
 
-	k := strings.ToLower(m.key)
-	val, ok := a.Find(k)
+	val, ok := a.Find(m.key)
 	if m.builtIn {
 		switch strings.ToLower(m.value) {
 		case "should not exist":
@@ -105,5 +104,5 @@ func (m *Matcher) Match(a *Assertable) (bool, error) {
 		}
 		return false, fmt.Errorf("expect %s in %s, but not", red(m.value), red(m.key))
 	}
-	return false, fmt.Errorf("response does not contain %s", k)
+	return false, fmt.Errorf("response does not contain %s", m.key)
 }

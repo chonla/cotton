@@ -30,5 +30,5 @@ Here is the expectation table
 | Assert | Expected |
 | - | - |
 | StatusCode | 200 |
-| Header.Content-Type | /^application/json($|;)/ |
+| header.Content-Type | /^application/json($|;)/ |
 | Data.token | /.+/ |
