@@ -32,16 +32,18 @@ $ cotton
 
 Usage of cotton:
 
-  cotton [-u <base-url>] <test-cases>
+  cotton [-u <base-url>] [-i] [-d] [-p name1=value1] [-p name2=value2] ... <test-cases>
 
   test-cases can be a markdown file or a directory contain markdowns.
 
-  -h  show this help
-  -i  insecure mode -- to disable certificate verification
-  -d  detail mode -- to dump test detail
+  -d	detail mode -- to dump test detail
+  -h	show this help
+  -i	insecure mode -- to disable certificate verification
+  -p value
+    	to inject predefined variable
   -u string
-      set base url (default "http://localhost:8080")
-  -v  show cotton version
+    	set base url (default "http://localhost:8080")
+  -v	show cotton version
 ```
 
 ## Executable markdown specfication

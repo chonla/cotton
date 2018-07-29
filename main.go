@@ -97,8 +97,6 @@ func usage() {
 	fmt.Println("Usage of cotton:")
 	fmt.Println()
 	fmt.Println("  cotton [-u <base-url>] [-i] [-d] [-p name1=value1] [-p name2=value2] ... <test-cases>")
-	fmt.Println("  cotton -h")
-	fmt.Println("  cotton -v")
 	fmt.Println()
 	fmt.Println("  test-cases can be a markdown file or a directory contain markdowns.")
 	fmt.Println()
