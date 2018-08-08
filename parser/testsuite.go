@@ -25,7 +25,9 @@ func NewParser() *Parser {
 
 // Parse a test path into []*TestSuite
 func (p *Parser) Parse(path string) (*ts.TestSuites, error) {
-	suites := &ts.TestSuites{}
+	suites := &ts.TestSuites{
+		Variables: map[string]string{},
+	}
 	suite := []*ts.TestSuite{}
 
 	files, e := p.listFiles(path)
