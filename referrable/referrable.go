@@ -16,6 +16,9 @@ type Referrable struct {
 	data   objx.Map
 }
 
+// Any type
+type Any interface{}
+
 // NewReferrable creates an referrable object
 func NewReferrable(resp *response.Response) *Referrable {
 	red := color.New(color.FgRed).SprintFunc()
@@ -37,7 +40,8 @@ func NewReferrable(resp *response.Response) *Referrable {
 	var jsonObj objx.Map
 	var e error
 	if isJSONContent(values["header.content-type"]) {
-		jsonObj, e = objx.FromJSON(resp.Body)
+		// jsonObj, e = objx.FromJSON(resp.Body)
+		jsonObj, e = tryParse(resp.Body)
 		if e != nil {
 			fmt.Printf("%s: %s\n", red("Error"), e)
 			jsonObj, _ = objx.FromJSON("{}")
@@ -50,6 +54,15 @@ func NewReferrable(resp *response.Response) *Referrable {
 		values: values,
 		data:   jsonObj,
 	}
+}
+
+func tryParse(jsonString string) (objx.Map, error) {
+	jsonObj, e := objx.FromJSON(fmt.Sprintf("{ \"document\": %s }", jsonString))
+	if e == nil {
+		return jsonObj, nil
+	}
+
+	return nil, e
 }
 
 func isJSONContent(contenttype []string) bool {
@@ -67,8 +80,18 @@ func (a *Referrable) Find(k string) ([]string, bool) {
 	re := regexp.MustCompile("(?i)^data\\.(.+)")
 	match := re.FindStringSubmatch(k)
 	if len(match) > 1 {
-		if a.data.Has(match[1]) {
-			return []string{a.data.Get(match[1]).String()}, true
+		key := fmt.Sprintf("document.%s", match[1])
+		if a.data.Has(key) {
+			return []string{a.data.Get(key).String()}, true
+		}
+		return nil, false
+	}
+	re = regexp.MustCompile("(?i)^data(\\[\\d+\\].*)")
+	match = re.FindStringSubmatch(k)
+	if len(match) > 1 {
+		key := fmt.Sprintf("document%s", match[1])
+		if a.data.Has(key) {
+			return []string{a.data.Get(key).String()}, true
 		}
 		return nil, false
 	}

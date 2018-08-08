@@ -6,4 +6,5 @@
 
 | Assert | Expected |
 | - | - |
-| Data.d.results[0].Id | 1 |
+| Data.d.results[2].Id | 3 |
+| Data.d.results[2].Name | Peter |
