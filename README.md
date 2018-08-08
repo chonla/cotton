@@ -21,6 +21,12 @@ brew install cotton
 go get github.com/chonla/cotton
 ```
 
+## Upgrade
+
+```
+brew upgrade
+```
+
 ## Usage
 
 ```
