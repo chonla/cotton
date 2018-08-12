@@ -12,6 +12,7 @@ type Putter struct {
 
 // Request do actual request
 func (p *Putter) Request(url, body string) (*http.Response, error) {
+	url = p.EscapeURL(url)
 
 	bodyBytes := []byte(body)
 	r, e := http.NewRequest("PUT", url, bytes.NewBuffer(bodyBytes))

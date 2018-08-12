@@ -10,17 +10,18 @@ type Optioner struct {
 }
 
 // Request do actual request
-func (g *Optioner) Request(url, body string) (*http.Response, error) {
+func (o *Optioner) Request(url, body string) (*http.Response, error) {
+	url = o.EscapeURL(url)
 
 	r, e := http.NewRequest("OPTION", url, nil)
 	if e != nil {
 		return nil, e
 	}
-	for k, v := range g.Requester.headers {
+	for k, v := range o.Requester.headers {
 		r.Header.Set(k, v)
 	}
 
-	g.Requester.LogRequest(r)
+	o.Requester.LogRequest(r)
 
-	return g.Requester.client.Do(r)
+	return o.Requester.client.Do(r)
 }

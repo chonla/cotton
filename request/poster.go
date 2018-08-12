@@ -12,6 +12,7 @@ type Poster struct {
 
 // Request do actual request
 func (p *Poster) Request(url, body string) (*http.Response, error) {
+	url = p.EscapeURL(url)
 
 	bodyBytes := []byte(body)
 	r, e := http.NewRequest("POST", url, bytes.NewBuffer(bodyBytes))

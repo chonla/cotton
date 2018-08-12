@@ -12,6 +12,7 @@ type Patcher struct {
 
 // Request do actual request
 func (p *Patcher) Request(url, body string) (*http.Response, error) {
+	url = p.EscapeURL(url)
 
 	bodyBytes := []byte(body)
 	r, e := http.NewRequest("PATCH", url, bytes.NewBuffer(bodyBytes))

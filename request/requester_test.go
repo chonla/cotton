@@ -92,3 +92,30 @@ func TestCreateNewDeleteRequest(t *testing.T) {
 	assert.Nil(t, e)
 	assert.Equal(t, xreq, r)
 }
+
+func TestEscapeURL(t *testing.T) {
+	r := &Requester{}
+	u := "http://www.google.com/q?param=data"
+	expected := u
+
+	result := r.EscapeURL(u)
+	assert.Equal(t, expected, result)
+}
+
+func TestEscapeURLWithEscapableQueryString(t *testing.T) {
+	r := &Requester{}
+	u := "http://www.google.com/q?param=data test"
+	expected := "http://www.google.com/q?param=data+test"
+
+	result := r.EscapeURL(u)
+	assert.Equal(t, expected, result)
+}
+
+func TestEscapeURLWithThaiLanguage(t *testing.T) {
+	r := &Requester{}
+	u := "http://www.google.com/q?param=ทดสอบ"
+	expected := "http://www.google.com/q?param=%E0%B8%97%E0%B8%94%E0%B8%AA%E0%B8%AD%E0%B8%9A"
+
+	result := r.EscapeURL(u)
+	assert.Equal(t, expected, result)
+}

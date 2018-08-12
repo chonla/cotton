@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"strings"
 
 	"github.com/fatih/color"
@@ -119,4 +120,15 @@ func (r *Requester) prettifyJSON(jsonString string) string {
 	json.Unmarshal([]byte(jsonString), &jsonObj)
 	prettyBody, _ := json.MarshalIndent(jsonObj, "", "    ")
 	return string(prettyBody)
+}
+
+// EscapeURL to do escape parameters in given URL and rebuild the proper URL
+func (r *Requester) EscapeURL(u string) string {
+	uSegment, e := url.Parse(u)
+	if e != nil {
+		return u
+	}
+	q := uSegment.Query()
+	uSegment.RawQuery = q.Encode()
+	return uSegment.String()
 }

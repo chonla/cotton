@@ -10,17 +10,18 @@ type Deleter struct {
 }
 
 // Request do actual request
-func (g *Deleter) Request(url, body string) (*http.Response, error) {
+func (d *Deleter) Request(url, body string) (*http.Response, error) {
+	url = d.EscapeURL(url)
 
 	r, e := http.NewRequest("DELETE", url, nil)
 	if e != nil {
 		return nil, e
 	}
-	for k, v := range g.Requester.headers {
+	for k, v := range d.Requester.headers {
 		r.Header.Set(k, v)
 	}
 
-	g.Requester.LogRequest(r)
+	d.Requester.LogRequest(r)
 
-	return g.Requester.client.Do(r)
+	return d.Requester.client.Do(r)
 }

@@ -11,6 +11,7 @@ type Getter struct {
 
 // Request do actual request
 func (g *Getter) Request(url, body string) (*http.Response, error) {
+	url = g.EscapeURL(url)
 
 	r, e := http.NewRequest("GET", url, nil)
 	if e != nil {
