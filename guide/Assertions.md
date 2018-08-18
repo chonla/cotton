@@ -21,7 +21,7 @@ Cotton provide some predefined expectation to help assertion. The following expe
 
 | Predefined value | Description |
 | - | - |
-| `*should exists*` | The asserted variable should present in the response. |
+| `*should exist*` | The asserted variable should present in the response. |
 | `*should not exist*` | The asserted variable should not present in the response. |
 
 ## Example
