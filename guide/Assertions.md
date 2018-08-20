@@ -23,6 +23,10 @@ Cotton provide some predefined expectation to help assertion. The following expe
 | - | - |
 | `*should exist*` | The asserted variable should present in the response. |
 | `*should not exist*` | The asserted variable should not present in the response. |
+| `*should be null*` | The asserted variable should be null. |
+| `*should not be null*` | The asserted variable should not be null. |
+| `*should be true*` | The asserted variable should be boolean with value TRUE. |
+| `*should be false*` | The asserted variable should be boolean with value FALSE. |
 
 ## Example
 
