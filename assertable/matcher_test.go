@@ -151,3 +151,203 @@ func TestIsBuiltInShouldReturnFalseIfStringHasNoStarAtBeginningAndTheEnd(t *test
 	result := isBuiltIn("a*keyword*a")
 	assert.Equal(t, false, result)
 }
+
+func TestBuiltInShouldExist(t *testing.T) {
+	jsonString := "{ \"data\": \"ok\", \"list\": [0, 1, 2] }"
+
+	response := &response.Response{
+		Proto:      "http",
+		Status:     "200 OK",
+		StatusCode: 200,
+		Header: map[string][]string{
+			"content-type": []string{
+				"application/json; charset=utf-8",
+			},
+		},
+		Body: jsonString,
+	}
+
+	assertable := NewAssertable(response)
+
+	m := NewMatcher("data.list", "*should exist*")
+	r, _ := m.Match(assertable)
+	assert.True(t, r)
+}
+
+func TestBuiltInShouldNotExist(t *testing.T) {
+	jsonString := "{ \"data\": \"ok\", \"list\": [0, 1, 2] }"
+
+	response := &response.Response{
+		Proto:      "http",
+		Status:     "200 OK",
+		StatusCode: 200,
+		Header: map[string][]string{
+			"content-type": []string{
+				"application/json; charset=utf-8",
+			},
+		},
+		Body: jsonString,
+	}
+
+	assertable := NewAssertable(response)
+
+	m := NewMatcher("data.no-a-list", "*should not exist*")
+	r, _ := m.Match(assertable)
+	assert.True(t, r)
+}
+
+func TestBuiltInShouldBeNull(t *testing.T) {
+	jsonString := "{ \"data\": \"ok\", \"list\": [0, 1, 2], \"item\": null }"
+
+	response := &response.Response{
+		Proto:      "http",
+		Status:     "200 OK",
+		StatusCode: 200,
+		Header: map[string][]string{
+			"content-type": []string{
+				"application/json; charset=utf-8",
+			},
+		},
+		Body: jsonString,
+	}
+
+	assertable := NewAssertable(response)
+
+	m := NewMatcher("data.item", "*should be null*")
+	r, _ := m.Match(assertable)
+	assert.True(t, r)
+}
+
+func TestBuiltInShouldNotBeNull(t *testing.T) {
+	jsonString := "{ \"data\": \"ok\", \"list\": [0, 1, 2], \"item\": \"element\" }"
+
+	response := &response.Response{
+		Proto:      "http",
+		Status:     "200 OK",
+		StatusCode: 200,
+		Header: map[string][]string{
+			"content-type": []string{
+				"application/json; charset=utf-8",
+			},
+		},
+		Body: jsonString,
+	}
+
+	assertable := NewAssertable(response)
+
+	m := NewMatcher("data.item", "*should not be null*")
+	r, _ := m.Match(assertable)
+	assert.True(t, r)
+}
+
+func TestBuiltInShouldBeNullOnStringOfNull(t *testing.T) {
+	jsonString := "{ \"data\": \"ok\", \"list\": [0, 1, 2], \"item\": \"null\" }"
+
+	response := &response.Response{
+		Proto:      "http",
+		Status:     "200 OK",
+		StatusCode: 200,
+		Header: map[string][]string{
+			"content-type": []string{
+				"application/json; charset=utf-8",
+			},
+		},
+		Body: jsonString,
+	}
+
+	assertable := NewAssertable(response)
+
+	m := NewMatcher("data.item", "*should be null*")
+	r, _ := m.Match(assertable)
+	assert.False(t, r)
+}
+
+func TestBuiltInShouldBeTrue(t *testing.T) {
+	jsonString := "{ \"data\": \"ok\", \"list\": [0, 1, 2], \"item\": true }"
+
+	response := &response.Response{
+		Proto:      "http",
+		Status:     "200 OK",
+		StatusCode: 200,
+		Header: map[string][]string{
+			"content-type": []string{
+				"application/json; charset=utf-8",
+			},
+		},
+		Body: jsonString,
+	}
+
+	assertable := NewAssertable(response)
+
+	m := NewMatcher("data.item", "*should be true*")
+	r, _ := m.Match(assertable)
+	assert.True(t, r)
+}
+
+func TestBuiltInShouldBeFalse(t *testing.T) {
+	jsonString := "{ \"data\": \"ok\", \"list\": [0, 1, 2], \"item\": false }"
+
+	response := &response.Response{
+		Proto:      "http",
+		Status:     "200 OK",
+		StatusCode: 200,
+		Header: map[string][]string{
+			"content-type": []string{
+				"application/json; charset=utf-8",
+			},
+		},
+		Body: jsonString,
+	}
+
+	assertable := NewAssertable(response)
+
+	m := NewMatcher("data.item", "*should be false*")
+	r, _ := m.Match(assertable)
+	assert.True(t, r)
+}
+
+func TestBuiltInShouldBeTrueOnNonBooleanValue(t *testing.T) {
+	jsonString := "{ \"data\": \"ok\", \"list\": [0, 1, 2], \"item\": \"true\" }"
+
+	response := &response.Response{
+		Proto:      "http",
+		Status:     "200 OK",
+		StatusCode: 200,
+		Header: map[string][]string{
+			"content-type": []string{
+				"application/json; charset=utf-8",
+			},
+		},
+		Body: jsonString,
+	}
+
+	assertable := NewAssertable(response)
+
+	m := NewMatcher("data.item", "*should be true*")
+	r, e := m.Match(assertable)
+	assert.False(t, r)
+	assert.NotNil(t, e)
+}
+
+func TestBuiltInShouldBeFalseOnNonBooleanValue(t *testing.T) {
+	jsonString := "{ \"data\": \"ok\", \"list\": [0, 1, 2], \"item\": \"false\" }"
+
+	response := &response.Response{
+		Proto:      "http",
+		Status:     "200 OK",
+		StatusCode: 200,
+		Header: map[string][]string{
+			"content-type": []string{
+				"application/json; charset=utf-8",
+			},
+		},
+		Body: jsonString,
+	}
+
+	assertable := NewAssertable(response)
+
+	m := NewMatcher("data.item", "*should be false*")
+	r, e := m.Match(assertable)
+	assert.False(t, r)
+	assert.NotNil(t, e)
+}

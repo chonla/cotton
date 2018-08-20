@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/fatih/color"
+	"github.com/kr/pretty"
 )
 
 // Matcher is matcher
@@ -89,6 +90,29 @@ func (m *Matcher) Match(a *Assertable) (bool, error) {
 				return true, nil
 			}
 			return false, fmt.Errorf("expect %s to exist, but it does not", red(m.key))
+		case "should be null":
+			if val == nil {
+				return true, nil
+			}
+			return false, fmt.Errorf("expect %s to be null, but it does not", red(m.key))
+		case "should not be null":
+			if val != nil {
+				return true, nil
+			}
+			return false, fmt.Errorf("expect %s to be null, but it does not", red(m.key))
+		case "should be true":
+			valBool, ok := a.FindBoolean(m.key)
+			pretty.Println(valBool, ok)
+			if ok && valBool {
+				return true, nil
+			}
+			return false, fmt.Errorf("expect %s to be boolean and true, but it does not", red(m.key))
+		case "should be false":
+			valBool, ok := a.FindBoolean(m.key)
+			if ok && !valBool {
+				return true, nil
+			}
+			return false, fmt.Errorf("expect %s to be boolean and false, but it does not", red(m.key))
 		}
 	}
 	if ok {

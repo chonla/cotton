@@ -1,6 +1,7 @@
 package referrable
 
 import (
+	"errors"
 	"fmt"
 	"regexp"
 	"strings"
@@ -75,29 +76,53 @@ func isJSONContent(contenttype []string) bool {
 	return false
 }
 
-// Find to find a value of given key
-func (a *Referrable) Find(k string) ([]string, bool) {
+// find is internal finder
+func (a *Referrable) find(k string) (*objx.Value, error) {
 	re := regexp.MustCompile("(?i)^data\\.(.+)")
 	match := re.FindStringSubmatch(k)
 	if len(match) > 1 {
 		key := fmt.Sprintf("document.%s", match[1])
 		if a.data.Has(key) {
-			return []string{a.data.Get(key).String()}, true
+			return a.data.Get(key), nil
 		}
-		return nil, false
+		return nil, errors.New("not found")
 	}
 	re = regexp.MustCompile("(?i)^data(\\[\\d+\\].*)")
 	match = re.FindStringSubmatch(k)
 	if len(match) > 1 {
 		key := fmt.Sprintf("document%s", match[1])
 		if a.data.Has(key) {
-			return []string{a.data.Get(key).String()}, true
+			return a.data.Get(key), nil
 		}
-		return nil, false
+		return nil, errors.New("not found")
 	}
+	return nil, errors.New("not found")
+}
+
+// Find to find a value of given key
+func (a *Referrable) Find(k string) ([]string, bool) {
+	val, err := a.find(k)
+	if err == nil {
+		return []string{val.String()}, true
+	}
+
 	k = strings.ToLower(k)
 	if val, ok := a.values[k]; ok {
 		return val, true
 	}
 	return nil, false
+}
+
+// FindBoolean to find a value of given key and treat it as boolean.
+// If the value is non-boolean, error will be raised.
+// All header stuffs will be treated as non-boolean.
+func (a *Referrable) FindBoolean(k string) (bool, bool) {
+	val, err := a.find(k)
+	if err == nil {
+		if v, ok := val.Data().(bool); ok {
+			return v, true
+		}
+	}
+
+	return false, false
 }
