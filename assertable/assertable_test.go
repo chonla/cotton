@@ -51,7 +51,7 @@ func TestAssertWithNoAssertion(t *testing.T) {
 
 	assertable := NewAssertable(response)
 
-	result := assertable.Assert(map[string]string{})
+	result := assertable.Assert([]Row{})
 
 	assert.Equal(t, errors.New("no assertion given"), result)
 }
@@ -73,9 +73,15 @@ func TestAssertionAllPass(t *testing.T) {
 
 	assertable := NewAssertable(response)
 
-	result := assertable.Assert(map[string]string{
-		"header.content-type": "application/json; charset=utf-8",
-		"data.list[1]":        "1",
+	result := assertable.Assert([]Row{
+		Row{
+			Field:       "header.content-type",
+			Expectation: "application/json; charset=utf-8",
+		},
+		Row{
+			Field:       "data.list[1]",
+			Expectation: "1",
+		},
 	})
 
 	assert.Nil(t, result)
@@ -98,9 +104,15 @@ func TestAssertionSomeFailShouldGiveResultFail(t *testing.T) {
 
 	assertable := NewAssertable(response)
 
-	result := assertable.Assert(map[string]string{
-		"header.content-type": "application/json; charset=utf-8",
-		"data.list[1]":        "0",
+	result := assertable.Assert([]Row{
+		Row{
+			Field:       "header.content-type",
+			Expectation: "application/json; charset=utf-8",
+		},
+		Row{
+			Field:       "data.list[1]",
+			Expectation: "0",
+		},
 	})
 
 	assert.NotNil(t, result)
@@ -123,9 +135,15 @@ func TestAssertionNonExistingShouldGiveResultFail(t *testing.T) {
 
 	assertable := NewAssertable(response)
 
-	result := assertable.Assert(map[string]string{
-		"header.content-type": "application/json; charset=utf-8",
-		"data.not-here":       "0",
+	result := assertable.Assert([]Row{
+		Row{
+			Field:       "header.content-type",
+			Expectation: "application/json; charset=utf-8",
+		},
+		Row{
+			Field:       "data.list[1]",
+			Expectation: "0",
+		},
 	})
 
 	assert.NotNil(t, result)

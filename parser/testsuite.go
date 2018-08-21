@@ -9,6 +9,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/chonla/cotton/assertable"
 	"github.com/chonla/cotton/markdown"
 	ts "github.com/chonla/cotton/testsuite"
 )
@@ -166,7 +167,10 @@ func (p *Parser) ParseString(content, filePath string) ([]*ts.TestCase, error) {
 				if te.ColumnCount() == 2 && te.MatchHeaders([]string{"(?i)^assert$", "(?i)^expected$"}) {
 					for te.Next() {
 						row := te.Value()
-						tc.Expectations[row[0]] = row[1]
+						tc.Expectations = append(tc.Expectations, assertable.Row{
+							Field:       row[0],
+							Expectation: row[1],
+						})
 					}
 				}
 			case "captures":

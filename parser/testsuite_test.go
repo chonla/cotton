@@ -3,6 +3,7 @@ package parser
 import (
 	"testing"
 
+	"github.com/chonla/cotton/assertable"
 	ts "github.com/chonla/cotton/testsuite"
 	"github.com/stretchr/testify/assert"
 )
@@ -25,7 +26,7 @@ func TestParseSimpleAction(t *testing.T) {
 			Method:       "GET",
 			Path:         "/todos",
 			Headers:      map[string]string{},
-			Expectations: map[string]string{},
+			Expectations: []assertable.Row{},
 			Captures:     map[string]string{},
 			Variables:    map[string]string{},
 			Captured:     map[string]string{},
@@ -59,7 +60,7 @@ func TestParseMultipleSimpleAction(t *testing.T) {
 			Method:       "GET",
 			Path:         "/todos",
 			Headers:      map[string]string{},
-			Expectations: map[string]string{},
+			Expectations: []assertable.Row{},
 			Captures:     map[string]string{},
 			Variables:    map[string]string{},
 			Captured:     map[string]string{},
@@ -75,7 +76,7 @@ func TestParseMultipleSimpleAction(t *testing.T) {
 			Method:       "GET",
 			Path:         "/list",
 			Headers:      map[string]string{},
-			Expectations: map[string]string{},
+			Expectations: []assertable.Row{},
 			Captures:     map[string]string{},
 			Variables:    map[string]string{},
 			Captured:     map[string]string{},
@@ -111,7 +112,7 @@ func TestParsePostAction(t *testing.T) {
 			Path:         "/todos",
 			RequestBody:  "{\n\"title\": \"Text data\"\n}",
 			Headers:      map[string]string{},
-			Expectations: map[string]string{},
+			Expectations: []assertable.Row{},
 			Captures:     map[string]string{},
 			Variables:    map[string]string{},
 			Captured:     map[string]string{},
@@ -155,7 +156,7 @@ func TestParseActionWithHeader(t *testing.T) {
 				"Content-Type":  "application/json",
 				"Authorization": "Bearer test",
 			},
-			Expectations: map[string]string{},
+			Expectations: []assertable.Row{},
 			Captures:     map[string]string{},
 			Variables:    map[string]string{},
 			Captured:     map[string]string{},
@@ -208,10 +209,19 @@ func TestParseActionWithExpectations(t *testing.T) {
 				"Content-Type":  "application/json",
 				"Authorization": "Bearer test",
 			},
-			Expectations: map[string]string{
-				"StatusCode":          "200",
-				"Header.Content-Type": "application/json",
-				"Data.title":          "Some text",
+			Expectations: []assertable.Row{
+				assertable.Row{
+					Field:       "StatusCode",
+					Expectation: "200",
+				},
+				assertable.Row{
+					Field:       "Header.Content-Type",
+					Expectation: "application/json",
+				},
+				assertable.Row{
+					Field:       "Data.title",
+					Expectation: "Some text",
+				},
 			},
 			Captures:  map[string]string{},
 			Variables: map[string]string{},
@@ -272,10 +282,19 @@ func TestParseActionWithCaptures(t *testing.T) {
 				"Content-Type":  "application/json",
 				"Authorization": "Bearer test",
 			},
-			Expectations: map[string]string{
-				"StatusCode":          "200",
-				"Header.Content-Type": "application/json",
-				"Data.title":          "Some text",
+			Expectations: []assertable.Row{
+				assertable.Row{
+					Field:       "StatusCode",
+					Expectation: "200",
+				},
+				assertable.Row{
+					Field:       "Header.Content-Type",
+					Expectation: "application/json",
+				},
+				assertable.Row{
+					Field:       "Data.title",
+					Expectation: "Some text",
+				},
 			},
 			Captures: map[string]string{
 				"status-code": "StatusCode",
@@ -405,10 +424,19 @@ func TestParseActionWithFullSections(t *testing.T) {
 				"Content-Type":  "application/json",
 				"Authorization": "Bearer test",
 			},
-			Expectations: map[string]string{
-				"StatusCode":          "200",
-				"Header.Content-Type": "application/json",
-				"Data.title":          "Some text",
+			Expectations: []assertable.Row{
+				assertable.Row{
+					Field:       "StatusCode",
+					Expectation: "200",
+				},
+				assertable.Row{
+					Field:       "Header.Content-Type",
+					Expectation: "application/json",
+				},
+				assertable.Row{
+					Field:       "Data.title",
+					Expectation: "Some text",
+				},
 			},
 			Captures: map[string]string{
 				"status-code": "StatusCode",

@@ -21,7 +21,7 @@ type TestCase struct {
 	ContentType  string
 	RequestBody  string
 	Headers      map[string]string
-	Expectations map[string]string
+	Expectations []assertable.Row
 	Captures     map[string]string
 	Setups       []*Task
 	Teardowns    []*Task
@@ -34,7 +34,7 @@ func NewTestCase(name string) *TestCase {
 	return &TestCase{
 		Name:         name,
 		Headers:      map[string]string{},
-		Expectations: map[string]string{},
+		Expectations: []assertable.Row{},
 		Config: &Config{
 			Insecure: false,
 			Detail:   false,
