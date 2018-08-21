@@ -14,9 +14,7 @@ import (
 // Referrable is referrable items
 type Referrable struct {
 	values map[string][]string
-	// data   objx.Map
-	data gjson.Result
-	// jsonString string
+	data   gjson.Result
 }
 
 // Any type
@@ -63,17 +61,10 @@ func NewReferrable(resp *response.Response) *Referrable {
 // func tryParse(jsonString string) (objx.Map, error) {
 func tryParse(jsonString string) (gjson.Result, error) {
 	jsonString = fmt.Sprintf("{ \"document\": %s }", jsonString)
-	// fmt.Println(jsonString)
 	if gjson.Valid(jsonString) {
 		return gjson.Parse(jsonString), nil
 	}
 	return gjson.Result{}, errors.New("not a well-formed json")
-	// jsonObj, e := objx.FromJSON(fmt.Sprintf("{ \"document\": %s }", jsonString))
-	// if e == nil {
-	// 	return jsonObj, nil
-	// }
-
-	// return nil, e
 }
 
 func isJSONContent(contenttype []string) bool {
