@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"github.com/fatih/color"
-	"github.com/kr/pretty"
 )
 
 // Matcher is matcher
@@ -98,7 +97,6 @@ func (m *Matcher) Match(a *Assertable) (bool, error) {
 			return false, fmt.Errorf("expect %s to be null, but it does not", red(m.key))
 		case "should not be null":
 			valNull, ok := a.FindNull(m.key)
-			pretty.Println(m.key, valNull, ok)
 			if ok && !valNull {
 				return true, nil
 			}

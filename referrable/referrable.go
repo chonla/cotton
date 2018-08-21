@@ -38,11 +38,9 @@ func NewReferrable(resp *response.Response) *Referrable {
 		}
 	}
 
-	// var jsonObj objx.Map
 	var jsonObj gjson.Result
 	var e error
 	if isJSONContent(values["header.content-type"]) {
-		// jsonObj, e = objx.FromJSON(resp.Body)
 		jsonObj, e = tryParse(resp.Body)
 		if e != nil {
 			fmt.Printf("%s: %s\n", red("Error"), e)
@@ -58,7 +56,6 @@ func NewReferrable(resp *response.Response) *Referrable {
 	}
 }
 
-// func tryParse(jsonString string) (objx.Map, error) {
 func tryParse(jsonString string) (gjson.Result, error) {
 	jsonString = fmt.Sprintf("{ \"document\": %s }", jsonString)
 	if gjson.Valid(jsonString) {

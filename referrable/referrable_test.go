@@ -39,7 +39,6 @@ func TestIsJsonObjectShouldReturnTrueIfArrayNotContainsContentTypeOfApplicationJ
 
 func TestNewReferrableFromJsonResponseDataShouldBeWrappedUnderDocument(t *testing.T) {
 	jsonString := "{ \"data\": \"ok\" }"
-	// jsonObject, _ := objx.FromJSON(fmt.Sprintf("{ \"document\": %s }", jsonString))
 	jsonObject := gjson.Parse(fmt.Sprintf("{ \"document\": %s }", jsonString))
 
 	response := &response.Response{
@@ -72,7 +71,6 @@ func TestNewReferrableFromJsonResponseDataShouldBeWrappedUnderDocument(t *testin
 
 func TestNewReferrableFromJsonResponseAsListDataShouldBeWrappedUnderDocument(t *testing.T) {
 	jsonString := "[{ \"data\": \"ok\" }]"
-	// jsonObject, _ := objx.FromJSON(fmt.Sprintf("{ \"document\": %s }", jsonString))
 	jsonObject := gjson.Parse(fmt.Sprintf("{ \"document\": %s }", jsonString))
 
 	response := &response.Response{
@@ -105,7 +103,6 @@ func TestNewReferrableFromJsonResponseAsListDataShouldBeWrappedUnderDocument(t *
 
 func TestNewReferrableFromBrokenJsonResponseShouldContainEmptyData(t *testing.T) {
 	jsonString := "{ \"data\": \"ok\""
-	// jsonObject, _ := objx.FromJSON("{}")
 	jsonObject := gjson.Parse("{}")
 
 	response := &response.Response{
@@ -138,7 +135,6 @@ func TestNewReferrableFromBrokenJsonResponseShouldContainEmptyData(t *testing.T)
 
 func TestNewReferrableFromNonJsonResponseShouldContainEmptyData(t *testing.T) {
 	jsonString := "{ \"data\": \"ok\"}"
-	// jsonObject, _ := objx.FromJSON("{}")
 	jsonObject := gjson.Parse("{}")
 
 	response := &response.Response{
