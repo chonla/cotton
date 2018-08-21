@@ -8,13 +8,15 @@ import (
 
 	"github.com/chonla/cotton/response"
 	"github.com/fatih/color"
-	"github.com/stretchr/objx"
+	"github.com/tidwall/gjson"
 )
 
 // Referrable is referrable items
 type Referrable struct {
 	values map[string][]string
-	data   objx.Map
+	// data   objx.Map
+	data gjson.Result
+	// jsonString string
 }
 
 // Any type
@@ -38,17 +40,18 @@ func NewReferrable(resp *response.Response) *Referrable {
 		}
 	}
 
-	var jsonObj objx.Map
+	// var jsonObj objx.Map
+	var jsonObj gjson.Result
 	var e error
 	if isJSONContent(values["header.content-type"]) {
 		// jsonObj, e = objx.FromJSON(resp.Body)
 		jsonObj, e = tryParse(resp.Body)
 		if e != nil {
 			fmt.Printf("%s: %s\n", red("Error"), e)
-			jsonObj, _ = objx.FromJSON("{}")
+			jsonObj = gjson.Parse("{}")
 		}
 	} else {
-		jsonObj, _ = objx.FromJSON("{}")
+		jsonObj = gjson.Parse("{}")
 	}
 
 	return &Referrable{
@@ -57,13 +60,20 @@ func NewReferrable(resp *response.Response) *Referrable {
 	}
 }
 
-func tryParse(jsonString string) (objx.Map, error) {
-	jsonObj, e := objx.FromJSON(fmt.Sprintf("{ \"document\": %s }", jsonString))
-	if e == nil {
-		return jsonObj, nil
+// func tryParse(jsonString string) (objx.Map, error) {
+func tryParse(jsonString string) (gjson.Result, error) {
+	jsonString = fmt.Sprintf("{ \"document\": %s }", jsonString)
+	// fmt.Println(jsonString)
+	if gjson.Valid(jsonString) {
+		return gjson.Parse(jsonString), nil
 	}
+	return gjson.Result{}, errors.New("not a well-formed json")
+	// jsonObj, e := objx.FromJSON(fmt.Sprintf("{ \"document\": %s }", jsonString))
+	// if e == nil {
+	// 	return jsonObj, nil
+	// }
 
-	return nil, e
+	// return nil, e
 }
 
 func isJSONContent(contenttype []string) bool {
@@ -77,26 +87,34 @@ func isJSONContent(contenttype []string) bool {
 }
 
 // find is internal finder
-func (a *Referrable) find(k string) (*objx.Value, error) {
+func (a *Referrable) find(k string) (gjson.Result, error) {
 	re := regexp.MustCompile("(?i)^data\\.(.+)")
 	match := re.FindStringSubmatch(k)
 	if len(match) > 1 {
 		key := fmt.Sprintf("document.%s", match[1])
-		if a.data.Has(key) {
+		key = a.convertToGJsonPath(key)
+		if a.data.Get(key).Exists() {
 			return a.data.Get(key), nil
 		}
-		return nil, errors.New("not found")
+		return gjson.Result{}, errors.New("not found")
 	}
-	re = regexp.MustCompile("(?i)^data(\\[\\d+\\].*)")
+	re = regexp.MustCompile("(?i)^data\\[(\\d+)\\](.*)")
 	match = re.FindStringSubmatch(k)
 	if len(match) > 1 {
-		key := fmt.Sprintf("document%s", match[1])
-		if a.data.Has(key) {
+		key := fmt.Sprintf("document.%s%s", match[1], match[2])
+		key = a.convertToGJsonPath(key)
+		if a.data.Get(key).Exists() {
 			return a.data.Get(key), nil
 		}
-		return nil, errors.New("not found")
+		return gjson.Result{}, errors.New("not found")
 	}
-	return nil, errors.New("not found")
+	return gjson.Result{}, errors.New("not found")
+}
+
+func (a *Referrable) convertToGJsonPath(k string) string {
+	re := regexp.MustCompile("(.*)\\[(\\d+)\\](.*)")
+	k = re.ReplaceAllString(k, "$1.$2$3")
+	return k
 }
 
 // Find to find a value of given key
@@ -119,9 +137,23 @@ func (a *Referrable) Find(k string) ([]string, bool) {
 func (a *Referrable) FindBoolean(k string) (bool, bool) {
 	val, err := a.find(k)
 	if err == nil {
-		if v, ok := val.Data().(bool); ok {
+		if v, ok := val.Value().(bool); ok {
 			return v, true
 		}
+	}
+
+	return false, false
+}
+
+// FindNull to find a value of given key and treat it as null.
+// If the value is not-null, error will be raised.
+func (a *Referrable) FindNull(k string) (bool, bool) {
+	val, err := a.find(k)
+	if err == nil {
+		if val.Type == gjson.Null {
+			return true, true
+		}
+		return false, true
 	}
 
 	return false, false

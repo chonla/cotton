@@ -174,6 +174,28 @@ func TestBuiltInShouldExist(t *testing.T) {
 	assert.True(t, r)
 }
 
+func TestBuiltInShouldExistOnNullValue(t *testing.T) {
+	jsonString := "{ \"data\": \"ok\", \"list\": [0, 1, 2], \"target\": null }"
+
+	response := &response.Response{
+		Proto:      "http",
+		Status:     "200 OK",
+		StatusCode: 200,
+		Header: map[string][]string{
+			"content-type": []string{
+				"application/json; charset=utf-8",
+			},
+		},
+		Body: jsonString,
+	}
+
+	assertable := NewAssertable(response)
+
+	m := NewMatcher("data.target", "*should exist*")
+	r, _ := m.Match(assertable)
+	assert.True(t, r)
+}
+
 func TestBuiltInShouldNotExist(t *testing.T) {
 	jsonString := "{ \"data\": \"ok\", \"list\": [0, 1, 2] }"
 

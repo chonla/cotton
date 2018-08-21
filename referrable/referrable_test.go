@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/stretchr/objx"
+	"github.com/tidwall/gjson"
 
 	"github.com/chonla/cotton/response"
 	"github.com/stretchr/testify/assert"
@@ -39,7 +39,8 @@ func TestIsJsonObjectShouldReturnTrueIfArrayNotContainsContentTypeOfApplicationJ
 
 func TestNewReferrableFromJsonResponseDataShouldBeWrappedUnderDocument(t *testing.T) {
 	jsonString := "{ \"data\": \"ok\" }"
-	jsonObject, _ := objx.FromJSON(fmt.Sprintf("{ \"document\": %s }", jsonString))
+	// jsonObject, _ := objx.FromJSON(fmt.Sprintf("{ \"document\": %s }", jsonString))
+	jsonObject := gjson.Parse(fmt.Sprintf("{ \"document\": %s }", jsonString))
 
 	response := &response.Response{
 		Proto:      "http",
@@ -71,7 +72,8 @@ func TestNewReferrableFromJsonResponseDataShouldBeWrappedUnderDocument(t *testin
 
 func TestNewReferrableFromJsonResponseAsListDataShouldBeWrappedUnderDocument(t *testing.T) {
 	jsonString := "[{ \"data\": \"ok\" }]"
-	jsonObject, _ := objx.FromJSON(fmt.Sprintf("{ \"document\": %s }", jsonString))
+	// jsonObject, _ := objx.FromJSON(fmt.Sprintf("{ \"document\": %s }", jsonString))
+	jsonObject := gjson.Parse(fmt.Sprintf("{ \"document\": %s }", jsonString))
 
 	response := &response.Response{
 		Proto:      "http",
@@ -103,7 +105,8 @@ func TestNewReferrableFromJsonResponseAsListDataShouldBeWrappedUnderDocument(t *
 
 func TestNewReferrableFromBrokenJsonResponseShouldContainEmptyData(t *testing.T) {
 	jsonString := "{ \"data\": \"ok\""
-	jsonObject, _ := objx.FromJSON("{}")
+	// jsonObject, _ := objx.FromJSON("{}")
+	jsonObject := gjson.Parse("{}")
 
 	response := &response.Response{
 		Proto:      "http",
@@ -135,7 +138,8 @@ func TestNewReferrableFromBrokenJsonResponseShouldContainEmptyData(t *testing.T)
 
 func TestNewReferrableFromNonJsonResponseShouldContainEmptyData(t *testing.T) {
 	jsonString := "{ \"data\": \"ok\"}"
-	jsonObject, _ := objx.FromJSON("{}")
+	// jsonObject, _ := objx.FromJSON("{}")
+	jsonObject := gjson.Parse("{}")
 
 	response := &response.Response{
 		Proto:      "http",

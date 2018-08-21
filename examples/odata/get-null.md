@@ -6,4 +6,5 @@
 
 | Assert | Expected |
 | - | - |
-| Data.d.results[0].Region | *should be null* |
+| Data.d.results[0].Region | *should exist* |
+<!-- | Data.d.results[0].Region | *should be null* | -->

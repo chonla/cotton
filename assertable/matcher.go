@@ -91,18 +91,20 @@ func (m *Matcher) Match(a *Assertable) (bool, error) {
 			}
 			return false, fmt.Errorf("expect %s to exist, but it does not", red(m.key))
 		case "should be null":
-			if val == nil {
+			valNull, ok := a.FindNull(m.key)
+			if ok && valNull {
 				return true, nil
 			}
 			return false, fmt.Errorf("expect %s to be null, but it does not", red(m.key))
 		case "should not be null":
-			if val != nil {
+			valNull, ok := a.FindNull(m.key)
+			pretty.Println(m.key, valNull, ok)
+			if ok && !valNull {
 				return true, nil
 			}
 			return false, fmt.Errorf("expect %s to be null, but it does not", red(m.key))
 		case "should be true":
 			valBool, ok := a.FindBoolean(m.key)
-			pretty.Println(valBool, ok)
 			if ok && valBool {
 				return true, nil
 			}
