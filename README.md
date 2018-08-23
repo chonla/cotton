@@ -58,4 +58,4 @@ See [Guide](./guide) for more information.
 
 ## License
 
-[License](LICENSE.txt)
+[MIT](LICENSE.txt)
