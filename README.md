@@ -58,11 +58,11 @@ See [Guide](./guide) for more information.
 
 ## Contributing
 
-1. Fork it (<https://github.com/chonla/cotton/fork>)
-1. Create your feature branch (`git checkout -b feature/fooBar`)
-1. Commit your changes (`git commit -am 'Add some fooBar'`)
-1. Push to the branch (`git push origin feature/fooBar`)
-1. Create a new Pull Request
+1. Fork it (<https://github.com/chonla/cotton/fork>).
+1. Create your feature branch (`git checkout -b feature/fooBar`).
+1. Commit your changes (`git commit -am 'Add some fooBar'`).
+1. Push to the branch (`git push origin feature/fooBar`).
+1. Create a new Pull Request.
 
 ### Testing
 
