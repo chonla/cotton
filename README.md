@@ -10,30 +10,30 @@ Markdown Test Specification Runner. This project is originally inspired by [silk
 
 ### Homebrew/Linuxbrew
 
-```
+```sh
 brew tap chonla/universe
 brew install cotton
 ```
 
 ### From source
 
-```
+```sh
 go get github.com/chonla/cotton
 ```
 
 ## Upgrade
 
-```
+```sh
 brew upgrade
 ```
 
 ## Usage
 
-```
+```sh
 cotton [-u <base-api-url>] [-i] [-d] <directory or file>
 ```
 
-```
+```sh
 $ cotton
 
 Usage of cotton:
@@ -52,9 +52,23 @@ Usage of cotton:
   -v	show cotton version
 ```
 
-## Executable markdown specfication
+## Executable markdown specification
 
 See [Guide](./guide) for more information.
+
+## Contributing
+
+1. Fork it (<https://github.com/chonla/cotton/fork>).
+1. Create your feature branch (`git checkout -b feature/fooBar`).
+1. Commit your changes (`git commit -am 'Add some fooBar'`).
+1. Push to the branch (`git push origin feature/fooBar`).
+1. Create a new Pull Request.
+
+### Testing
+
+```sh
+go test ./...
+```
 
 ## License
 
