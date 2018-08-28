@@ -4,7 +4,7 @@ Markdown Test Specification Runner. This project is originally inspired by [silk
 
 * Executable RESTful API Markdown-based Document Specification.
 
-[![Latest stable version](https://img.shields.io/badge/stable-0.2.1-green.svg)](https://github.com/chonla/cotton/releases)
+[![Latest stable version](https://img.shields.io/badge/stable-0.2.3-green.svg)](https://github.com/chonla/cotton/releases)
 
 ## Installation
 
@@ -38,7 +38,7 @@ $ cotton
 
 Usage of cotton:
 
-  cotton [-u <base-url>] [-i] [-d] [-p name1=value1] [-p name2=value2] ... <test-cases>
+  cotton [-u <base-url>] [-i] [-d] [-w] [-p name1=value1] [-p name2=value2] ... <test-cases>
 
   test-cases can be a markdown file or a directory contain markdowns.
 
@@ -50,6 +50,7 @@ Usage of cotton:
   -u string
     	set base url (default "http://localhost:8080")
   -v	show cotton version
+  -w	watch mode -- to auto-rerun when files are changed
 ```
 
 ## Executable markdown specification

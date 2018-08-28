@@ -15,9 +15,25 @@ type TestSuites struct {
 	Variables map[string]string
 }
 
+// TestSuitesInterface is interface of TestSuites
+type TestSuitesInterface interface {
+	Run()
+	Summary() int
+	SetVariables(map[string]string)
+}
+
+// SetVariables to set variables to test suites
+func (ts *TestSuites) SetVariables(v map[string]string) {
+	ts.Variables = v
+}
+
 // Run executes test suite
 func (ts *TestSuites) Run() {
+	ts.Stat.Total = 0
+	ts.Stat.Success = 0
 	for _, suite := range ts.Suites {
+		suite.Stat.Total = 0
+		suite.Stat.Success = 0
 		suite.BaseURL = ts.BaseURL
 		suite.Config = ts.Config
 		suite.Variables = ts.Variables
