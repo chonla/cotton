@@ -4,18 +4,23 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/chonla/cotton/parser"
 	"github.com/chonla/cotton/testsuite"
 	"github.com/fatih/color"
+	"github.com/fsnotify/fsnotify"
 )
 
 // VERSION of cotton
-const VERSION = "0.2.1"
+const VERSION = "0.2.3"
 
 // Vars are injected variables from command line
 type Vars []string
+
+// watcher is file changes watcher
+var watcher *fsnotify.Watcher
 
 // Set to set vars, can be multiple times
 func (v *Vars) Set(value string) error {
@@ -42,7 +47,7 @@ func main() {
 	flag.StringVar(&url, "u", "http://localhost:8080", "set base url")
 	flag.BoolVar(&detail, "d", false, "detail mode -- to dump test detail")
 	flag.BoolVar(&insecure, "i", false, "insecure mode -- to disable certificate verification")
-	flag.BoolVar(&watch, "w", false, "auto-rerun when files are changed")
+	flag.BoolVar(&watch, "w", false, "watch mode -- to auto-rerun when files are changed")
 	flag.BoolVar(&ver, "v", false, "show cotton version")
 	flag.BoolVar(&help, "h", false, "show this help")
 	flag.Var(&vars, "p", "to inject predefined in variable-name=variable-value format")
@@ -71,7 +76,37 @@ func main() {
 	}
 
 	exitCode := dispatchTests(ts, vars, detail)
-	os.Exit(exitCode)
+
+	if watch {
+		watcher, _ = fsnotify.NewWatcher()
+		defer watcher.Close()
+
+		// register all files/directories to be watched
+		if err := filepath.Walk(testpath, watchDir); err != nil {
+			fmt.Println("ERROR", err)
+		}
+
+		done := make(chan bool)
+
+		go func() {
+			for {
+				select {
+				case event := <-watcher.Events:
+					if event.Op&fsnotify.Write == fsnotify.Write {
+						yellow := color.New(color.FgYellow).SprintFunc()
+						fmt.Printf("\n%s\n\n", yellow("(File changes detected. Rerun tests.)"))
+						dispatchTests(ts, vars, detail)
+					}
+				case err := <-watcher.Errors:
+					fmt.Println("ERROR", err)
+				}
+			}
+		}()
+
+		<-done
+	} else {
+		os.Exit(exitCode)
+	}
 }
 
 func usage() {
@@ -84,7 +119,7 @@ func usage() {
 	flag.PrintDefaults()
 }
 
-func dispatchTests(ts *testsuite.TestSuites, vars Vars, detail bool) int {
+func dispatchTests(ts testsuite.TestSuitesInterface, vars Vars, detail bool) int {
 	if len(vars) > 0 {
 		preVars := map[string]string{}
 		for _, v := range vars {
@@ -102,10 +137,22 @@ func dispatchTests(ts *testsuite.TestSuites, vars Vars, detail bool) int {
 				fmt.Printf("* %s\n", blue(k))
 			}
 		}
-		ts.Variables = preVars
+		ts.SetVariables(preVars)
 	}
 
 	ts.Run()
 	exitCode := ts.Summary()
 	return exitCode
+}
+
+// watchDir gets run as a walk func, searching for directories to add watchers to
+func watchDir(path string, fi os.FileInfo, err error) error {
+
+	// since fsnotify can watch all the files in a directory, watchers only need
+	// to be added to each nested directory
+	if fi.Mode().IsDir() {
+		return watcher.Add(path)
+	}
+
+	return nil
 }
