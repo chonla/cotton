@@ -34,6 +34,7 @@ func main() {
 	var ver bool
 	var insecure bool
 	var detail bool
+	var watch bool
 	var vars Vars
 
 	flag.Usage = usage
@@ -41,6 +42,7 @@ func main() {
 	flag.StringVar(&url, "u", "http://localhost:8080", "set base url")
 	flag.BoolVar(&detail, "d", false, "detail mode -- to dump test detail")
 	flag.BoolVar(&insecure, "i", false, "insecure mode -- to disable certificate verification")
+	flag.BoolVar(&watch, "w", false, "auto-rerun when files are changed")
 	flag.BoolVar(&ver, "v", false, "show cotton version")
 	flag.BoolVar(&help, "h", false, "show this help")
 	flag.Var(&vars, "p", "to inject predefined in variable-name=variable-value format")
@@ -68,6 +70,21 @@ func main() {
 		Detail:   detail,
 	}
 
+	exitCode := dispatchTests(ts, vars, detail)
+	os.Exit(exitCode)
+}
+
+func usage() {
+	fmt.Println("Usage of cotton:")
+	fmt.Println()
+	fmt.Println("  cotton [-u <base-url>] [-i] [-d] [-p name1=value1] [-p name2=value2] ... <test-cases>")
+	fmt.Println()
+	fmt.Println("  test-cases can be a markdown file or a directory contain markdowns.")
+	fmt.Println()
+	flag.PrintDefaults()
+}
+
+func dispatchTests(ts *testsuite.TestSuites, vars Vars, detail bool) int {
 	if len(vars) > 0 {
 		preVars := map[string]string{}
 		for _, v := range vars {
@@ -90,15 +107,5 @@ func main() {
 
 	ts.Run()
 	exitCode := ts.Summary()
-	os.Exit(exitCode)
-}
-
-func usage() {
-	fmt.Println("Usage of cotton:")
-	fmt.Println()
-	fmt.Println("  cotton [-u <base-url>] [-i] [-d] [-p name1=value1] [-p name2=value2] ... <test-cases>")
-	fmt.Println()
-	fmt.Println("  test-cases can be a markdown file or a directory contain markdowns.")
-	fmt.Println()
-	flag.PrintDefaults()
+	return exitCode
 }
