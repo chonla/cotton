@@ -88,14 +88,17 @@ func main() {
 
 		done := make(chan bool)
 
+		yellow := color.New(color.FgYellow).SprintFunc()
+		fmt.Printf("\n%s\n", yellow("(Watching...)"))
+
 		go func() {
 			for {
 				select {
 				case event := <-watcher.Events:
 					if event.Op&fsnotify.Write == fsnotify.Write {
-						yellow := color.New(color.FgYellow).SprintFunc()
 						fmt.Printf("\n%s\n\n", yellow("(File changes detected. Rerun tests.)"))
 						dispatchTests(ts, vars, detail)
+						fmt.Printf("\n%s\n", yellow("(Watching...)"))
 					}
 				case err := <-watcher.Errors:
 					fmt.Println("ERROR", err)
