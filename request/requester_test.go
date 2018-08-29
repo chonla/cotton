@@ -77,6 +77,22 @@ func TestCreateNewPatchRequest(t *testing.T) {
 	assert.Equal(t, xreq, r)
 }
 
+func TestCreateNewOptionRequest(t *testing.T) {
+	r, e := NewRequester("OPTION", false, false)
+
+	xreq := &Optioner{
+		Requester: &Requester{
+			headers:     map[string]string{},
+			client:      &http.Client{},
+			insecure:    false,
+			printDetail: false,
+		},
+	}
+
+	assert.Nil(t, e)
+	assert.Equal(t, xreq, r)
+}
+
 func TestCreateNewDeleteRequest(t *testing.T) {
 	r, e := NewRequester("DELETE", false, false)
 
@@ -118,4 +134,37 @@ func TestEscapeURLWithThaiLanguage(t *testing.T) {
 
 	result := r.EscapeURL(u)
 	assert.Equal(t, expected, result)
+}
+
+func TestEscapeURLWithMalformedURL(t *testing.T) {
+	r := &Requester{}
+	u := "%%"
+	expected := "%%"
+
+	result := r.EscapeURL(u)
+	assert.Equal(t, expected, result)
+}
+
+func TestSetHeaders(t *testing.T) {
+	r := &Requester{
+		headers: map[string]string{},
+	}
+
+	r.SetHeaders(map[string]string{
+		"h1": "1",
+		"h2": "2",
+		"h3": "3",
+		"h4": "4",
+	})
+
+	expected := &Requester{
+		headers: map[string]string{
+			"h1": "1",
+			"h2": "2",
+			"h3": "3",
+			"h4": "4",
+		},
+	}
+
+	assert.Equal(t, expected, r)
 }
