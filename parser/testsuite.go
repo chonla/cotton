@@ -19,13 +19,20 @@ var readFileFn = ioutil.ReadFile
 // Parser is test parser
 type Parser struct{}
 
+// Interface is interface of parser
+type Interface interface {
+	Parse(string) (ts.TestSuitesInterface, error)
+	ParseFile(string) (*ts.TestSuite, error)
+	ParseString(string, string) ([]*ts.TestCase, error)
+}
+
 // NewParser create a new parser
 func NewParser() *Parser {
 	return &Parser{}
 }
 
 // Parse a test path into []*TestSuite
-func (p *Parser) Parse(path string) (*ts.TestSuites, error) {
+func (p *Parser) Parse(path string) (ts.TestSuitesInterface, error) {
 	suites := &ts.TestSuites{
 		Variables: map[string]string{},
 	}

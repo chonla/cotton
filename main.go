@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/chonla/cotton/cotton"
 	"github.com/chonla/cotton/parser"
 	"github.com/chonla/cotton/testsuite"
 	"github.com/fatih/color"
@@ -33,7 +34,7 @@ func (v *Vars) String() string {
 }
 
 func main() {
-	parser := parser.NewParser()
+	// parser := parser.NewParser()
 	var url string
 	var help bool
 	var ver bool
@@ -64,18 +65,31 @@ func main() {
 		os.Exit(1)
 	}
 
-	ts, e := parser.Parse(testpath)
+	c, e := cotton.NewCotton(testpath, cotton.Config{
+		BaseURL:   url,
+		Insecure:  insecure,
+		Verbose:   detail,
+		Variables: vars,
+	})
 	if e != nil {
 		fmt.Printf("%s\n", e.Error())
 		os.Exit(1)
 	}
-	ts.BaseURL = url
-	ts.Config = &testsuite.Config{
-		Insecure: insecure,
-		Detail:   detail,
-	}
+	c.SetParser(parser.NewParser())
 
-	exitCode := dispatchTests(ts, vars, detail)
+	// ts, e := parser.Parse(testpath)
+	// if e != nil {
+	// 	fmt.Printf("%s\n", e.Error())
+	// 	os.Exit(1)
+	// }
+	// ts.BaseURL = url
+	// ts.Config = &testsuite.Config{
+	// 	Insecure: insecure,
+	// 	Detail:   detail,
+	// }
+
+	// exitCode := dispatchTests(ts, vars, detail)
+	_, exitCode := c.Run()
 
 	if watch {
 		watcher, _ = fsnotify.NewWatcher()
@@ -97,7 +111,8 @@ func main() {
 				case event := <-watcher.Events:
 					if event.Op&fsnotify.Write == fsnotify.Write {
 						fmt.Printf("\n%s\n\n", yellow("(File changes detected. Rerun tests.)"))
-						dispatchTests(ts, vars, detail)
+						//dispatchTests(ts, vars, detail)
+						_, exitCode = c.Run()
 						fmt.Printf("\n%s\n", yellow("(Watching...)"))
 					}
 				case err := <-watcher.Errors:
