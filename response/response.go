@@ -31,7 +31,10 @@ func NewResponse(resp *http.Response, detail bool) *Response {
 		}
 	}
 
-	body, _ := ioutil.ReadAll(resp.Body)
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil
+	}
 	defer resp.Body.Close()
 
 	r := &Response{
