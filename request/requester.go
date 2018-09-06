@@ -99,8 +99,14 @@ func (r *Requester) LogRequest(req *http.Request) {
 	}
 	fmt.Println()
 	if req.Method == "POST" {
-		bodyCopy, _ := req.GetBody()
-		body, _ := ioutil.ReadAll(bodyCopy)
+		bodyCopy, err := req.GetBody()
+		if err != nil {
+			return
+		}
+		body, err := ioutil.ReadAll(bodyCopy)
+		if err != nil {
+			return
+		}
 		r.LogBody(string(body))
 	}
 	fmt.Printf("%s\n", magenta("<<--"))
