@@ -26,7 +26,7 @@ New post should be created.
 | Assert | Expected |
 | - | - |
 | StatusCode | 201 |
-| Header.Location | /^/posts/\d+$/
+| Header.Location | /^/posts/\d+$/ |
 
 ## Capture
 
