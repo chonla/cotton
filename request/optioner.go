@@ -20,6 +20,9 @@ func (o *Optioner) Request(url, body string) (*http.Response, error) {
 	for k, v := range o.Requester.headers {
 		r.Header.Set(k, v)
 	}
+	for _, cookie := range o.Requester.cookies {
+		r.AddCookie(cookie)
+	}
 
 	o.Requester.LogRequest(r)
 

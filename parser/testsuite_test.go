@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"net/http"
 	"testing"
 
 	"github.com/chonla/cotton/assertable"
@@ -36,6 +37,7 @@ func TestParseSimpleAction(t *testing.T) {
 				Insecure: false,
 				Detail:   false,
 			},
+			Cookies: []*http.Cookie{},
 		},
 	}, result)
 }
@@ -70,6 +72,7 @@ func TestParseMultipleSimpleAction(t *testing.T) {
 				Insecure: false,
 				Detail:   false,
 			},
+			Cookies: []*http.Cookie{},
 		},
 		&ts.TestCase{
 			Name:         "Another Test Case Name",
@@ -86,6 +89,7 @@ func TestParseMultipleSimpleAction(t *testing.T) {
 				Insecure: false,
 				Detail:   false,
 			},
+			Cookies: []*http.Cookie{},
 		},
 	}, result)
 }
@@ -122,6 +126,7 @@ func TestParsePostAction(t *testing.T) {
 				Insecure: false,
 				Detail:   false,
 			},
+			Cookies: []*http.Cookie{},
 		},
 	}, result)
 }
@@ -166,6 +171,7 @@ func TestParseActionWithHeader(t *testing.T) {
 				Insecure: false,
 				Detail:   false,
 			},
+			Cookies: []*http.Cookie{},
 		},
 	}, result)
 }
@@ -232,6 +238,7 @@ func TestParseActionWithExpectations(t *testing.T) {
 				Insecure: false,
 				Detail:   false,
 			},
+			Cookies: []*http.Cookie{},
 		},
 	}, result)
 }
@@ -308,6 +315,7 @@ func TestParseActionWithCaptures(t *testing.T) {
 				Insecure: false,
 				Detail:   false,
 			},
+			Cookies: []*http.Cookie{},
 		},
 	}, result)
 }
@@ -448,6 +456,7 @@ func TestParseActionWithFullSections(t *testing.T) {
 				Insecure: false,
 				Detail:   false,
 			},
+			Cookies: []*http.Cookie{},
 			Setups: []*ts.Task{
 				&ts.Task{
 					Name:        "Login",
@@ -464,6 +473,7 @@ func TestParseActionWithFullSections(t *testing.T) {
 						Insecure: false,
 						Detail:   false,
 					},
+					Cookies: []*http.Cookie{},
 				},
 				&ts.Task{
 					Name:        "Create ToDo",
@@ -480,6 +490,7 @@ func TestParseActionWithFullSections(t *testing.T) {
 						Insecure: false,
 						Detail:   false,
 					},
+					Cookies: []*http.Cookie{},
 				},
 			},
 			Teardowns: []*ts.Task{
@@ -495,6 +506,7 @@ func TestParseActionWithFullSections(t *testing.T) {
 						Insecure: false,
 						Detail:   false,
 					},
+					Cookies: []*http.Cookie{},
 				},
 				&ts.Task{
 					Name:      "Logout",
@@ -508,6 +520,7 @@ func TestParseActionWithFullSections(t *testing.T) {
 						Insecure: false,
 						Detail:   false,
 					},
+					Cookies: []*http.Cookie{},
 				},
 			},
 		},

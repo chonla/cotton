@@ -17,11 +17,13 @@ import (
 type RequesterInterface interface {
 	Request(string, string) (*http.Response, error)
 	SetHeaders(map[string]string)
+	SetCookies([]*http.Cookie)
 }
 
 // Requester is base class for all requester
 type Requester struct {
 	headers     map[string]string
+	cookies     []*http.Cookie
 	client      *http.Client
 	insecure    bool
 	printDetail bool
@@ -42,6 +44,7 @@ func NewRequester(method string, insecure, detail bool) (RequesterInterface, err
 	var req RequesterInterface
 	reqer := &Requester{
 		headers:     map[string]string{},
+		cookies:     []*http.Cookie{},
 		client:      client,
 		insecure:    insecure,
 		printDetail: detail,
@@ -70,6 +73,18 @@ func NewRequester(method string, insecure, detail bool) (RequesterInterface, err
 func (r *Requester) SetHeaders(h map[string]string) {
 	for k, v := range h {
 		r.headers[k] = v
+	}
+}
+
+// SetCookies set cookie values to request
+func (r *Requester) SetCookies(c []*http.Cookie) {
+	for _, cookie := range c {
+		for _, cc := range r.cookies {
+			if cc.Name == cookie.Name {
+				continue
+			}
+		}
+		r.cookies = append(r.cookies, cookie)
 	}
 }
 

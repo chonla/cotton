@@ -2,6 +2,7 @@ package testsuite
 
 import (
 	"fmt"
+	"net/http"
 	"strings"
 
 	"github.com/chonla/cotton/referrable"
@@ -24,6 +25,7 @@ type Task struct {
 	Captures    map[string]string
 	Captured    map[string]string
 	Variables   map[string]string
+	Cookies     []*http.Cookie
 }
 
 // NewTask to create a new task
@@ -43,6 +45,7 @@ func NewTask(t *TestCase) *Task {
 		Captures:    t.Captures,
 		Variables:   map[string]string{},
 		Captured:    map[string]string{},
+		Cookies:     []*http.Cookie{},
 	}
 }
 
@@ -57,6 +60,7 @@ func (t *Task) Run() error {
 		return e
 	}
 	req.SetHeaders(t.applyVarsToMap(t.Headers))
+	req.SetCookies(t.Cookies)
 	resp, e := req.Request(t.applyVars(url), t.applyVars(t.RequestBody))
 	if e != nil {
 		fmt.Printf("%s: %s\n", red("Error"), e)
@@ -69,6 +73,12 @@ func (t *Task) Run() error {
 	}
 
 	ref := referrable.NewReferrable(r)
+
+	t.Cookies = []*http.Cookie{}
+
+	for _, v := range r.Cookies {
+		t.Cookies = append(t.Cookies, v)
+	}
 
 	for k, v := range t.Captures {
 		r, ok := ref.Find(v)
@@ -95,6 +105,12 @@ func (t *Task) Value(k string) (string, bool) {
 func (t *Task) MergeVariables(vars map[string]string) {
 	for k, v := range vars {
 		t.Variables[k] = v
+	}
+}
+
+func (t *Task) SetCookies(c []*http.Cookie) {
+	for _, v := range c {
+		t.Cookies = append(t.Cookies, v)
 	}
 }
 

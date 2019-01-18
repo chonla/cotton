@@ -38,6 +38,13 @@ func NewReferrable(resp *response.Response) *Referrable {
 		}
 	}
 
+	for _, v := range resp.Cookies {
+		key := strings.ToLower(fmt.Sprintf("cookies.%s", v.Name))
+		if values[key] == nil {
+			values[key] = []string{v.Value}
+		}
+	}
+
 	var jsonObj gjson.Result
 	var e error
 	if isJSONContent(values["header.content-type"]) {

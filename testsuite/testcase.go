@@ -2,6 +2,7 @@ package testsuite
 
 import (
 	"fmt"
+	"net/http"
 	"strings"
 
 	"github.com/chonla/cotton/assertable"
@@ -27,6 +28,7 @@ type TestCase struct {
 	Teardowns    []*Task
 	Variables    map[string]string
 	Captured     map[string]string
+	Cookies      []*http.Cookie
 }
 
 // NewTestCase creates a new testcase
@@ -44,6 +46,7 @@ func NewTestCase(name string) *TestCase {
 		Teardowns: []*Task{},
 		Variables: map[string]string{},
 		Captured:  map[string]string{},
+		Cookies:   []*http.Cookie{},
 	}
 }
 
@@ -77,6 +80,8 @@ func (tc *TestCase) Run() error {
 	fmt.Printf("Testcase: %s\n", white(tc.Name))
 	fmt.Printf("%s\n", white("================================================================================"))
 
+	tc.Cookies = []*http.Cookie{}
+
 	if len(tc.Setups) > 0 {
 		fmt.Printf("Setup:\n")
 		for _, s := range tc.Setups {
@@ -86,6 +91,10 @@ func (tc *TestCase) Run() error {
 			s.BaseURL = tc.BaseURL
 			s.Config = tc.Config
 			s.MergeVariables(tc.Variables)
+
+			if len(tc.Cookies) > 0 {
+				s.SetCookies(tc.Cookies)
+			}
 
 			if s.Config.Detail {
 				fmt.Println()
@@ -106,6 +115,12 @@ func (tc *TestCase) Run() error {
 			for k, v := range s.Captured {
 				tc.Variables[k] = v
 			}
+
+			if len(s.Cookies) > 0 {
+				for _, v := range s.Cookies {
+					tc.Cookies = append(tc.Cookies, v)
+				}
+			}
 		}
 
 		fmt.Println()
@@ -117,6 +132,7 @@ func (tc *TestCase) Run() error {
 	}
 
 	req.SetHeaders(tc.applyVarsToMap(tc.Headers))
+	req.SetCookies(tc.Cookies)
 
 	targetURL := tc.applyVars(url)
 	fmt.Printf("Action: %s %s\n", white(tc.Method), yellow(targetURL))
@@ -150,6 +166,12 @@ func (tc *TestCase) Run() error {
 		}
 	}
 
+	if len(r.Cookies) > 0 {
+		for _, v := range r.Cookies {
+			tc.Cookies = append(tc.Cookies, v)
+		}
+	}
+
 	as := assertable.NewAssertable(r)
 
 	assertResult := as.Assert(tc.Expectations)
@@ -163,6 +185,10 @@ func (tc *TestCase) Run() error {
 			s.BaseURL = tc.BaseURL
 			s.Config = tc.Config
 			s.MergeVariables(tc.Variables)
+
+			if len(tc.Cookies) > 0 {
+				s.SetCookies(tc.Cookies)
+			}
 
 			if s.Config.Detail {
 				fmt.Println()
@@ -183,6 +209,13 @@ func (tc *TestCase) Run() error {
 			for k, v := range s.Captured {
 				tc.Variables[k] = v
 			}
+
+			if len(s.Cookies) > 0 {
+				for _, v := range s.Cookies {
+					tc.Cookies = append(tc.Cookies, v)
+				}
+			}
+
 		}
 	}
 

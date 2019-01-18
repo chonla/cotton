@@ -20,6 +20,9 @@ func (g *Getter) Request(url, body string) (*http.Response, error) {
 	for k, v := range g.Requester.headers {
 		r.Header.Set(k, v)
 	}
+	for _, cookie := range g.Requester.cookies {
+		r.AddCookie(cookie)
+	}
 
 	g.Requester.LogRequest(r)
 

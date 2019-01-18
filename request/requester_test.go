@@ -23,6 +23,7 @@ func TestCreateNewGetRequest(t *testing.T) {
 			client:      &http.Client{},
 			insecure:    false,
 			printDetail: false,
+			cookies:     []*http.Cookie{},
 		},
 	}
 
@@ -39,6 +40,7 @@ func TestCreateNewPostRequest(t *testing.T) {
 			client:      &http.Client{},
 			insecure:    false,
 			printDetail: false,
+			cookies:     []*http.Cookie{},
 		},
 	}
 
@@ -55,6 +57,7 @@ func TestCreateNewPutRequest(t *testing.T) {
 			client:      &http.Client{},
 			insecure:    false,
 			printDetail: false,
+			cookies:     []*http.Cookie{},
 		},
 	}
 
@@ -71,6 +74,7 @@ func TestCreateNewPatchRequest(t *testing.T) {
 			client:      &http.Client{},
 			insecure:    false,
 			printDetail: false,
+			cookies:     []*http.Cookie{},
 		},
 	}
 
@@ -87,6 +91,7 @@ func TestCreateNewOptionRequest(t *testing.T) {
 			client:      &http.Client{},
 			insecure:    false,
 			printDetail: false,
+			cookies:     []*http.Cookie{},
 		},
 	}
 
@@ -103,6 +108,7 @@ func TestCreateNewDeleteRequest(t *testing.T) {
 			client:      &http.Client{},
 			insecure:    false,
 			printDetail: false,
+			cookies:     []*http.Cookie{},
 		},
 	}
 
@@ -123,6 +129,7 @@ func TestCreateNewGetSecureRequest(t *testing.T) {
 			},
 			insecure:    true,
 			printDetail: false,
+			cookies:     []*http.Cookie{},
 		},
 	}
 
@@ -143,6 +150,7 @@ func TestCreateNewPostSecureRequest(t *testing.T) {
 			},
 			insecure:    true,
 			printDetail: false,
+			cookies:     []*http.Cookie{},
 		},
 	}
 
@@ -163,6 +171,7 @@ func TestCreateNewPutSecureRequest(t *testing.T) {
 			},
 			insecure:    true,
 			printDetail: false,
+			cookies:     []*http.Cookie{},
 		},
 	}
 
@@ -183,6 +192,7 @@ func TestCreateNewPatchSecureRequest(t *testing.T) {
 			},
 			insecure:    true,
 			printDetail: false,
+			cookies:     []*http.Cookie{},
 		},
 	}
 
@@ -203,6 +213,7 @@ func TestCreateNewOptionSecureRequest(t *testing.T) {
 			},
 			insecure:    true,
 			printDetail: false,
+			cookies:     []*http.Cookie{},
 		},
 	}
 
@@ -223,6 +234,7 @@ func TestCreateNewDeleteSecureRequest(t *testing.T) {
 			},
 			insecure:    true,
 			printDetail: false,
+			cookies:     []*http.Cookie{},
 		},
 	}
 

@@ -20,6 +20,9 @@ func (d *Deleter) Request(url, body string) (*http.Response, error) {
 	for k, v := range d.Requester.headers {
 		r.Header.Set(k, v)
 	}
+	for _, cookie := range d.Requester.cookies {
+		r.AddCookie(cookie)
+	}
 
 	d.Requester.LogRequest(r)
 

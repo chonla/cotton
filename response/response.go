@@ -14,6 +14,7 @@ type Response struct {
 	Status      string
 	StatusCode  int
 	Header      map[string][]string
+	Cookies     []*http.Cookie
 	Body        string
 	printDetail bool
 }
@@ -40,6 +41,7 @@ func NewResponse(resp *http.Response, detail bool) *Response {
 		StatusCode:  resp.StatusCode,
 		Header:      headers,
 		Body:        string(body),
+		Cookies:     resp.Cookies(),
 		printDetail: detail,
 	}
 
@@ -67,4 +69,12 @@ func (r *Response) LogResponse() {
 		fmt.Printf("%s\n", blue(r.Body))
 	}
 	fmt.Printf("%s\n", magenta("-->>"))
+
+	// if len(r.Cookies) > 0 {
+	// 	fmt.Printf("%s %s\n", magenta("::"), white("COOKIES"))
+	// 	for _, v := range r.Cookies {
+	// 		fmt.Printf("%s: %s\n", yellow(v.Name), v.Value)
+	// 	}
+	// 	fmt.Printf("%s\n", magenta("::"))
+	// }
 }
