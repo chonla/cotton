@@ -50,7 +50,7 @@ func main() {
 	flag.BoolVar(&detail, "d", false, "detail mode -- to dump test detail")
 	flag.BoolVar(&insecure, "i", false, "insecure mode -- to disable certificate verification")
 	flag.BoolVar(&watch, "w", false, "watch mode -- to auto-rerun when files are changed")
-	flag.BoolVar(&stopWhenFailed, "s", false, "panic mode -- stop when failed")
+	flag.BoolVar(&stopWhenFailed, "s", false, "panic mode -- to stop when failed")
 	flag.BoolVar(&ver, "v", false, "show cotton version")
 	flag.BoolVar(&help, "h", false, "show this help")
 	flag.Var(&vars, "p", "to inject predefined in variable-name=variable-value format")
