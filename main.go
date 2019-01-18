@@ -53,7 +53,7 @@ func main() {
 	flag.BoolVar(&ver, "v", false, "show cotton version")
 	flag.BoolVar(&help, "h", false, "show this help")
 	flag.Var(&vars, "p", "to inject predefined in variable-name=variable-value format")
-	flag.BoolVal(&stopWhenFailed, "s", false, "stop when failed")
+	flag.BoolVar(&stopWhenFailed, "s", false, "stop when failed")
 	flag.Parse()
 
 	if ver {
