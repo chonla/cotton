@@ -15,7 +15,7 @@ import (
 )
 
 // VERSION of cotton
-const VERSION = "0.2.3"
+const VERSION = "0.3.0"
 
 // Vars are injected variables from command line
 type Vars []string
@@ -41,6 +41,7 @@ func main() {
 	var insecure bool
 	var detail bool
 	var watch bool
+	var stopWhenFailed bool
 	var vars Vars
 
 	flag.Usage = usage
@@ -52,6 +53,7 @@ func main() {
 	flag.BoolVar(&ver, "v", false, "show cotton version")
 	flag.BoolVar(&help, "h", false, "show this help")
 	flag.Var(&vars, "p", "to inject predefined in variable-name=variable-value format")
+	flag.BoolVal(&stopWhenFailed, "s", false, "stop when failed")
 	flag.Parse()
 
 	if ver {
@@ -77,18 +79,6 @@ func main() {
 	}
 	c.SetParser(parser.NewParser())
 
-	// ts, e := parser.Parse(testpath)
-	// if e != nil {
-	// 	fmt.Printf("%s\n", e.Error())
-	// 	os.Exit(1)
-	// }
-	// ts.BaseURL = url
-	// ts.Config = &testsuite.Config{
-	// 	Insecure: insecure,
-	// 	Detail:   detail,
-	// }
-
-	// exitCode := dispatchTests(ts, vars, detail)
 	_, exitCode := c.Run()
 
 	if watch {
@@ -111,7 +101,6 @@ func main() {
 				case event := <-watcher.Events:
 					if event.Op&fsnotify.Write == fsnotify.Write {
 						fmt.Printf("\n%s\n\n", yellow("(File changes detected. Rerun tests.)"))
-						//dispatchTests(ts, vars, detail)
 						_, exitCode = c.Run()
 						fmt.Printf("\n%s\n", yellow("(Watching...)"))
 					}
@@ -130,7 +119,7 @@ func main() {
 func usage() {
 	fmt.Println("Usage of cotton:")
 	fmt.Println()
-	fmt.Println("  cotton [-u <base-url>] [-i] [-d] [-p name1=value1] [-p name2=value2] ... <test-cases>")
+	fmt.Println("  cotton [-u <base-url>] [-i] [-d] [-s] [-p name1=value1] [-p name2=value2] ... <test-cases>")
 	fmt.Println()
 	fmt.Println("  test-cases can be a markdown file or a directory contain markdowns.")
 	fmt.Println()
