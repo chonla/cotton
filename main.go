@@ -15,7 +15,7 @@ import (
 )
 
 // VERSION of cotton
-const VERSION = "0.3.0"
+const VERSION = "0.3.1"
 
 // Vars are injected variables from command line
 type Vars []string
@@ -50,10 +50,10 @@ func main() {
 	flag.BoolVar(&detail, "d", false, "detail mode -- to dump test detail")
 	flag.BoolVar(&insecure, "i", false, "insecure mode -- to disable certificate verification")
 	flag.BoolVar(&watch, "w", false, "watch mode -- to auto-rerun when files are changed")
+	flag.BoolVar(&stopWhenFailed, "s", false, "panic mode -- stop when failed")
 	flag.BoolVar(&ver, "v", false, "show cotton version")
 	flag.BoolVar(&help, "h", false, "show this help")
 	flag.Var(&vars, "p", "to inject predefined in variable-name=variable-value format")
-	flag.BoolVar(&stopWhenFailed, "s", false, "stop when failed")
 	flag.Parse()
 
 	if ver {
@@ -68,10 +68,11 @@ func main() {
 	}
 
 	c, e := cotton.NewCotton(testpath, cotton.Config{
-		BaseURL:   url,
-		Insecure:  insecure,
-		Verbose:   detail,
-		Variables: vars,
+		BaseURL:        url,
+		Insecure:       insecure,
+		Verbose:        detail,
+		Variables:      vars,
+		StopWhenFailed: stopWhenFailed,
 	})
 	if e != nil {
 		fmt.Printf("%s\n", e.Error())

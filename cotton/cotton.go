@@ -22,10 +22,11 @@ type Cotton struct {
 
 // Config holds cotton configuration
 type Config struct {
-	BaseURL   string
-	Insecure  bool
-	Verbose   bool
-	Variables []string
+	BaseURL        string
+	Insecure       bool
+	Verbose        bool
+	Variables      []string
+	StopWhenFailed bool
 }
 
 // NewCotton creates a new cotton.
@@ -75,11 +76,14 @@ func (c *Cotton) Run() (testsuite.TestStat, int) {
 		ts.SetVariables(preVars)
 	}
 
+	suiteConfig := &testsuite.Config{
+		Insecure:       c.Insecure,
+		Detail:         c.Verbose,
+		StopWhenFailed: c.StopWhenFailed,
+	}
+
 	ts.SetBaseURL(c.BaseURL)
-	ts.SetConfig(&testsuite.Config{
-		Insecure: c.Insecure,
-		Detail:   c.Verbose,
-	})
+	ts.SetConfig(suiteConfig)
 
 	ts.Run()
 	exitCode := ts.Summary()

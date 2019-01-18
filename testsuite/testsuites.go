@@ -38,8 +38,9 @@ func (ts *TestSuites) SetBaseURL(url string) {
 // SetConfig to set configuration
 func (ts *TestSuites) SetConfig(conf *Config) {
 	ts.Config = &Config{
-		Insecure: conf.Insecure,
-		Detail:   conf.Detail,
+		Insecure:       conf.Insecure,
+		Detail:         conf.Detail,
+		StopWhenFailed: conf.StopWhenFailed,
 	}
 }
 
@@ -62,9 +63,13 @@ func (ts *TestSuites) Run() {
 		suite.BaseURL = ts.BaseURL
 		suite.Config = ts.Config
 		suite.Variables = ts.Variables
-		suite.Run()
+		e := suite.Run()
 		ts.stat.Total += suite.Stat.Total
 		ts.stat.Success += suite.Stat.Success
+
+		if e != nil && ts.Config.StopWhenFailed {
+			return
+		}
 	}
 }
 
