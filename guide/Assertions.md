@@ -13,6 +13,7 @@ All variable names are case-insensitive.
 | StatusCode | HTTP Response Status Code, e.g. `200`, `404` |
 | Status | HTTP Response Status, e.g. `200 OK` |
 | Header.&lt;header-name&gt; | Value in header corresponding to the `header-name` given |
+| Cookies.&lt;cookie-name&gt; | Value in cookie corresponding to the `cookie-name` given |
 | Data.&lt;data-name&gt; | Data in response body, available only when data is JSON (data must be JSON parsable and content-type must be `application/json`) |
 
 ## Predefined Expectation
