@@ -29,6 +29,7 @@ type TestCase struct {
 	Variables    map[string]string
 	Captured     map[string]string
 	Cookies      []*http.Cookie
+	UploadList   request.UploadFiles
 }
 
 // NewTestCase creates a new testcase
@@ -41,12 +42,13 @@ func NewTestCase(name string) *TestCase {
 			Insecure: false,
 			Detail:   false,
 		},
-		Captures:  map[string]string{},
-		Setups:    []*Task{},
-		Teardowns: []*Task{},
-		Variables: map[string]string{},
-		Captured:  map[string]string{},
-		Cookies:   []*http.Cookie{},
+		Captures:   map[string]string{},
+		Setups:     []*Task{},
+		Teardowns:  []*Task{},
+		Variables:  map[string]string{},
+		Captured:   map[string]string{},
+		Cookies:    []*http.Cookie{},
+		UploadList: []*request.UploadFile{},
 	}
 }
 
@@ -136,7 +138,22 @@ func (tc *TestCase) Run() error {
 
 	targetURL := tc.applyVars(url)
 	fmt.Printf("Action: %s %s\n", white(tc.Method), yellow(targetURL))
-	resp, e := req.Request(targetURL, tc.applyVars(tc.RequestBody))
+
+	reqBody := tc.applyVars(tc.RequestBody)
+	if len(tc.UploadList) > 0 {
+		uploadRequest, e := tc.UploadList.ToRequestBody()
+		if e != nil {
+			return e
+		}
+
+		reqBody = uploadRequest.RequestBody
+		req.SetHeaders(map[string]string{
+			"Content-Type":   uploadRequest.ContentType,
+			"Content-Length": fmt.Sprintf("%d", len(reqBody)),
+		})
+	}
+
+	resp, e := req.Request(targetURL, reqBody)
 	if e != nil {
 		fmt.Printf("%s: %s\n", red("Error"), e)
 		return e

@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/chonla/cotton/assertable"
+	"github.com/chonla/cotton/request"
 	ts "github.com/chonla/cotton/testsuite"
 	"github.com/stretchr/testify/assert"
 )
@@ -37,7 +38,8 @@ func TestParseSimpleAction(t *testing.T) {
 				Insecure: false,
 				Detail:   false,
 			},
-			Cookies: []*http.Cookie{},
+			Cookies:    []*http.Cookie{},
+			UploadList: []*request.UploadFile{},
 		},
 	}, result)
 }
@@ -72,7 +74,8 @@ func TestParseMultipleSimpleAction(t *testing.T) {
 				Insecure: false,
 				Detail:   false,
 			},
-			Cookies: []*http.Cookie{},
+			Cookies:    []*http.Cookie{},
+			UploadList: []*request.UploadFile{},
 		},
 		&ts.TestCase{
 			Name:         "Another Test Case Name",
@@ -89,7 +92,8 @@ func TestParseMultipleSimpleAction(t *testing.T) {
 				Insecure: false,
 				Detail:   false,
 			},
-			Cookies: []*http.Cookie{},
+			Cookies:    []*http.Cookie{},
+			UploadList: []*request.UploadFile{},
 		},
 	}, result)
 }
@@ -126,7 +130,8 @@ func TestParsePostAction(t *testing.T) {
 				Insecure: false,
 				Detail:   false,
 			},
-			Cookies: []*http.Cookie{},
+			Cookies:    []*http.Cookie{},
+			UploadList: []*request.UploadFile{},
 		},
 	}, result)
 }
@@ -171,7 +176,8 @@ func TestParseActionWithHeader(t *testing.T) {
 				Insecure: false,
 				Detail:   false,
 			},
-			Cookies: []*http.Cookie{},
+			Cookies:    []*http.Cookie{},
+			UploadList: []*request.UploadFile{},
 		},
 	}, result)
 }
@@ -238,7 +244,8 @@ func TestParseActionWithExpectations(t *testing.T) {
 				Insecure: false,
 				Detail:   false,
 			},
-			Cookies: []*http.Cookie{},
+			Cookies:    []*http.Cookie{},
+			UploadList: []*request.UploadFile{},
 		},
 	}, result)
 }
@@ -315,7 +322,8 @@ func TestParseActionWithCaptures(t *testing.T) {
 				Insecure: false,
 				Detail:   false,
 			},
-			Cookies: []*http.Cookie{},
+			Cookies:    []*http.Cookie{},
+			UploadList: []*request.UploadFile{},
 		},
 	}, result)
 }
@@ -456,7 +464,8 @@ func TestParseActionWithFullSections(t *testing.T) {
 				Insecure: false,
 				Detail:   false,
 			},
-			Cookies: []*http.Cookie{},
+			Cookies:    []*http.Cookie{},
+			UploadList: []*request.UploadFile{},
 			Setups: []*ts.Task{
 				&ts.Task{
 					Name:        "Login",
@@ -473,7 +482,8 @@ func TestParseActionWithFullSections(t *testing.T) {
 						Insecure: false,
 						Detail:   false,
 					},
-					Cookies: []*http.Cookie{},
+					Cookies:    []*http.Cookie{},
+					UploadList: []*request.UploadFile{},
 				},
 				&ts.Task{
 					Name:        "Create ToDo",
@@ -490,7 +500,8 @@ func TestParseActionWithFullSections(t *testing.T) {
 						Insecure: false,
 						Detail:   false,
 					},
-					Cookies: []*http.Cookie{},
+					Cookies:    []*http.Cookie{},
+					UploadList: []*request.UploadFile{},
 				},
 			},
 			Teardowns: []*ts.Task{
@@ -506,7 +517,8 @@ func TestParseActionWithFullSections(t *testing.T) {
 						Insecure: false,
 						Detail:   false,
 					},
-					Cookies: []*http.Cookie{},
+					Cookies:    []*http.Cookie{},
+					UploadList: []*request.UploadFile{},
 				},
 				&ts.Task{
 					Name:      "Logout",
@@ -520,7 +532,55 @@ func TestParseActionWithFullSections(t *testing.T) {
 						Insecure: false,
 						Detail:   false,
 					},
-					Cookies: []*http.Cookie{},
+					Cookies:    []*http.Cookie{},
+					UploadList: []*request.UploadFile{},
+				},
+			},
+		},
+	}, result)
+}
+
+func TestParseUploadWithPostAction(t *testing.T) {
+	data := `# Test Case Name
+
+## POST /todos
+
+### Upload file list
+
+* [fieldname](./path/filename.txt)
+* [fieldname](./path/filename2.txt)
+`
+
+	p := NewParser()
+	result, e := p.ParseString(data, "")
+
+	assert.Nil(t, e)
+	assert.Equal(t, []*ts.TestCase{
+		&ts.TestCase{
+			Name:         "Test Case Name",
+			Method:       "POST",
+			Path:         "/todos",
+			RequestBody:  "",
+			Headers:      map[string]string{},
+			Expectations: []assertable.Row{},
+			Captures:     map[string]string{},
+			Variables:    map[string]string{},
+			Captured:     map[string]string{},
+			Setups:       []*ts.Task{},
+			Teardowns:    []*ts.Task{},
+			Config: &ts.Config{
+				Insecure: false,
+				Detail:   false,
+			},
+			Cookies: []*http.Cookie{},
+			UploadList: []*request.UploadFile{
+				&request.UploadFile{
+					FieldName: "fieldname",
+					FileName:  "./path/filename.txt",
+				},
+				&request.UploadFile{
+					FieldName: "fieldname",
+					FileName:  "./path/filename2.txt",
 				},
 			},
 		},

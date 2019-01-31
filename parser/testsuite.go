@@ -11,6 +11,7 @@ import (
 
 	"github.com/chonla/cotton/assertable"
 	"github.com/chonla/cotton/markdown"
+	"github.com/chonla/cotton/request"
 	ts "github.com/chonla/cotton/testsuite"
 )
 
@@ -191,6 +192,16 @@ func (p *Parser) ParseString(content, filePath string) ([]*ts.TestCase, error) {
 			}
 		case "Bullet":
 			switch section {
+			case "request":
+				se := elm.(*markdown.RichTextElement)
+				if len(se.Anchor) > 0 {
+					for _, anc := range se.Anchor {
+						tc.UploadList = append(tc.UploadList, &request.UploadFile{
+							FieldName: anc.Text,
+							FileName:  anc.Link,
+						})
+					}
+				}
 			case "preconditions":
 				se := elm.(*markdown.RichTextElement)
 				if len(se.Anchor) > 0 {

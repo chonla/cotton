@@ -26,6 +26,7 @@ type Task struct {
 	Captured    map[string]string
 	Variables   map[string]string
 	Cookies     []*http.Cookie
+	UploadList  request.UploadFiles
 }
 
 // NewTask to create a new task
@@ -46,6 +47,7 @@ func NewTask(t *TestCase) *Task {
 		Variables:   map[string]string{},
 		Captured:    map[string]string{},
 		Cookies:     []*http.Cookie{},
+		UploadList:  []*request.UploadFile{},
 	}
 }
 
@@ -61,6 +63,7 @@ func (t *Task) Run() error {
 	}
 	req.SetHeaders(t.applyVarsToMap(t.Headers))
 	req.SetCookies(t.Cookies)
+
 	resp, e := req.Request(t.applyVars(url), t.applyVars(t.RequestBody))
 	if e != nil {
 		fmt.Printf("%s: %s\n", red("Error"), e)

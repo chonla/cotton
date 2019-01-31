@@ -168,7 +168,7 @@ func tryColumn(data string) ([]string, bool) {
 }
 
 func extractAnchors(data string) []AnchorElement {
-	re := regexp.MustCompile(`\[([^\]]+)\]\(([^\)]+)\)`)
+	re := regexp.MustCompile(`\[(.+)\]\(([^\)]+)\)`)
 	m := re.FindAllStringSubmatch(data, -1)
 	a := []AnchorElement{}
 	for _, match := range m {

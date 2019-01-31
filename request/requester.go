@@ -132,8 +132,14 @@ func (r *Requester) LogBody(body string) {
 
 func (r *Requester) prettifyJSON(jsonString string) string {
 	jsonObj := map[string]interface{}{}
-	json.Unmarshal([]byte(jsonString), &jsonObj)
-	prettyBody, _ := json.MarshalIndent(jsonObj, "", "    ")
+	e := json.Unmarshal([]byte(jsonString), &jsonObj)
+	if e != nil {
+		return jsonString
+	}
+	prettyBody, e := json.MarshalIndent(jsonObj, "", "    ")
+	if e != nil {
+		return jsonString
+	}
 	return string(prettyBody)
 }
 
