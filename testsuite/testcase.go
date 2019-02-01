@@ -48,7 +48,7 @@ func NewTestCase(name string) *TestCase {
 		Variables:  map[string]string{},
 		Captured:   map[string]string{},
 		Cookies:    []*http.Cookie{},
-		UploadList: []*request.UploadFile{},
+		UploadList: request.UploadFiles{},
 	}
 }
 

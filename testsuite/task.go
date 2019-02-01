@@ -47,7 +47,7 @@ func NewTask(t *TestCase) *Task {
 		Variables:   map[string]string{},
 		Captured:    map[string]string{},
 		Cookies:     []*http.Cookie{},
-		UploadList:  []*request.UploadFile{},
+		UploadList:  t.UploadList,
 	}
 }
 
@@ -64,7 +64,21 @@ func (t *Task) Run() error {
 	req.SetHeaders(t.applyVarsToMap(t.Headers))
 	req.SetCookies(t.Cookies)
 
-	resp, e := req.Request(t.applyVars(url), t.applyVars(t.RequestBody))
+	reqBody := t.applyVars(t.RequestBody)
+	if len(t.UploadList) > 0 {
+		uploadRequest, e := t.UploadList.ToRequestBody()
+		if e != nil {
+			return e
+		}
+
+		reqBody = uploadRequest.RequestBody
+		req.SetHeaders(map[string]string{
+			"Content-Type":   uploadRequest.ContentType,
+			"Content-Length": fmt.Sprintf("%d", len(reqBody)),
+		})
+	}
+
+	resp, e := req.Request(t.applyVars(url), reqBody)
 	if e != nil {
 		fmt.Printf("%s: %s\n", red("Error"), e)
 		return e
