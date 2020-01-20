@@ -187,6 +187,28 @@ func TestFindDataStuffInReferrableShouldReturnCorrespondingDataAndTrueWhenFound(
 	assert.Equal(t, []string{"jane"}, result)
 }
 
+func TestFindDataWithNestedArrayStuffInReferrableShouldReturnCorrespondingDataAndTrueWhenFound(t *testing.T) {
+	jsonString := "{ \"data\": \"ok\", \"list\": [{ \"children\": [{ \"name\": \"john\" }] }, { \"children\": [{\"name\": \"jane\" }] }] }"
+
+	response := &response.Response{
+		Proto:      "http",
+		Status:     "200 OK",
+		StatusCode: 200,
+		Header: map[string][]string{
+			"content-type": []string{
+				"application/json; charset=utf-8",
+			},
+		},
+		Body: jsonString,
+	}
+
+	ref := NewReferrable(response)
+	result, ok := ref.Find("data.list[1].children[0].name")
+
+	assert.True(t, ok)
+	assert.Equal(t, []string{"jane"}, result)
+}
+
 func TestFindDataStuffInDataListReferrableShouldReturnCorrespondingDataAndTrueWhenFound(t *testing.T) {
 	jsonString := "[{ \"name\": \"john\" }, {\"name\": \"jane\" }]"
 

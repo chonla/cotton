@@ -107,8 +107,8 @@ func (a *Referrable) find(k string) (gjson.Result, error) {
 }
 
 func (a *Referrable) convertToGJsonPath(k string) string {
-	re := regexp.MustCompile("(.*)\\[(\\d+)\\](.*)")
-	k = re.ReplaceAllString(k, "$1.$2$3")
+	re := regexp.MustCompile("\\[(\\d+)\\]")
+	k = re.ReplaceAllString(k, ".$1")
 	return k
 }
 
