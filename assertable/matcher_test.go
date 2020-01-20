@@ -152,6 +152,36 @@ func TestIsBuiltInShouldReturnFalseIfStringHasNoStarAtBeginningAndTheEnd(t *test
 	assert.Equal(t, false, result)
 }
 
+func TestIsBuiltInShouldReturnTrueIfStringIsSurroundedByUndersocres(t *testing.T) {
+	result := isBuiltIn("_keyword_")
+	assert.Equal(t, true, result)
+}
+
+func TestIsBuiltInShouldReturnFalseIfStringIsOnlyEndedByUnderscore(t *testing.T) {
+	result := isBuiltIn("a_keyword_")
+	assert.Equal(t, false, result)
+}
+
+func TestIsBuiltInShouldReturnFalseIfStringIsOnlyStartedWithUnderscore(t *testing.T) {
+	result := isBuiltIn("_keyword_a")
+	assert.Equal(t, false, result)
+}
+
+func TestIsBuiltInShouldReturnFalseIfStringHasNoUnderscoreAtBeginningAndTheEnd(t *testing.T) {
+	result := isBuiltIn("a_keyword_a")
+	assert.Equal(t, false, result)
+}
+
+func TestIsBuiltInShouldReturnFalseIfStringStartedWithStarAndEndedWithUnderscore(t *testing.T) {
+	result := isBuiltIn("*keyword_")
+	assert.Equal(t, false, result)
+}
+
+func TestIsBuiltInShouldReturnFalseIfStringStartedWithUnderscoreAndEndedWithStar(t *testing.T) {
+	result := isBuiltIn("_keyword*")
+	assert.Equal(t, false, result)
+}
+
 func TestBuiltInShouldExist(t *testing.T) {
 	jsonString := "{ \"data\": \"ok\", \"list\": [0, 1, 2] }"
 
@@ -169,9 +199,27 @@ func TestBuiltInShouldExist(t *testing.T) {
 
 	assertable := NewAssertable(response)
 
-	m := NewMatcher("data.list", "*should exist*")
-	r, _ := m.Match(assertable)
-	assert.True(t, r)
+	cases := []struct {
+		name  string
+		input string
+	}{
+		{
+			name:  "star",
+			input: "*should exist*",
+		},
+		{
+			name:  "underscore",
+			input: "_should exist_",
+		},
+	}
+
+	for _, v := range cases {
+		t.Run(v.name, func(t *testing.T) {
+			m := NewMatcher("data.list", v.input)
+			r, _ := m.Match(assertable)
+			assert.True(t, r)
+		})
+	}
 }
 
 func TestBuiltInShouldExistOnNullValue(t *testing.T) {
@@ -191,9 +239,27 @@ func TestBuiltInShouldExistOnNullValue(t *testing.T) {
 
 	assertable := NewAssertable(response)
 
-	m := NewMatcher("data.target", "*should exist*")
-	r, _ := m.Match(assertable)
-	assert.True(t, r)
+	cases := []struct {
+		name  string
+		input string
+	}{
+		{
+			name:  "star",
+			input: "*should exist*",
+		},
+		{
+			name:  "underscore",
+			input: "_should exist_",
+		},
+	}
+
+	for _, v := range cases {
+		t.Run(v.name, func(t *testing.T) {
+			m := NewMatcher("data.target", v.input)
+			r, _ := m.Match(assertable)
+			assert.True(t, r)
+		})
+	}
 }
 
 func TestBuiltInShouldNotExist(t *testing.T) {
@@ -213,9 +279,27 @@ func TestBuiltInShouldNotExist(t *testing.T) {
 
 	assertable := NewAssertable(response)
 
-	m := NewMatcher("data.no-a-list", "*should not exist*")
-	r, _ := m.Match(assertable)
-	assert.True(t, r)
+	cases := []struct {
+		name  string
+		input string
+	}{
+		{
+			name:  "star",
+			input: "*should not exist*",
+		},
+		{
+			name:  "underscore",
+			input: "_should not exist_",
+		},
+	}
+
+	for _, v := range cases {
+		t.Run(v.name, func(t *testing.T) {
+			m := NewMatcher("data.no-a-list", v.input)
+			r, _ := m.Match(assertable)
+			assert.True(t, r)
+		})
+	}
 }
 
 func TestBuiltInShouldBeNull(t *testing.T) {
@@ -235,9 +319,27 @@ func TestBuiltInShouldBeNull(t *testing.T) {
 
 	assertable := NewAssertable(response)
 
-	m := NewMatcher("data.item", "*should be null*")
-	r, _ := m.Match(assertable)
-	assert.True(t, r)
+	cases := []struct {
+		name  string
+		input string
+	}{
+		{
+			name:  "star",
+			input: "*should be null*",
+		},
+		{
+			name:  "underscore",
+			input: "_should be null_",
+		},
+	}
+
+	for _, v := range cases {
+		t.Run(v.name, func(t *testing.T) {
+			m := NewMatcher("data.item", v.input)
+			r, _ := m.Match(assertable)
+			assert.True(t, r)
+		})
+	}
 }
 
 func TestBuiltInShouldNotBeNull(t *testing.T) {
@@ -257,9 +359,27 @@ func TestBuiltInShouldNotBeNull(t *testing.T) {
 
 	assertable := NewAssertable(response)
 
-	m := NewMatcher("data.item", "*should not be null*")
-	r, _ := m.Match(assertable)
-	assert.True(t, r)
+	cases := []struct {
+		name  string
+		input string
+	}{
+		{
+			name:  "star",
+			input: "*should not be null*",
+		},
+		{
+			name:  "underscore",
+			input: "_should not be null_",
+		},
+	}
+
+	for _, v := range cases {
+		t.Run(v.name, func(t *testing.T) {
+			m := NewMatcher("data.item", v.input)
+			r, _ := m.Match(assertable)
+			assert.True(t, r)
+		})
+	}
 }
 
 func TestBuiltInShouldBeNullOnStringOfNull(t *testing.T) {
@@ -279,9 +399,27 @@ func TestBuiltInShouldBeNullOnStringOfNull(t *testing.T) {
 
 	assertable := NewAssertable(response)
 
-	m := NewMatcher("data.item", "*should be null*")
-	r, _ := m.Match(assertable)
-	assert.False(t, r)
+	cases := []struct {
+		name  string
+		input string
+	}{
+		{
+			name:  "star",
+			input: "*should not be null*",
+		},
+		{
+			name:  "underscore",
+			input: "_should not be null_",
+		},
+	}
+
+	for _, v := range cases {
+		t.Run(v.name, func(t *testing.T) {
+			m := NewMatcher("data.item", v.input)
+			r, _ := m.Match(assertable)
+			assert.True(t, r)
+		})
+	}
 }
 
 func TestBuiltInShouldBeTrue(t *testing.T) {
@@ -301,9 +439,27 @@ func TestBuiltInShouldBeTrue(t *testing.T) {
 
 	assertable := NewAssertable(response)
 
-	m := NewMatcher("data.item", "*should be true*")
-	r, _ := m.Match(assertable)
-	assert.True(t, r)
+	cases := []struct {
+		name  string
+		input string
+	}{
+		{
+			name:  "star",
+			input: "*should be true*",
+		},
+		{
+			name:  "underscore",
+			input: "_should be true_",
+		},
+	}
+
+	for _, v := range cases {
+		t.Run(v.name, func(t *testing.T) {
+			m := NewMatcher("data.item", v.input)
+			r, _ := m.Match(assertable)
+			assert.True(t, r)
+		})
+	}
 }
 
 func TestBuiltInShouldBeFalse(t *testing.T) {
@@ -323,9 +479,27 @@ func TestBuiltInShouldBeFalse(t *testing.T) {
 
 	assertable := NewAssertable(response)
 
-	m := NewMatcher("data.item", "*should be false*")
-	r, _ := m.Match(assertable)
-	assert.True(t, r)
+	cases := []struct {
+		name  string
+		input string
+	}{
+		{
+			name:  "star",
+			input: "*should be false*",
+		},
+		{
+			name:  "underscore",
+			input: "_should be false_",
+		},
+	}
+
+	for _, v := range cases {
+		t.Run(v.name, func(t *testing.T) {
+			m := NewMatcher("data.item", v.input)
+			r, _ := m.Match(assertable)
+			assert.True(t, r)
+		})
+	}
 }
 
 func TestBuiltInShouldBeTrueOnNonBooleanValue(t *testing.T) {
@@ -345,10 +519,28 @@ func TestBuiltInShouldBeTrueOnNonBooleanValue(t *testing.T) {
 
 	assertable := NewAssertable(response)
 
-	m := NewMatcher("data.item", "*should be true*")
-	r, e := m.Match(assertable)
-	assert.False(t, r)
-	assert.NotNil(t, e)
+	cases := []struct {
+		name  string
+		input string
+	}{
+		{
+			name:  "star",
+			input: "*should be true*",
+		},
+		{
+			name:  "underscore",
+			input: "_should be true_",
+		},
+	}
+
+	for _, v := range cases {
+		t.Run(v.name, func(t *testing.T) {
+			m := NewMatcher("data.item", v.input)
+			r, e := m.Match(assertable)
+			assert.False(t, r)
+			assert.NotNil(t, e)
+		})
+	}
 }
 
 func TestBuiltInShouldBeFalseOnNonBooleanValue(t *testing.T) {
@@ -368,8 +560,26 @@ func TestBuiltInShouldBeFalseOnNonBooleanValue(t *testing.T) {
 
 	assertable := NewAssertable(response)
 
-	m := NewMatcher("data.item", "*should be false*")
-	r, e := m.Match(assertable)
-	assert.False(t, r)
-	assert.NotNil(t, e)
+	cases := []struct {
+		name  string
+		input string
+	}{
+		{
+			name:  "star",
+			input: "*should be false*",
+		},
+		{
+			name:  "underscore",
+			input: "_should be false_",
+		},
+	}
+
+	for _, v := range cases {
+		t.Run(v.name, func(t *testing.T) {
+			m := NewMatcher("data.item", v.input)
+			r, e := m.Match(assertable)
+			assert.False(t, r)
+			assert.NotNil(t, e)
+		})
+	}
 }
