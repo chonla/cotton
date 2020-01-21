@@ -29,6 +29,8 @@ Cotton provide some predefined expectation to help assertion. The following expe
 | `*should be true*` | The asserted variable should be boolean with value TRUE. |
 | `*should be false*` | The asserted variable should be boolean with value FALSE. |
 
+Underscores can also be used instead of stars, e.g.: `_should exist_`
+
 ## Example
 
 ```

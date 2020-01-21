@@ -58,7 +58,9 @@ func (m *Matcher) String() string {
 }
 
 func isBuiltIn(v string) bool {
-	return len(v) > 2 && v[0] == '*' && v[len(v)-1] == '*'
+	return len(v) > 2 &&
+		(v[0] == '*' && v[len(v)-1] == '*') ||
+		(v[0] == '_' && v[len(v)-1] == '_')
 }
 
 func isRegExp(v string) bool {
