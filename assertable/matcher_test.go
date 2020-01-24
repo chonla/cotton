@@ -29,7 +29,7 @@ func TestIsRegShouldReturnFalseIfStringHasNoSlashAtBeginningAndTheEnd(t *testing
 }
 
 func TestNewMatcherShouldReturnRegexMatcherIfPatternIsRegularExpression(t *testing.T) {
-	m := NewMatcher("key", "/pattern/")
+	m := NewMatcher("key", "/pattern/", nil)
 	assert.Equal(t, &Matcher{
 		reg:     regexp.MustCompile("pattern"),
 		value:   "/pattern/",
@@ -39,12 +39,45 @@ func TestNewMatcherShouldReturnRegexMatcherIfPatternIsRegularExpression(t *testi
 }
 
 func TestNewMatcherShouldReturnStringMatcherIfPatternIsNotRegularExpression(t *testing.T) {
-	m := NewMatcher("key", "a/pattern/b")
+	m := NewMatcher("key", "a/pattern/b", nil)
+	assert.Equal(t, &Matcher{
+		reg:         nil,
+		value:       "a/pattern/b",
+		actualValue: "a/pattern/b",
+		key:         "key",
+		builtIn:     false,
+	}, m)
+}
+
+func TestNewMatcherShouldReturnBuiltInMatcherIfPatternIsBuiltIn(t *testing.T) {
+	m := NewMatcher("key", "*should exist*", nil)
 	assert.Equal(t, &Matcher{
 		reg:     nil,
-		value:   "a/pattern/b",
+		value:   "should exist",
 		key:     "key",
-		builtIn: false,
+		builtIn: true,
+	}, m)
+}
+
+func TestNewMatcherShouldReturnStringMatcherIfPatternIsNotBuiltIn(t *testing.T) {
+	m := NewMatcher("key", "should exist", nil)
+	assert.Equal(t, &Matcher{
+		reg:         nil,
+		value:       "should exist",
+		actualValue: "should exist",
+		key:         "key",
+		builtIn:     false,
+	}, m)
+}
+
+func TestNewMatcherShouldReturnStringMatcherWithActualValueIfPatternHasVariables(t *testing.T) {
+	m := NewMatcher("key", "{var1},{var2}", map[string]string{"var1": "value1", "var2": "value2"})
+	assert.Equal(t, &Matcher{
+		reg:         nil,
+		value:       "{var1},{var2}",
+		actualValue: "value1,value2",
+		key:         "key",
+		builtIn:     false,
 	}, m)
 }
 
@@ -65,27 +98,33 @@ func TestMatcherWithRegularExpressionShouldFailure(t *testing.T) {
 
 	assertable := NewAssertable(response)
 
-	m := NewMatcher("header.content-type", "/pattern/")
+	m := NewMatcher("header.content-type", "/pattern/", nil)
 	r, _ := m.Match(assertable)
 	assert.False(t, r)
 }
 
 func TestToStringShouldShowItIsRegexIfPatternIsRegularExpression(t *testing.T) {
-	m := NewMatcher("key", "/pattern/")
+	m := NewMatcher("key", "/pattern/", nil)
 	result := m.String()
 	assert.Equal(t, "with Regex(/pattern/)", result)
 }
 
 func TestToStringShouldShowBuiltinKeywordIfItIsBuiltIn(t *testing.T) {
-	m := NewMatcher("key", "*pattern*")
+	m := NewMatcher("key", "*pattern*", nil)
 	result := m.String()
 	assert.Equal(t, "pattern", result)
 }
 
 func TestToStringShouldShowItIsRegexIfPatternIsNotRegularExpression(t *testing.T) {
-	m := NewMatcher("key", "/pattern/a")
+	m := NewMatcher("key", "/pattern/a", nil)
 	result := m.String()
 	assert.Equal(t, "with /pattern/a", result)
+}
+
+func TestToStringShouldShowActualValueIfPatternHasVariables(t *testing.T) {
+	m := NewMatcher("key", "{var1},{var2}", map[string]string{"var1": "value1", "var2": "value2"})
+	result := m.String()
+	assert.Equal(t, "with value1,value2 as {var1},{var2}", result)
 }
 
 func TestMatchStringShouldDoExactMatch(t *testing.T) {
@@ -105,7 +144,31 @@ func TestMatchStringShouldDoExactMatch(t *testing.T) {
 
 	assertable := NewAssertable(response)
 
-	m := NewMatcher("header.content-type", "application/json; charset=utf-8")
+	m := NewMatcher("header.content-type", "application/json; charset=utf-8", nil)
+	r, _ := m.Match(assertable)
+	assert.True(t, r)
+}
+func TestMatchStringShouldDoExactMatchToActualValue(t *testing.T) {
+	jsonString := "{ \"data\": \"ok\", \"list\": [0, 1, 2], \"joined\": \"0-1-2\" }"
+
+	response := &response.Response{
+		Proto:      "http",
+		Status:     "200 OK",
+		StatusCode: 200,
+		Header: map[string][]string{
+			"content-type": []string{
+				"application/json; charset=utf-8",
+			},
+		},
+		Body: jsonString,
+	}
+
+	assertable := NewAssertable(response)
+	assertable.Variables["first"] = "0"
+	assertable.Variables["second"] = "1"
+	assertable.Variables["third"] = "2"
+
+	m := NewMatcher("data.joined", "{first}-{second}-{third}", assertable.Variables)
 	r, _ := m.Match(assertable)
 	assert.True(t, r)
 }
@@ -127,7 +190,7 @@ func TestMatchStringShouldDoRegularExpressionMatch(t *testing.T) {
 
 	assertable := NewAssertable(response)
 
-	m := NewMatcher("header.content-type", "/^application/json/")
+	m := NewMatcher("header.content-type", "/^application/json/", nil)
 	r, _ := m.Match(assertable)
 	assert.True(t, r)
 }
@@ -215,7 +278,7 @@ func TestBuiltInShouldExist(t *testing.T) {
 
 	for _, v := range cases {
 		t.Run(v.name, func(t *testing.T) {
-			m := NewMatcher("data.list", v.input)
+			m := NewMatcher("data.list", v.input, nil)
 			r, _ := m.Match(assertable)
 			assert.True(t, r)
 		})
@@ -255,7 +318,7 @@ func TestBuiltInShouldExistOnNullValue(t *testing.T) {
 
 	for _, v := range cases {
 		t.Run(v.name, func(t *testing.T) {
-			m := NewMatcher("data.target", v.input)
+			m := NewMatcher("data.target", v.input, nil)
 			r, _ := m.Match(assertable)
 			assert.True(t, r)
 		})
@@ -295,7 +358,7 @@ func TestBuiltInShouldNotExist(t *testing.T) {
 
 	for _, v := range cases {
 		t.Run(v.name, func(t *testing.T) {
-			m := NewMatcher("data.no-a-list", v.input)
+			m := NewMatcher("data.no-a-list", v.input, nil)
 			r, _ := m.Match(assertable)
 			assert.True(t, r)
 		})
@@ -335,7 +398,7 @@ func TestBuiltInShouldBeNull(t *testing.T) {
 
 	for _, v := range cases {
 		t.Run(v.name, func(t *testing.T) {
-			m := NewMatcher("data.item", v.input)
+			m := NewMatcher("data.item", v.input, nil)
 			r, _ := m.Match(assertable)
 			assert.True(t, r)
 		})
@@ -375,7 +438,7 @@ func TestBuiltInShouldNotBeNull(t *testing.T) {
 
 	for _, v := range cases {
 		t.Run(v.name, func(t *testing.T) {
-			m := NewMatcher("data.item", v.input)
+			m := NewMatcher("data.item", v.input, nil)
 			r, _ := m.Match(assertable)
 			assert.True(t, r)
 		})
@@ -415,7 +478,7 @@ func TestBuiltInShouldBeNullOnStringOfNull(t *testing.T) {
 
 	for _, v := range cases {
 		t.Run(v.name, func(t *testing.T) {
-			m := NewMatcher("data.item", v.input)
+			m := NewMatcher("data.item", v.input, nil)
 			r, _ := m.Match(assertable)
 			assert.True(t, r)
 		})
@@ -455,7 +518,7 @@ func TestBuiltInShouldBeTrue(t *testing.T) {
 
 	for _, v := range cases {
 		t.Run(v.name, func(t *testing.T) {
-			m := NewMatcher("data.item", v.input)
+			m := NewMatcher("data.item", v.input, nil)
 			r, _ := m.Match(assertable)
 			assert.True(t, r)
 		})
@@ -495,7 +558,7 @@ func TestBuiltInShouldBeFalse(t *testing.T) {
 
 	for _, v := range cases {
 		t.Run(v.name, func(t *testing.T) {
-			m := NewMatcher("data.item", v.input)
+			m := NewMatcher("data.item", v.input, nil)
 			r, _ := m.Match(assertable)
 			assert.True(t, r)
 		})
@@ -535,7 +598,7 @@ func TestBuiltInShouldBeTrueOnNonBooleanValue(t *testing.T) {
 
 	for _, v := range cases {
 		t.Run(v.name, func(t *testing.T) {
-			m := NewMatcher("data.item", v.input)
+			m := NewMatcher("data.item", v.input, nil)
 			r, e := m.Match(assertable)
 			assert.False(t, r)
 			assert.NotNil(t, e)
@@ -576,7 +639,7 @@ func TestBuiltInShouldBeFalseOnNonBooleanValue(t *testing.T) {
 
 	for _, v := range cases {
 		t.Run(v.name, func(t *testing.T) {
-			m := NewMatcher("data.item", v.input)
+			m := NewMatcher("data.item", v.input, nil)
 			r, e := m.Match(assertable)
 			assert.False(t, r)
 			assert.NotNil(t, e)

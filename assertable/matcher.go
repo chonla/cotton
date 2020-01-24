@@ -10,14 +10,15 @@ import (
 
 // Matcher is matcher
 type Matcher struct {
-	reg     *regexp.Regexp
-	builtIn bool
-	key     string
-	value   string
+	reg         *regexp.Regexp
+	builtIn     bool
+	key         string
+	value       string
+	actualValue string
 }
 
 // NewMatcher creates a new matcher
-func NewMatcher(k, v string) *Matcher {
+func NewMatcher(k, v string, vars map[string]string) *Matcher {
 	var m *Matcher
 	if isRegExp(v) {
 		m = &Matcher{
@@ -35,11 +36,13 @@ func NewMatcher(k, v string) *Matcher {
 				value:   v[1 : len(v)-1],
 			}
 		} else {
+			applied := applyVars(v, vars)
 			m = &Matcher{
-				reg:     nil,
-				builtIn: false,
-				key:     k,
-				value:   v,
+				reg:         nil,
+				builtIn:     false,
+				key:         k,
+				value:       v,
+				actualValue: applied,
 			}
 		}
 	}
@@ -53,6 +56,9 @@ func (m *Matcher) String() string {
 	}
 	if m.builtIn {
 		return fmt.Sprintf("%s", magenta(m.value))
+	}
+	if m.value != m.actualValue {
+		return fmt.Sprintf("with %s as %s", magenta(m.actualValue), magenta(m.value))
 	}
 	return fmt.Sprintf("with %s", magenta(m.value))
 }
@@ -70,6 +76,9 @@ func isRegExp(v string) bool {
 func (m *Matcher) match(v string) bool {
 	if m.reg != nil {
 		return m.reg.MatchString(v)
+	}
+	if m.value != m.actualValue {
+		return m.actualValue == v
 	}
 	return m.value == v
 }
@@ -131,4 +140,11 @@ func (m *Matcher) Match(a *Assertable) (bool, error) {
 		return false, fmt.Errorf("expect %s in %s, but not", red(m.value), red(m.key))
 	}
 	return false, fmt.Errorf("response does not contain %s", m.key)
+}
+
+func applyVars(data string, vars map[string]string) string {
+	for k, v := range vars {
+		data = strings.ReplaceAll(data, fmt.Sprintf("{%s}", k), v)
+	}
+	return data
 }

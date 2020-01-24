@@ -190,6 +190,11 @@ func (tc *TestCase) Run() error {
 	}
 
 	as := assertable.NewAssertable(r)
+	if len(tc.Variables) > 0 {
+		for k, v := range tc.Variables {
+			as.Variables[k] = v
+		}
+	}
 
 	assertResult := as.Assert(tc.Expectations)
 
