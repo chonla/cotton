@@ -48,6 +48,7 @@ func (a *Assertable) Assert(ex []Row) error {
 			fmt.Printf("%s\n", green("PASSED"))
 		} else {
 			fmt.Printf("%s\n", red("FAILED"))
+			fmt.Printf("    %s\n", e)
 			return e
 		}
 	}
