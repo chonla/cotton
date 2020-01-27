@@ -142,7 +142,7 @@ func (m *Matcher) Match(a *Assertable) (bool, error) {
 		case 0:
 			err = fmt.Errorf("%s is empty", red(m.key))
 		case 1:
-			err = fmt.Errorf("expect %s as %s, but acutal value is %s", red(m.value), red(m.key), red(val[0]))
+			err = fmt.Errorf("expect %s as %s, but actual value is %s", red(m.value), red(m.key), red(val[0]))
 		default:
 			err = fmt.Errorf("expect %s in %s%q, but not", red(m.value), red(m.key), val)
 		}
