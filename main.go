@@ -15,7 +15,7 @@ import (
 )
 
 // VERSION of cotton
-const VERSION = "0.3.6"
+const VERSION = "0.3.7"
 
 // Vars are injected variables from command line
 type Vars []string
