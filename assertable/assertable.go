@@ -12,6 +12,7 @@ import (
 // Assertable is something assertable
 type Assertable struct {
 	*referrable.Referrable
+	Variables map[string]string
 }
 
 // Row is assertion entry
@@ -26,6 +27,7 @@ func NewAssertable(resp *response.Response) *Assertable {
 
 	return &Assertable{
 		Referrable: ref,
+		Variables:  map[string]string{},
 	}
 }
 
@@ -41,7 +43,7 @@ func (a *Assertable) Assert(ex []Row) error {
 	}
 
 	for _, row := range ex {
-		m := NewMatcher(row.Field, row.Expectation)
+		m := NewMatcher(row.Field, row.Expectation, a.Variables)
 		fmt.Printf("* Assert %s %s...", blue(row.Field), m)
 		r, e := m.Match(a)
 		if r {

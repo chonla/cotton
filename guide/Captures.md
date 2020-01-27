@@ -22,7 +22,7 @@ Values is the name of item in response like declared in [Assertions](Assertions.
 
 ## Reference to the captured
 
-Use `{<variable-name>}` to get the captured. You can use the captured value in the request URI, header and body.
+Use `{<variable-name>}` to get the captured. You can use the captured value in the request URI, header, body and assertion expected value.
 
 ## Example
 
@@ -32,6 +32,14 @@ Use `{<variable-name>}` to get the captured. You can use the captured value in t
 | Header | Value |
 | - | - |
 | Authorization | Bearer {token} |
+
+## Expectations
+
+| Assert | Expected |
+| - | - |
+| StatusCode | 200 |
+| Header.Content-Type | application/json |
+| Data.Id | {id} |
 ```
 
 | Previous | Index | Next |
