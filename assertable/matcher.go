@@ -153,7 +153,7 @@ func (m *Matcher) Match(a *Assertable) (bool, error) {
 
 func applyVars(data string, vars map[string]string) string {
 	for k, v := range vars {
-		data = strings.ReplaceAll(data, fmt.Sprintf("{%s}", k), v)
+		data = strings.Replace(data, fmt.Sprintf("{%s}", k), v, -1)
 	}
 	return data
 }
