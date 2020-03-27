@@ -16,6 +16,19 @@ All variable names are case-insensitive.
 | Cookies.&lt;cookie-name&gt; | Value in cookie corresponding to the `cookie-name` given |
 | Data.&lt;data-name&gt; | Data in response body, available only when data is JSON (data must be JSON parsable and content-type must be `application/json`) |
 
+## Pattern Matching
+
+Cotton use regular expression to do complicated assertion. Regular expression pattern is surrounded by `/`.
+
+### Pattern Matching Example
+
+The assertion below tests the returned status code must be `201` and content type must be started with `application/json`.
+
+| Assert | Expected |
+| - | - |
+| StatusCode | 201 |
+| Header.Content-Type | /^application/json($|;)/ |
+
 ## Predefined Expectation
 
 Cotton provide some predefined expectation to help assertion. The following expected value can be used as to assert some response value.
