@@ -27,7 +27,7 @@ The assertion below tests the returned status code must be `201` and content typ
 | Assert | Expected |
 | - | - |
 | StatusCode | 201 |
-| Header.Content-Type | /^application/json($|;)/ |
+| Header.Content-Type | /^application/json/ |
 
 ## Predefined Expectation
 
