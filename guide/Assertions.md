@@ -41,6 +41,8 @@ Cotton provide some predefined expectation to help assertion. The following expe
 | `*should not be null*` | The asserted variable should not be null. |
 | `*should be true*` | The asserted variable should be boolean with value TRUE. |
 | `*should be false*` | The asserted variable should be boolean with value FALSE. |
+| `*should be empty*` | The asserted variable should be empty string. This is a shortcut version of regular expression `//`. |
+| `*should not be empty*` | The asserted variable should not be empty string. This is a shortcut version of regular expression `/.+/`. |
 
 Underscores can also be used instead of stars, e.g.: `_should exist_`
 

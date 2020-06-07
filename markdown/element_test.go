@@ -18,6 +18,9 @@ func TestNewElementWithKnownElements(t *testing.T) {
 		[]string{"* Bullet 1 with [Anchor Text](Anchor Link)"},
 		[]string{"* [Anchor Text](Anchor Link)"},
 		[]string{"```", "text in code block", "another text", "```"},
+		[]string{"~~~", "text in code block", "another text", "~~~"},
+		[]string{"```json", "text in code block", "another text", "```"},
+		[]string{"~~~json", "text in code block", "another text", "~~~"},
 	}
 	expected := []ElementInterface{
 		&SimpleElement{
@@ -86,6 +89,24 @@ func TestNewElementWithKnownElements(t *testing.T) {
 					Link: "Anchor Link",
 				},
 			},
+		},
+		&SimpleElement{
+			BaseElement: &BaseElement{
+				Type: "Code",
+			},
+			Text: "text in code block\nanother text",
+		},
+		&SimpleElement{
+			BaseElement: &BaseElement{
+				Type: "Code",
+			},
+			Text: "text in code block\nanother text",
+		},
+		&SimpleElement{
+			BaseElement: &BaseElement{
+				Type: "Code",
+			},
+			Text: "text in code block\nanother text",
 		},
 		&SimpleElement{
 			BaseElement: &BaseElement{

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
+	"reflect"
 
 	"github.com/fatih/color"
 )
@@ -124,6 +125,16 @@ func (m *Matcher) Match(a *Assertable) (bool, error) {
 				return true, nil
 			}
 			return false, fmt.Errorf("expect %s to be boolean and false, but it does not", red(m.key))
+		case "should be empty":
+			if reflect.DeepEqual(val, []string{""}) {
+				return true, nil
+			}
+			return false, fmt.Errorf("expect %s to be empty string, but it does not", red(m.key))
+		case "should not be empty":
+			if !reflect.DeepEqual(val, []string{""}) {
+				return true, nil
+			}
+			return false, fmt.Errorf("expect %s to be empty string, but it does not", red(m.key))
 		}
 	}
 	if ok {

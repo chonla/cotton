@@ -646,3 +646,127 @@ func TestBuiltInShouldBeFalseOnNonBooleanValue(t *testing.T) {
 		})
 	}
 }
+
+func TestBuiltInShouldBeEmpty(t *testing.T) {
+	jsonString := "{ \"data\": \"ok\", \"list\": [0, 1, 2], \"item\": \"\" }"
+
+	response := &response.Response{
+		Proto:      "http",
+		Status:     "200 OK",
+		StatusCode: 200,
+		Header: map[string][]string{
+			"content-type": []string{
+				"application/json; charset=utf-8",
+			},
+		},
+		Body: jsonString,
+	}
+
+	assertable := NewAssertable(response)
+
+	cases := []struct {
+		name  string
+		input string
+	}{
+		{
+			name:  "star",
+			input: "*should be empty*",
+		},
+		{
+			name:  "underscore",
+			input: "_should be empty_",
+		},
+	}
+
+	negativeCases := []struct {
+		name  string
+		input string
+	}{
+		{
+			name:  "star",
+			input: "*should not be empty*",
+		},
+		{
+			name:  "underscore",
+			input: "_should not be empty_",
+		},
+	}
+
+	for _, v := range cases {
+		t.Run(v.name, func(t *testing.T) {
+			m := NewMatcher("data.item", v.input, nil)
+			r, _ := m.Match(assertable)
+			assert.True(t, r)
+		})
+	}
+
+	for _, v := range negativeCases {
+		t.Run(v.name, func(t *testing.T) {
+			m := NewMatcher("data.item", v.input, nil)
+			r, _ := m.Match(assertable)
+			assert.False(t, r)
+		})
+	}
+}
+
+func TestBuiltInShouldNotBeEmpty(t *testing.T) {
+	jsonString := "{ \"data\": \"ok\", \"list\": [0, 1, 2], \"item\": \"element\" }"
+
+	response := &response.Response{
+		Proto:      "http",
+		Status:     "200 OK",
+		StatusCode: 200,
+		Header: map[string][]string{
+			"content-type": []string{
+				"application/json; charset=utf-8",
+			},
+		},
+		Body: jsonString,
+	}
+
+	assertable := NewAssertable(response)
+
+	cases := []struct {
+		name  string
+		input string
+	}{
+		{
+			name:  "star",
+			input: "*should not be empty*",
+		},
+		{
+			name:  "underscore",
+			input: "_should not be empty_",
+		},
+	}
+
+	negativeCases := []struct {
+		name  string
+		input string
+	}{
+		{
+			name:  "star",
+			input: "*should be empty*",
+		},
+		{
+			name:  "underscore",
+			input: "_should be empty_",
+		},
+	}
+
+	for _, v := range cases {
+		t.Run(v.name, func(t *testing.T) {
+			m := NewMatcher("data.item", v.input, nil)
+			r, _ := m.Match(assertable)
+			assert.True(t, r)
+		})
+	}
+
+	for _, v := range negativeCases {
+		t.Run(v.name, func(t *testing.T) {
+			m := NewMatcher("data.item", v.input, nil)
+			r, _ := m.Match(assertable)
+			assert.False(t, r)
+		})
+	}
+}

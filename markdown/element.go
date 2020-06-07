@@ -88,8 +88,16 @@ func tryBullet(data []string) (ElementInterface, bool) {
 
 func tryCodeBlock(data []string) (ElementInterface, bool) {
 	body := strings.Join(data, "\n")
-	re := regexp.MustCompile("^(?s)```\\n(.*)\\n```")
+	re := regexp.MustCompile("^(?s)```[^\\n]*\\n(.*)\\n```")
 	m := re.FindStringSubmatch(body)
+	if len(m) == 0 {
+		// Alternate code block
+		re = regexp.MustCompile("^(?s)~~~[^\\n]*\\n(.*)\\n~~~")
+		m = re.FindStringSubmatch(body)
+		if len(m) == 0 {
+		}
+	}
+
 	if len(m) > 1 {
 		return &SimpleElement{
 			BaseElement: &BaseElement{

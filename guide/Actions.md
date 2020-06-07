@@ -4,7 +4,7 @@ Action is a request sent to RESTful API application. Use `##` to define an actio
 
 ## Request Body
 
-Some action may need to send a body to the server, like `POST`. Use ~```~ to declare the request body.
+Some action may need to send a body to the server, like `POST`. Use code block, ~```~ or `~~~`, to declare the request body. Code block with language annotated is acceptable.
 
 ## Request Headers
 
@@ -42,6 +42,23 @@ Authorization: Bearer some-token
     "title": "Buy milk"
 }
 ```
+
+## Example Code Block with Annotated Language
+
+~~~
+## POST /todos
+
+| Header | Value |
+| - | - |
+| Content-Type | application/json |
+| Authorization | Bearer some-token |
+
+```json
+{
+    "title": "Buy milk"
+}
+```
+~~~
 
 ## File Upload Example
 
