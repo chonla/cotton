@@ -5,7 +5,6 @@ testcases/
 !guide/*.md
 !examples/*.md
 !examples/**/*.md
-Makefile
 pkg/
 homebrew/
 *.swp
