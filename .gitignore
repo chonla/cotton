@@ -8,3 +8,4 @@ testcases/
 pkg/
 homebrew/
 *.swp
+bin/

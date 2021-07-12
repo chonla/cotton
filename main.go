@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -10,12 +11,13 @@ import (
 	"github.com/chonla/cotton/cotton"
 	"github.com/chonla/cotton/parser"
 	"github.com/chonla/cotton/testsuite"
+	"github.com/chonla/cotton/types"
 	"github.com/fatih/color"
 	"github.com/fsnotify/fsnotify"
 )
 
 // VERSION of cotton
-const VERSION = "0.4.0"
+const VERSION = "0.5.0"
 
 // Vars are injected variables from command line
 type Vars []string
@@ -42,11 +44,13 @@ func main() {
 	var detail bool
 	var watch bool
 	var stopWhenFailed bool
+	var varsFile string
 	var vars Vars
 
 	flag.Usage = usage
 
 	flag.StringVar(&url, "u", "http://localhost:8080", "set base url")
+	flag.StringVar(&varsFile, "f", "", "set variables file")
 	flag.BoolVar(&detail, "d", false, "detail mode -- to dump test detail")
 	flag.BoolVar(&insecure, "i", false, "insecure mode -- to disable certificate verification")
 	flag.BoolVar(&watch, "w", false, "watch mode -- to auto-rerun when files are changed")
@@ -67,11 +71,20 @@ func main() {
 		os.Exit(1)
 	}
 
+	varsFromFiles := readVariablesFromFile(varsFile, vars)
+	mergedVars := []string{}
+	for _, v := range varsFromFiles {
+		mergedVars = append(mergedVars, v)
+	}
+	for _, v := range vars {
+		mergedVars = append(mergedVars, v)
+	}
+
 	c, e := cotton.NewCotton(testpath, cotton.Config{
 		BaseURL:        url,
 		Insecure:       insecure,
 		Verbose:        detail,
-		Variables:      vars,
+		Variables:      mergedVars,
 		StopWhenFailed: stopWhenFailed,
 	})
 	if e != nil {
@@ -120,7 +133,7 @@ func main() {
 func usage() {
 	fmt.Println("Usage of cotton:")
 	fmt.Println()
-	fmt.Println("  cotton [-u <base-url>] [-i] [-d] [-s] [-p name1=value1] [-p name2=value2] ... <test-cases>")
+	fmt.Println("  cotton [-u <base-url>] [-f <variables-filename>] [-i] [-d] [-s] [-p name1=value1] [-p name2=value2] ... <test-cases>")
 	fmt.Println()
 	fmt.Println("  test-cases can be a markdown file or a directory contain markdowns.")
 	fmt.Println()
@@ -163,4 +176,15 @@ func watchDir(path string, fi os.FileInfo, err error) error {
 	}
 
 	return nil
+}
+
+// read variables from given file and return lines content
+func readVariablesFromFile(varsFile string, vars Vars) []string {
+	b, err := ioutil.ReadFile(varsFile)
+	if err != nil {
+		yellow := color.New(color.FgYellow).SprintFunc()
+		fmt.Printf("%s Unable to load variables file...\n", yellow("WARNING"))
+		return vars
+	}
+	return types.StringFromBytes(b).LineBreak()
 }
