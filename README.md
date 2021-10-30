@@ -18,7 +18,7 @@ brew install cotton
 ### From source
 
 ```sh
-go get github.com/chonla/cotton
+go install github.com/chonla/cotton@latest
 ```
 
 ## Upgrade
