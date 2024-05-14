@@ -1,0 +1,40 @@
+# This is title of test case written with ATX Heading 1
+
+The test case is described by providing paragraphs right after the test case title.
+
+The description of test case can be single or multiple lines.
+
+Cotton will consider only the first ATX Heading 1 as the test title.
+
+## Before Test
+
+All links before code block ` ```http` will be executed before test request.
+
+* [Link before the test will be executed before executing test](somelink.md)
+* [Other link before the test](before.md)
+* [Another link before the test](before2.md)
+
+## Request
+
+HTTP request is described by code block with `http` annotation right after the open code block ` ```http `.
+
+Cotton will consider only the first code block as the testing request.
+
+* [Link in section other than Before Test and After test will considered as documentation and will not be executed](link)
+* [Other link in section](link)
+
+```http
+POST http://localhost/some-path HTTP/1.1
+
+{
+    "login": "login_name"
+}
+```
+
+## After Test
+
+All links after code block ` ```http` will be executed after test request.
+
+* [Link after the test will be executed after executing test](somelink.md)
+* [Other link after the test](after.md)
+* [Another link after the Test](after2.md)
