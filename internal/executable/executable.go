@@ -10,5 +10,5 @@ type Executable struct {
 	Title   string
 	Request *http.Request
 
-	Captures []capture.Captured
+	Captures []*capture.Captured
 }

@@ -20,7 +20,7 @@ func TestParsingCompleteMarkdownFile(t *testing.T) {
 	parser := testcase.NewParser(reader)
 
 	curdir, _ := os.Getwd()
-	result, err := parser.FromMarkdownFile(curdir + "/../../etc/examples/complete.md")
+	result, err := parser.FromMarkdownFile(curdir + "/../../etc/examples/testcase.md")
 
 	expectedRequest, _ := http.ReadRequest(bufio.NewReader(strings.NewReader(`POST http://localhost/some-path HTTP/1.1
 
