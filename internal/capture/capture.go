@@ -10,16 +10,16 @@ type Captured struct {
 }
 
 func Try(mdLine line.Line) (*Captured, bool) {
-	if captured, ok := mdLine.CaptureAll(`\s*\*\s+([^=]+)=` + "`([^`]+)`"); ok {
+	if captured, ok := mdLine.CaptureAll(`\s*\*\s+([^=]+)\s*=\s*` + "`([^`]+)`"); ok {
 		return &Captured{
-			Name:    captured[1],
+			Name:    line.Line(captured[1]).Trim().Value(),
 			Locator: captured[2],
 		}, true
 	}
-	if captured, ok := mdLine.CaptureAll(`\s*\*\s+([^=]+)=(.+)`); ok {
+	if captured, ok := mdLine.CaptureAll(`\s*\*\s+([^=]+)\s*=\s*(.+)`); ok {
 		return &Captured{
-			Name:    captured[1],
-			Locator: captured[2],
+			Name:    line.Line(captured[1]).Trim().Value(),
+			Locator: line.Line(captured[2]).Trim().Value(),
 		}, true
 	}
 	return nil, false
