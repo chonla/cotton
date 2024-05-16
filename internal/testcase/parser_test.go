@@ -2,6 +2,7 @@ package testcase_test
 
 import (
 	"bufio"
+	"cotton/internal/capture"
 	"cotton/internal/executable"
 	"cotton/internal/line"
 	"cotton/internal/testcase"
@@ -286,8 +287,28 @@ func TestGetExecutablesBeforeTest(t *testing.T) {
 		"```",
 	}
 
+	beforeLink1Lines := []line.Line{
+		"This is before first step",
+		"```http",
+		"GET /healthcheck HTTP/1.0",
+		"Host: http://localhost",
+		"```",
+	}
+
+	beforeLink2Lines := []line.Line{
+		"This is before second step",
+		"```http",
+		"GET /readiness HTTP/1.0",
+		"Host: http://localhost",
+		"```",
+		"# Capture part",
+		"* readiness=`$.readiness.status`",
+	}
+
 	reader := new(MockFileReader)
 	reader.On("Read", "mock_file").Return(lines, nil)
+	reader.On("Read", "link1").Return(beforeLink1Lines, nil)
+	reader.On("Read", "link2").Return(beforeLink2Lines, nil)
 
 	parser := testcase.NewParser(reader)
 	result, err := parser.FromMarkdownFile("mock_file")
@@ -314,6 +335,12 @@ body`)))
 			{
 				Title:   "link to another executable",
 				Request: expectedBefore,
+				Captures: []*capture.Captured{
+					{
+						Name:    "readiness",
+						Locator: "$.readiness.status",
+					},
+				},
 			},
 		},
 	}, result)

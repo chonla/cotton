@@ -4,9 +4,10 @@ Only ` ```http` block and Capture in this file are used. Others will be consider
 
 ```http
 GET /get-info HTTP/1.0
+Host: http://localhost
 ```
 
 ## Capture
 
-* var1=`$.path.of.data`
-* var2=`$.path.of.another.data`
+* readiness=$.readiness
+* version=`$.version`

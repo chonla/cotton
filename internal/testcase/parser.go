@@ -10,12 +10,14 @@ import (
 )
 
 type Parser struct {
-	fileReader reader.Reader
+	fileReader       reader.Reader
+	executableParser *executable.Parser
 }
 
 func NewParser(fileReader reader.Reader) *Parser {
 	return &Parser{
-		fileReader: fileReader,
+		fileReader:       fileReader,
+		executableParser: executable.NewParser(fileReader),
 	}
 }
 
@@ -81,19 +83,25 @@ func (p *Parser) FromMarkdownLines(mdLines []line.Line) (*TestCase, error) {
 		} else {
 			if captured, ok := mdLine.CaptureAll(`^\s*\*\s\[([^\]]+)\]\(([^\)]+)\)`); ok {
 				if sutReq == nil {
+					ex, err := p.executableParser.FromMarkdownFile(captured[2])
+					if err != nil {
+						return nil, err
+					}
+					ex.Title = captured[1]
 					if tc.Setups == nil {
 						tc.Setups = []*executable.Executable{}
 					}
-					tc.Setups = append(tc.Setups, &executable.Executable{
-						Title: captured[1],
-					})
+					tc.Setups = append(tc.Setups, ex)
 				} else {
+					ex, err := p.executableParser.FromMarkdownFile(captured[2])
+					if err != nil {
+						return nil, err
+					}
+					ex.Title = captured[1]
 					if tc.Teardowns == nil {
 						tc.Teardowns = []*executable.Executable{}
 					}
-					tc.Teardowns = append(tc.Teardowns, &executable.Executable{
-						Title: captured[1],
-					})
+					tc.Teardowns = append(tc.Teardowns, ex)
 				}
 			}
 		}
