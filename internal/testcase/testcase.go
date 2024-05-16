@@ -2,6 +2,7 @@ package testcase
 
 import (
 	"cotton/internal/assertion"
+	"cotton/internal/capture"
 	"cotton/internal/executable"
 	"net/http"
 )
@@ -12,6 +13,7 @@ type TestCase struct {
 	Description string
 	Request     *http.Request
 
+	Captures   []*capture.Captured
 	Setups     []*executable.Executable
 	Teardowns  []*executable.Executable
 	Assertions []*assertion.Assertion

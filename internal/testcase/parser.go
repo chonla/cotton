@@ -2,6 +2,7 @@ package testcase
 
 import (
 	"bufio"
+	"cotton/internal/capture"
 	"cotton/internal/executable"
 	"cotton/internal/line"
 	"cotton/internal/reader"
@@ -81,27 +82,34 @@ func (p *Parser) FromMarkdownLines(mdLines []line.Line) (*TestCase, error) {
 				req = append(req, mdLine.Value())
 			}
 		} else {
-			if captured, ok := mdLine.CaptureAll(`^\s*\*\s\[([^\]]+)\]\(([^\)]+)\)`); ok {
-				if sutReq == nil {
-					ex, err := p.executableParser.FromMarkdownFile(captured[2])
-					if err != nil {
-						return nil, err
+			if captured, ok := capture.Try(mdLine); ok {
+				if tc.Captures == nil {
+					tc.Captures = []*capture.Captured{}
+				}
+				tc.Captures = append(tc.Captures, captured)
+			} else {
+				if captured, ok := mdLine.CaptureAll(`^\s*\*\s\[([^\]]+)\]\(([^\)]+)\)`); ok {
+					if sutReq == nil {
+						ex, err := p.executableParser.FromMarkdownFile(captured[2])
+						if err != nil {
+							return nil, err
+						}
+						ex.Title = captured[1]
+						if tc.Setups == nil {
+							tc.Setups = []*executable.Executable{}
+						}
+						tc.Setups = append(tc.Setups, ex)
+					} else {
+						ex, err := p.executableParser.FromMarkdownFile(captured[2])
+						if err != nil {
+							return nil, err
+						}
+						ex.Title = captured[1]
+						if tc.Teardowns == nil {
+							tc.Teardowns = []*executable.Executable{}
+						}
+						tc.Teardowns = append(tc.Teardowns, ex)
 					}
-					ex.Title = captured[1]
-					if tc.Setups == nil {
-						tc.Setups = []*executable.Executable{}
-					}
-					tc.Setups = append(tc.Setups, ex)
-				} else {
-					ex, err := p.executableParser.FromMarkdownFile(captured[2])
-					if err != nil {
-						return nil, err
-					}
-					ex.Title = captured[1]
-					if tc.Teardowns == nil {
-						tc.Teardowns = []*executable.Executable{}
-					}
-					tc.Teardowns = append(tc.Teardowns, ex)
 				}
 			}
 		}

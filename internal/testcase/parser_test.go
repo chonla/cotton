@@ -266,7 +266,6 @@ body`)))
 	assert.Equal(t, &testcase.TestCase{
 		Request: expectedRequest,
 	}, result)
-
 }
 
 func TestGetExecutablesBeforeTest(t *testing.T) {
@@ -341,6 +340,43 @@ body`)))
 						Locator: "$.readiness.status",
 					},
 				},
+			},
+		},
+	}, result)
+}
+
+func TestGetCapturesInTestcase(t *testing.T) {
+	lines := []line.Line{
+		"```http",
+		"POST /this-should-be-collected HTTP/1.0",
+		"Host: http://url",
+		"",
+		"post",
+		"body",
+		"```",
+		"",
+		"* varname=`$.result`",
+	}
+
+	reader := new(MockFileReader)
+	reader.On("Read", "mock_file").Return(lines, nil)
+
+	parser := testcase.NewParser(reader)
+	result, err := parser.FromMarkdownFile("mock_file")
+
+	expectedRequest, _ := http.ReadRequest(bufio.NewReader(strings.NewReader(`POST /this-should-be-collected HTTP/1.0
+Host: http://url
+
+post
+body`)))
+
+	assert.NoError(t, err)
+	assert.Equal(t, &testcase.TestCase{
+		Request: expectedRequest,
+		Captures: []*capture.Captured{
+			{
+				Name:    "varname",
+				Locator: "$.result",
 			},
 		},
 	}, result)
