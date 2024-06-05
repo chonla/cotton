@@ -1,0 +1,11 @@
+# Test GET on httpbin.org
+
+Test getting data from httpbin.org using multiple http requests.
+
+## Test setting up
+
+* [Post some data to host](../../etc/examples/httpbin.org/post.md)
+
+```http
+GET https://httpbin.org/get?key1=value1 HTTP/1.1
+```

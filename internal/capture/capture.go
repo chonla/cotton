@@ -4,22 +4,22 @@ import (
 	"cotton/internal/line"
 )
 
-type Captured struct {
+type Capture struct {
 	Name    string
 	Locator string
 }
 
-func Try(mdLine line.Line) (*Captured, bool) {
-	if captured, ok := mdLine.CaptureAll(`\s*\*\s+([^=]+)\s*=\s*` + "`([^`]+)`"); ok {
-		return &Captured{
-			Name:    line.Line(captured[1]).Trim().Value(),
-			Locator: captured[2],
+func Try(mdLine line.Line) (*Capture, bool) {
+	if caps, ok := mdLine.CaptureAll(`\s*\*\s+([^=]+)\s*=\s*` + "`([^`]+)`"); ok {
+		return &Capture{
+			Name:    line.Line(caps[1]).Trim().Value(),
+			Locator: caps[2],
 		}, true
 	}
-	if captured, ok := mdLine.CaptureAll(`\s*\*\s+([^=]+)\s*=\s*(.+)`); ok {
-		return &Captured{
-			Name:    line.Line(captured[1]).Trim().Value(),
-			Locator: line.Line(captured[2]).Trim().Value(),
+	if caps, ok := mdLine.CaptureAll(`\s*\*\s+([^=]+)\s*=\s*(.+)`); ok {
+		return &Capture{
+			Name:    line.Line(caps[1]).Trim().Value(),
+			Locator: line.Line(caps[2]).Trim().Value(),
 		}, true
 	}
 	return nil, false

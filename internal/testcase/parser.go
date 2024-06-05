@@ -1,29 +1,36 @@
 package testcase
 
 import (
-	"bufio"
 	"cotton/internal/capture"
+	"cotton/internal/config"
 	"cotton/internal/executable"
 	"cotton/internal/line"
 	"cotton/internal/reader"
 	"net/http"
 	"strings"
+
+	"github.com/chonla/httpreqparser"
 )
 
 type Parser struct {
+	config           *config.Config
 	fileReader       reader.Reader
 	executableParser *executable.Parser
+	requestParser    httpreqparser.Parser
 }
 
-func NewParser(fileReader reader.Reader) *Parser {
+func NewParser(config *config.Config, fileReader reader.Reader, requestParser httpreqparser.Parser) *Parser {
 	return &Parser{
+		config:           config,
 		fileReader:       fileReader,
-		executableParser: executable.NewParser(fileReader),
+		executableParser: executable.NewParser(config, fileReader, requestParser),
+		requestParser:    requestParser,
 	}
 }
 
 func (p *Parser) FromMarkdownFile(mdFileName string) (*TestCase, error) {
-	lines, err := p.fileReader.Read(mdFileName)
+	mdFullPath := p.config.ResolvePath(mdFileName)
+	lines, err := p.fileReader.Read(mdFullPath)
 	if err != nil {
 		return nil, err
 	}
@@ -41,8 +48,8 @@ func (p *Parser) FromMarkdownLines(mdLines []line.Line) (*TestCase, error) {
 
 	tc := &TestCase{}
 	for _, mdLine := range mdLines {
-		if captured, ok := mdLine.Capture(`^ {0,3}#\s+(.*)`, 1); ok && !justTitle {
-			title = captured
+		if cap, ok := mdLine.Capture(`^ {0,3}#\s+(.*)`, 1); ok && !justTitle {
+			title = cap
 			justTitle = true
 			continue
 		}
@@ -68,8 +75,8 @@ func (p *Parser) FromMarkdownLines(mdLines []line.Line) (*TestCase, error) {
 				collectingCodeBlockBackTick = false
 
 				if len(req) > 0 {
-					reqReader := bufio.NewReader(strings.NewReader(line.Line(strings.Join(req, "\n")).Trim().Value()))
-					httpRequest, err := http.ReadRequest(reqReader)
+					requestString := line.Line(strings.Join(req, "\n")).Value()
+					httpRequest, err := p.requestParser.Parse(requestString)
 					if err == nil {
 						sutReq = httpRequest
 					}
@@ -82,29 +89,29 @@ func (p *Parser) FromMarkdownLines(mdLines []line.Line) (*TestCase, error) {
 				req = append(req, mdLine.Value())
 			}
 		} else {
-			if captured, ok := capture.Try(mdLine); ok {
+			if cap, ok := capture.Try(mdLine); ok {
 				if tc.Captures == nil {
-					tc.Captures = []*capture.Captured{}
+					tc.Captures = []*capture.Capture{}
 				}
-				tc.Captures = append(tc.Captures, captured)
+				tc.Captures = append(tc.Captures, cap)
 			} else {
-				if captured, ok := mdLine.CaptureAll(`^\s*\*\s\[([^\]]+)\]\(([^\)]+)\)`); ok {
+				if captures, ok := mdLine.CaptureAll(`^\s*\*\s\[([^\]]+)\]\(([^\)]+)\)`); ok {
 					if sutReq == nil {
-						ex, err := p.executableParser.FromMarkdownFile(captured[2])
+						ex, err := p.executableParser.FromMarkdownFile(captures[2])
 						if err != nil {
 							return nil, err
 						}
-						ex.Title = captured[1]
+						ex.Title = captures[1]
 						if tc.Setups == nil {
 							tc.Setups = []*executable.Executable{}
 						}
 						tc.Setups = append(tc.Setups, ex)
 					} else {
-						ex, err := p.executableParser.FromMarkdownFile(captured[2])
+						ex, err := p.executableParser.FromMarkdownFile(captures[2])
 						if err != nil {
 							return nil, err
 						}
-						ex.Title = captured[1]
+						ex.Title = captures[1]
 						if tc.Teardowns == nil {
 							tc.Teardowns = []*executable.Executable{}
 						}

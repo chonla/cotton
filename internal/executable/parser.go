@@ -1,26 +1,33 @@
 package executable
 
 import (
-	"bufio"
 	"cotton/internal/capture"
+	"cotton/internal/config"
 	"cotton/internal/line"
 	"cotton/internal/reader"
 	"net/http"
 	"strings"
+
+	"github.com/chonla/httpreqparser"
 )
 
 type Parser struct {
-	fileReader reader.Reader
+	config        *config.Config
+	fileReader    reader.Reader
+	requestParser httpreqparser.Parser
 }
 
-func NewParser(fileReader reader.Reader) *Parser {
+func NewParser(config *config.Config, fileReader reader.Reader, requestParser httpreqparser.Parser) *Parser {
 	return &Parser{
-		fileReader: fileReader,
+		config:        config,
+		fileReader:    fileReader,
+		requestParser: requestParser,
 	}
 }
 
 func (p *Parser) FromMarkdownFile(mdFileName string) (*Executable, error) {
-	lines, err := p.fileReader.Read(mdFileName)
+	mdFullPath := p.config.ResolvePath(mdFileName)
+	lines, err := p.fileReader.Read(mdFullPath)
 	if err != nil {
 		return nil, err
 	}
@@ -45,8 +52,8 @@ func (p *Parser) FromMarkdownLines(mdLines []line.Line) (*Executable, error) {
 				collectingCodeBlockBackTick = false
 
 				if len(req) > 0 {
-					reqReader := bufio.NewReader(strings.NewReader(line.Line(strings.Join(req, "\n")).Trim().Value()))
-					httpRequest, err := http.ReadRequest(reqReader)
+					requestString := line.Line(strings.Join(req, "\n")).Value()
+					httpRequest, err := p.requestParser.Parse(requestString)
 					if err == nil {
 						exReq = httpRequest
 					}
@@ -59,11 +66,11 @@ func (p *Parser) FromMarkdownLines(mdLines []line.Line) (*Executable, error) {
 				req = append(req, mdLine.Value())
 			}
 		} else {
-			if captured, ok := capture.Try(mdLine); ok {
+			if cap, ok := capture.Try(mdLine); ok {
 				if ex.Captures == nil {
-					ex.Captures = []*capture.Captured{}
+					ex.Captures = []*capture.Capture{}
 				}
-				ex.Captures = append(ex.Captures, captured)
+				ex.Captures = append(ex.Captures, cap)
 			}
 		}
 	}

@@ -1,29 +1,19 @@
 package request
 
 import (
-	"bufio"
+	"bytes"
 	"net/http"
-	"strings"
+	"net/http/httputil"
 )
 
-type Request struct {
-	Method  string
-	URL     string
-	Headers map[string]string
-	Body    string
-	Proto   string
-}
-
-func Parse(request string) (*Request, error) {
-	reqReader := bufio.NewReader(strings.NewReader(request))
-	reqHttpReader, err := http.ReadRequest(reqReader)
+func Similar(req1, req2 *http.Request) bool {
+	req1Bytes, err := httputil.DumpRequest(req1, true)
 	if err != nil {
-		return nil, err
+		return false
 	}
-
-	return &Request{
-		Method: reqHttpReader.Method,
-		URL:    "",
-		Proto:  reqHttpReader.Proto,
-	}, nil
+	req2Bytes, err := httputil.DumpRequest(req2, true)
+	if err != nil {
+		return false
+	}
+	return bytes.Equal(req1Bytes, req2Bytes)
 }

@@ -74,3 +74,7 @@ func (l Line) LookLike(pattern string) bool {
 func (l Line) Value() string {
 	return string(l)
 }
+
+func (l Line) Replace(needle, with string) string {
+	return strings.ReplaceAll(string(l), needle, with)
+}

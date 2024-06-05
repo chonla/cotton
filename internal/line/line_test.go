@@ -16,28 +16,28 @@ func TestTrim(t *testing.T) {
 func TestCapture(t *testing.T) {
 	l := line.Line("# Title")
 
-	captured, ok := l.Capture("# (.*)", 1)
+	cap, ok := l.Capture("# (.*)", 1)
 
 	assert.True(t, ok)
-	assert.Equal(t, "Title", captured)
+	assert.Equal(t, "Title", cap)
 }
 
 func TestOOBCapture(t *testing.T) {
 	l := line.Line("# Title")
 
-	captured, ok := l.Capture("# (.*)", 2)
+	cap, ok := l.Capture("# (.*)", 2)
 
 	assert.False(t, ok)
-	assert.Equal(t, "", captured)
+	assert.Equal(t, "", cap)
 }
 
 func TestUnmatchedCapture(t *testing.T) {
 	l := line.Line("# Title")
 
-	captured, ok := l.Capture("## (.*)", 1)
+	cap, ok := l.Capture("## (.*)", 1)
 
 	assert.False(t, ok)
-	assert.Equal(t, "", captured)
+	assert.Equal(t, "", cap)
 }
 
 func TestLookLike(t *testing.T) {
@@ -54,4 +54,28 @@ func TestUnmatchedLookLike(t *testing.T) {
 	ok := l.LookLike("^## (.*)")
 
 	assert.False(t, ok)
+}
+
+func TestReplaceSingleString(t *testing.T) {
+	l := line.Line("<rootDir>/some/path")
+
+	newPath := l.Replace("<rootDir>", "/tmp")
+
+	assert.Equal(t, "/tmp/some/path", newPath)
+}
+
+func TestReplaceMultipleStrings(t *testing.T) {
+	l := line.Line("<rootDir>/some/path<rootDir>")
+
+	newPath := l.Replace("<rootDir>", "/tmp")
+
+	assert.Equal(t, "/tmp/some/path/tmp", newPath)
+}
+
+func TestReplaceUnmatchString(t *testing.T) {
+	l := line.Line("/some/path")
+
+	newPath := l.Replace("<rootDir>", "/tmp")
+
+	assert.Equal(t, "/some/path", newPath)
 }

@@ -19,7 +19,8 @@ HTTP request is described by code block with `http` annotation right after the o
 Cotton will consider only the first code block as the testing request.
 
 ```http
-POST http://localhost/some-path HTTP/1.1
+POST /some-path HTTP/1.1
+Host: localhost
 
 {
     "login": "login_name"

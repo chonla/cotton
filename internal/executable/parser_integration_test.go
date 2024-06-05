@@ -4,28 +4,32 @@
 package executable_test
 
 import (
-	"bufio"
 	"cotton/internal/capture"
+	"cotton/internal/config"
 	"cotton/internal/executable"
 	"cotton/internal/reader"
-	"net/http"
 	"os"
-	"strings"
 	"testing"
 
+	"github.com/chonla/httpreqparser"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestParsingCompleteMarkdownFile(t *testing.T) {
-	reader := reader.New(os.ReadFile)
-	parser := executable.NewParser(reader)
-
+func TestParsingCompleteExecutableMarkdownFile(t *testing.T) {
 	curdir, _ := os.Getwd()
-	result, err := parser.FromMarkdownFile(curdir + "/../../etc/examples/executable.md")
+	config := &config.Config{
+		RootDir: curdir + "/../..",
+	}
 
-	expectedRequest, _ := http.ReadRequest(bufio.NewReader(strings.NewReader(`GET /get-info HTTP/1.0
-Host: http://localhost`)))
-	expectedCaptures := []*capture.Captured{
+	reader := reader.New(os.ReadFile)
+	reqParser := httpreqparser.New()
+	parser := executable.NewParser(config, reader, reqParser)
+
+	result, err := parser.FromMarkdownFile("<rootDir>/etc/examples/executable.md")
+
+	expectedRequest, _ := reqParser.Parse(`GET /get-info HTTP/1.1
+Host: localhost`)
+	expectedCaptures := []*capture.Capture{
 		{
 			Name:    "readiness",
 			Locator: "$.readiness",
