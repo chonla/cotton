@@ -1,16 +1,15 @@
 package testcase_test
 
 import (
-	"bufio"
 	"cotton/internal/capture"
 	"cotton/internal/config"
 	"cotton/internal/executable"
 	"cotton/internal/line"
 	"cotton/internal/testcase"
 	"net/http"
-	"strings"
 	"testing"
 
+	"github.com/chonla/httpreqparser"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -211,11 +210,11 @@ func TestGetHTTPRequestInHTTPCodeBlock(t *testing.T) {
 		"```",
 	}
 
-	expectedRequest, _ := http.ReadRequest(bufio.NewReader(strings.NewReader(`POST /some-path HTTP/1.0
+	expectedRequest, _ := httpreqparser.New().Parse(`POST /some-path HTTP/1.0
 Host: url
 
 post
-body`)))
+body`)
 
 	reader := new(MockFileReader)
 	reader.On("Read", "mock_file").Return(lines, nil)
@@ -288,11 +287,11 @@ func TestGetHTTPRequestInOtherHTTPCodeBlock(t *testing.T) {
 		"```",
 	}
 
-	expectedRequest, _ := http.ReadRequest(bufio.NewReader(strings.NewReader(`POST /some-path HTTP/1.0
+	expectedRequest, _ := httpreqparser.New().Parse(`POST /some-path HTTP/1.0
 Host: url
 
 post
-body`)))
+body`)
 
 	reader := new(MockFileReader)
 	reader.On("Read", "mock_file").Return(lines, nil)
@@ -333,11 +332,11 @@ func TestGetHTTPRequestInOnlyFirstHTTPCodeBlock(t *testing.T) {
 		"body",
 		"```",
 	}
-	expectedRequest, _ := http.ReadRequest(bufio.NewReader(strings.NewReader(`POST /this-should-be-collected HTTP/1.0
+	expectedRequest, _ := httpreqparser.New().Parse(`POST /this-should-be-collected HTTP/1.0
 Host: url
 
 post
-body`)))
+body`)
 
 	reader := new(MockFileReader)
 	reader.On("Read", "mock_file").Return(lines, nil)
@@ -401,15 +400,15 @@ func TestGetExecutablesBeforeTest(t *testing.T) {
 	reader.On("Read", "link1").Return(beforeLink1Lines, nil)
 	reader.On("Read", "link2").Return(beforeLink2Lines, nil)
 
-	expectedBefore1, _ := http.ReadRequest(bufio.NewReader(strings.NewReader(`GET /healthcheck HTTP/1.0
-Host: localhost`)))
-	expectedBefore2, _ := http.ReadRequest(bufio.NewReader(strings.NewReader(`GET /readiness HTTP/1.0
-Host: localhost`)))
-	expectedRequest, _ := http.ReadRequest(bufio.NewReader(strings.NewReader(`POST /some-path HTTP/1.0
+	expectedBefore1, _ := httpreqparser.New().Parse(`GET /healthcheck HTTP/1.0
+Host: localhost`)
+	expectedBefore2, _ := httpreqparser.New().Parse(`GET /readiness HTTP/1.0
+Host: localhost`)
+	expectedRequest, _ := httpreqparser.New().Parse(`POST /some-path HTTP/1.0
 Host: url
 
 post
-body`)))
+body`)
 
 	reqParser := new(MockRequestParser)
 	reqParser.On("Parse", "POST /some-path HTTP/1.0\nHost: url\n\npost\nbody").Return(expectedRequest, nil)
@@ -441,40 +440,47 @@ body`)))
 	}, result)
 }
 
-// func TestGetCapturesInTestcase(t *testing.T) {
-// 	lines := []line.Line{
-// 		"```http",
-// 		"POST /this-should-be-collected HTTP/1.0",
-// 		"Host: localhost",
-// 		"",
-// 		"post",
-// 		"body",
-// 		"```",
-// 		"",
-// 		"* varname=`$.result`",
-// 	}
+func TestGetCapturesInTestcase(t *testing.T) {
+	config := &config.Config{
+		RootDir: "",
+	}
 
-// 	reader := new(MockFileReader)
-// 	reader.On("Read", "mock_file").Return(lines, nil)
+	lines := []line.Line{
+		"```http",
+		"POST /this-should-be-collected HTTP/1.0",
+		"Host: localhost",
+		"",
+		"post",
+		"body",
+		"```",
+		"",
+		"* varname=`$.result`",
+	}
 
-// 	parser := testcase.NewParser(reader)
-// 	result, err := parser.FromMarkdownFile("mock_file")
+	expectedRequest, _ := httpreqparser.New().Parse(`POST /this-should-be-collected HTTP/1.0
+Host: localhost
 
-// 	expectedRequest, _ := http.ReadRequest(bufio.NewReader(strings.NewReader(`POST /this-should-be-collected HTTP/1.0
-// Host: localhost
+post
+body`)
 
-// post
-// body`)))
+	reader := new(MockFileReader)
+	reader.On("Read", "mock_file").Return(lines, nil)
 
-// 	assert.NoError(t, err)
-// 	assert.Equal(t, &testcase.TestCase{
-// 		Request: expectedRequest,
-// 		Captures: []*capture.Capture{
-// 			{
-// 				Name:    "varname",
-// 				Locator: "$.result",
-// 			},
-// 		},
-// 	}, result)
+	reqParser := new(MockRequestParser)
+	reqParser.On("Parse", "POST /this-should-be-collected HTTP/1.0\nHost: localhost\n\npost\nbody").Return(expectedRequest, nil)
 
-// }
+	parser := testcase.NewParser(config, reader, reqParser)
+	result, err := parser.FromMarkdownFile("mock_file")
+
+	assert.NoError(t, err)
+	assert.Equal(t, &testcase.TestCase{
+		Request: expectedRequest,
+		Captures: []*capture.Capture{
+			{
+				Name:    "varname",
+				Locator: "$.result",
+			},
+		},
+	}, result)
+
+}

@@ -8,7 +8,6 @@ import (
 	"cotton/internal/config"
 	"cotton/internal/executable"
 	"cotton/internal/reader"
-	"cotton/internal/request"
 	"cotton/internal/testcase"
 	"os"
 	"testing"
@@ -64,12 +63,14 @@ secret=updatedValue`)
 		},
 	}
 
+	expected := &testcase.TestCase{
+		Title:       "Test GET on httpbin.org",
+		Description: "Test getting data from httpbin.org using multiple http requests.",
+		Setups:      expectedSetups,
+		Teardowns:   expectedTeardowns,
+		Request:     expectedRequest,
+	}
+
 	assert.NoError(t, err)
-	assert.Equal(t, "Test GET on httpbin.org", result.Title)
-	assert.Equal(t, "Test getting data from httpbin.org using multiple http requests.", result.Description)
-	assert.True(t, request.Similar(expectedRequest, result.Request))
-	assert.Equal(t, len(expectedSetups), len(result.Setups))
-	assert.True(t, expectedSetups[0].SimilarTo(result.Setups[0]))
-	assert.Equal(t, len(expectedTeardowns), len(result.Teardowns))
-	assert.True(t, expectedTeardowns[0].SimilarTo(result.Teardowns[0]))
+	assert.True(t, expected.SimilarTo(result))
 }

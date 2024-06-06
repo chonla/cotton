@@ -4,8 +4,10 @@ import (
 	"cotton/internal/assertion"
 	"cotton/internal/capture"
 	"cotton/internal/executable"
+	"cotton/internal/request"
 	"errors"
 	"net/http"
+	"slices"
 )
 
 // Test cases
@@ -34,8 +36,26 @@ func (t *TestCase) Execute() error {
 	if err != nil {
 		return err
 	}
-
 	defer resp.Body.Close()
-	return nil
 
+	for _, teardown := range t.Teardowns {
+		teardown.Execute()
+	}
+
+	return nil
+}
+
+func (t *TestCase) SimilarTo(anotherTestCase *TestCase) bool {
+	return t.Title == anotherTestCase.Title &&
+		t.Description == anotherTestCase.Description &&
+		request.Similar(t.Request, anotherTestCase.Request) &&
+		slices.EqualFunc(t.Captures, anotherTestCase.Captures, func(c1, c2 *capture.Capture) bool {
+			return c1.SimilarTo(c2)
+		}) &&
+		slices.EqualFunc(t.Setups, anotherTestCase.Setups, func(s1, s2 *executable.Executable) bool {
+			return s1.SimilarTo(s2)
+		}) &&
+		slices.EqualFunc(t.Teardowns, anotherTestCase.Teardowns, func(s1, s2 *executable.Executable) bool {
+			return s1.SimilarTo(s2)
+		})
 }

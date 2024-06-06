@@ -8,7 +8,6 @@ import (
 	"cotton/internal/config"
 	"cotton/internal/executable"
 	"cotton/internal/reader"
-	"cotton/internal/request"
 	"cotton/internal/testcase"
 	"os"
 	"testing"
@@ -69,13 +68,14 @@ Host: localhost
 			Captures: expectedCapturesInAfter,
 		},
 	}
+	expected := &testcase.TestCase{
+		Title:       "This is title of test case written with ATX Heading 1",
+		Description: "The test case is described by providing paragraphs right after the test case title.\n\nThe description of test case can be single or multiple lines.\n\nCotton will consider only the first ATX Heading 1 as the test title.",
+		Setups:      expectedSetups,
+		Teardowns:   expectedTeardowns,
+		Request:     expectedRequest,
+	}
 
 	assert.NoError(t, err)
-	assert.Equal(t, "This is title of test case written with ATX Heading 1", result.Title)
-	assert.Equal(t, "The test case is described by providing paragraphs right after the test case title.\n\nThe description of test case can be single or multiple lines.\n\nCotton will consider only the first ATX Heading 1 as the test title.", result.Description)
-	assert.Equal(t, len(expectedSetups), len(result.Setups))
-	assert.True(t, expectedSetups[0].SimilarTo(result.Setups[0]))
-	assert.Equal(t, len(expectedTeardowns), len(result.Teardowns))
-	assert.True(t, expectedTeardowns[0].SimilarTo(result.Teardowns[0]))
-	assert.True(t, request.Similar(expectedRequest, result.Request))
+	assert.True(t, expected.SimilarTo(result))
 }
