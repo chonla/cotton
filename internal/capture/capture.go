@@ -24,3 +24,8 @@ func Try(mdLine line.Line) (*Capture, bool) {
 	}
 	return nil, false
 }
+
+func (c *Capture) SimilarTo(anotherCapture *Capture) bool {
+	return c.Name == anotherCapture.Name &&
+		c.Locator == anotherCapture.Locator
+}

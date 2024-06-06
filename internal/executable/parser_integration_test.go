@@ -39,9 +39,10 @@ Host: localhost`)
 			Locator: "$.version",
 		},
 	}
-	assert.NoError(t, err)
-	assert.Equal(t, &executable.Executable{
+	expectedExecutable := &executable.Executable{
 		Request:  expectedRequest,
 		Captures: expectedCaptures,
-	}, result)
+	}
+	assert.NoError(t, err)
+	assert.True(t, expectedExecutable.SimilarTo(result))
 }

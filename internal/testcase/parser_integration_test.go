@@ -47,28 +47,18 @@ Host: localhost
 			Locator: "$.version",
 		},
 	}
-
-	assert.NoError(t, err)
-	assert.Equal(t, "This is title of test case written with ATX Heading 1", result.Title)
-	assert.Equal(t, "The test case is described by providing paragraphs right after the test case title.\n\nThe description of test case can be single or multiple lines.\n\nCotton will consider only the first ATX Heading 1 as the test title.", result.Description)
-	assert.Equal(t, []*executable.Executable{
+	expectedSetups := []*executable.Executable{
 		{
 			Title:    "Link before the test will be executed before executing test",
 			Request:  expectedRequestInBefore,
 			Captures: expectedCapturesInBefore,
 		},
-	}, result.Setups)
+	}
+
+	assert.NoError(t, err)
+	assert.Equal(t, "This is title of test case written with ATX Heading 1", result.Title)
+	assert.Equal(t, "The test case is described by providing paragraphs right after the test case title.\n\nThe description of test case can be single or multiple lines.\n\nCotton will consider only the first ATX Heading 1 as the test title.", result.Description)
+	assert.Equal(t, len(expectedSetups), len(result.Setups))
+	assert.True(t, expectedSetups[0].SimilarTo(result.Setups[0]))
 	assert.True(t, request.Similar(expectedRequest, result.Request))
-	// assert.Equal(t, &testcase.TestCase{
-	// 	Title:       "This is title of test case written with ATX Heading 1",
-	// 	Description: "The test case is described by providing paragraphs right after the test case title.\n\nThe description of test case can be single or multiple lines.\n\nCotton will consider only the first ATX Heading 1 as the test title.",
-	// 	Request:     expectedRequest,
-	// 	Setups: []*executable.Executable{
-	// 		{
-	// 			Title:    "Link before the test will be executed before executing test",
-	// 			Request:  expectedRequestInBefore,
-	// 			Captures: expectedCapturesInBefore,
-	// 		},
-	// 	},
-	// }, result)
 }
