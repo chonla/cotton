@@ -25,7 +25,7 @@ func TestParsingCompleteExecutableMarkdownFile(t *testing.T) {
 	reqParser := httpreqparser.New()
 	parser := executable.NewParser(config, reader, reqParser)
 
-	result, err := parser.FromMarkdownFile("<rootDir>/etc/examples/executable.md")
+	result, err := parser.FromMarkdownFile("<rootDir>/etc/examples/executable_before.md")
 
 	expectedRequest, _ := reqParser.Parse(`GET /get-info HTTP/1.1
 Host: localhost`)
