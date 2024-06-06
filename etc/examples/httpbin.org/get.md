@@ -9,3 +9,5 @@ Test getting data from httpbin.org using multiple http requests.
 ```http
 GET https://httpbin.org/get?key1=value1 HTTP/1.1
 ```
+
+* [Patch some data to host](../../etc/examples/httpbin.org/patch.md)

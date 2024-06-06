@@ -36,6 +36,12 @@ Content-Length: 25
 
 secret=thisIsASecretValue`)
 
+	expectedAfterRequest, _ := reqParser.Parse(`PATCH https://httpbin.org/patch HTTP/1.1
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 19
+
+secret=updatedValue`)
+
 	expectedBeforeCaptures := []*capture.Capture{
 		{
 			Name:    "secret",
@@ -51,10 +57,19 @@ secret=thisIsASecretValue`)
 		},
 	}
 
+	expectedTeardowns := []*executable.Executable{
+		{
+			Title:   "Patch some data to host",
+			Request: expectedAfterRequest,
+		},
+	}
+
 	assert.NoError(t, err)
 	assert.Equal(t, "Test GET on httpbin.org", result.Title)
 	assert.Equal(t, "Test getting data from httpbin.org using multiple http requests.", result.Description)
 	assert.True(t, request.Similar(expectedRequest, result.Request))
 	assert.Equal(t, len(expectedSetups), len(result.Setups))
 	assert.True(t, expectedSetups[0].SimilarTo(result.Setups[0]))
+	assert.Equal(t, len(expectedTeardowns), len(result.Teardowns))
+	assert.True(t, expectedTeardowns[0].SimilarTo(result.Teardowns[0]))
 }
