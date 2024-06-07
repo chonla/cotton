@@ -8,7 +8,7 @@ Cotton will consider only the first ATX Heading 1 as the test title.
 
 ## Before Test
 
-All links before code block ` ```http` will be executed before test request.
+All links defined as list before code block ` ```http` will be executed before test request.
 
 * [Link before the test will be executed before executing test](../../etc/examples/executable_before.md)
 
@@ -29,6 +29,6 @@ Host: localhost
 
 ## After Test
 
-All links after code block ` ```http` will be executed after test request.
+All links defined as list after code block ` ```http` will be executed after test request.
 
 * [Link after the test will be executed after executing test](../../etc/examples/executable_after.md)
