@@ -10,4 +10,4 @@ secret=thisIsASecretValue
 
 ## Capture something from result
 
-* secret=$.form.secret
+* secret:$.form.secret

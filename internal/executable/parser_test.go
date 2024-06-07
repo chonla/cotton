@@ -226,8 +226,8 @@ func TestGetCaptures(t *testing.T) {
 		"body",
 		"```",
 		"",
-		"* var=sample",
-		"* var2=`good.vibe`",
+		"* var:sample",
+		"* var2:`good.vibe`",
 	}
 
 	expectedRequest, _ := httpreqparser.New().Parse(`POST /this-should-be-collected HTTP/1.0

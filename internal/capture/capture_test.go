@@ -9,7 +9,7 @@ import (
 )
 
 func TestCaptureFromPlainAssignment(t *testing.T) {
-	mdLine := line.Line("* name=$.data.firstname")
+	mdLine := line.Line("* name:$.data.firstname")
 
 	result, ok := capture.Try(mdLine)
 
@@ -21,7 +21,7 @@ func TestCaptureFromPlainAssignment(t *testing.T) {
 }
 
 func TestCaptureFromInlineAssignment(t *testing.T) {
-	mdLine := line.Line("* name=`$.data.firstname`")
+	mdLine := line.Line("* name:`$.data.firstname`")
 
 	result, ok := capture.Try(mdLine)
 
@@ -33,7 +33,7 @@ func TestCaptureFromInlineAssignment(t *testing.T) {
 }
 
 func TestCaptureFromMoreIndentsPlainAssignment(t *testing.T) {
-	mdLine := line.Line("*   name=$.data.firstname")
+	mdLine := line.Line("*   name:$.data.firstname")
 
 	result, ok := capture.Try(mdLine)
 
@@ -45,7 +45,7 @@ func TestCaptureFromMoreIndentsPlainAssignment(t *testing.T) {
 }
 
 func TestCaptureFromPlainAssignmentWithWhiteSpaces(t *testing.T) {
-	mdLine := line.Line("*   name =  $.data.firstname")
+	mdLine := line.Line("*   name :  $.data.firstname")
 
 	result, ok := capture.Try(mdLine)
 

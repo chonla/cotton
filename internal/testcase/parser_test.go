@@ -392,7 +392,7 @@ func TestGetExecutablesBeforeTest(t *testing.T) {
 		"Host: localhost",
 		"```",
 		"# Capture part",
-		"* readiness=`$.readiness.status`",
+		"* readiness:`$.readiness.status`",
 	}
 
 	reader := new(MockFileReader)
@@ -454,7 +454,7 @@ func TestGetCapturesInTestcase(t *testing.T) {
 		"body",
 		"```",
 		"",
-		"* varname=`$.result`",
+		"* varname:`$.result`",
 	}
 
 	expectedRequest, _ := httpreqparser.New().Parse(`POST /this-should-be-collected HTTP/1.0

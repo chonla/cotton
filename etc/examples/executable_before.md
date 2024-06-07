@@ -9,5 +9,5 @@ Host: localhost
 
 ## Capture
 
-* readiness=$.readiness
-* version=`$.version`
+* readiness:$.readiness
+* version:`$.version`

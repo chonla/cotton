@@ -32,3 +32,7 @@ Host: localhost
 All links defined as list after code block ` ```http` will be executed after test request.
 
 * [Link after the test will be executed after executing test](../../etc/examples/executable_after.md)
+
+## Assertions
+
+* `$.form.result`=="success"
