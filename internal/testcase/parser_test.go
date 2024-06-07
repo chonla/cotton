@@ -1,6 +1,7 @@
 package testcase_test
 
 import (
+	"cotton/internal/assertion"
 	"cotton/internal/capture"
 	"cotton/internal/config"
 	"cotton/internal/executable"
@@ -483,4 +484,57 @@ body`)
 		},
 	}, result)
 
+}
+
+func TestGetAssertion(t *testing.T) {
+	config := &config.Config{
+		RootDir: "",
+	}
+
+	lines := []line.Line{
+		"```http",
+		"POST /this-should-be-collected HTTP/1.0",
+		"Host: url",
+		"",
+		"post",
+		"body",
+		"```",
+		"",
+		"* `$.var`==`3`",
+		"* `$.var2`==`\"good.vibe\"`",
+	}
+
+	expectedRequest, _ := httpreqparser.New().Parse(`POST /this-should-be-collected HTTP/1.0
+Host: url
+
+post
+body`)
+
+	expectedAssertions := []*assertion.Assertion{
+		{
+			Selector: "$.var",
+			Value:    3,
+			Operator: &assertion.EqualAssertion{},
+		},
+		{
+			Selector: "$.var2",
+			Value:    "good.vibe",
+			Operator: &assertion.EqualAssertion{},
+		},
+	}
+
+	reader := new(MockFileReader)
+	reader.On("Read", "mock_file").Return(lines, nil)
+
+	reqParser := new(MockRequestParser)
+	reqParser.On("Parse", "POST /this-should-be-collected HTTP/1.0\nHost: url\n\npost\nbody").Return(expectedRequest, nil)
+
+	parser := testcase.NewParser(config, reader, reqParser)
+	result, err := parser.FromMarkdownFile("mock_file")
+
+	assert.NoError(t, err)
+	assert.Equal(t, &testcase.TestCase{
+		Request:    expectedRequest,
+		Assertions: expectedAssertions,
+	}, result)
 }

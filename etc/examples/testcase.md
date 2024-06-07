@@ -35,8 +35,8 @@ All links defined as list after code block ` ```http` will be executed after tes
 
 ## Assertions
 
-Assertion defined as list in `<value><operator><expected>` format. All expected values without inline code block are string by default. To explicitly define type, use inline code block.
+Assertion defined as list in `<value><operator><expected>` format. All LHS variable must be defined in inline code block. All expected values must be written in inline code block. Type must be explicitly defined.
 
-* `$.form.result`==success
-* `$.form.result`==`"success"`
-* `$.form.result.length`==`1`
+* `$.form.result` == `"success"`
+* `$.form.result.length` == `1`
+* `$.form.result` is defined

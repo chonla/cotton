@@ -1,6 +1,7 @@
 package testcase
 
 import (
+	"cotton/internal/assertion"
 	"cotton/internal/capture"
 	"cotton/internal/config"
 	"cotton/internal/executable"
@@ -95,27 +96,35 @@ func (p *Parser) FromMarkdownLines(mdLines []line.Line) (*TestCase, error) {
 				}
 				tc.Captures = append(tc.Captures, cap)
 			} else {
-				if captures, ok := mdLine.CaptureAll(`^\s*\*\s\[([^\]]+)\]\(([^\)]+)\)`); ok {
-					if sutReq == nil {
-						ex, err := p.executableParser.FromMarkdownFile(captures[2])
-						if err != nil {
-							return nil, err
+				if as, ok := assertion.Try(mdLine); ok {
+					if tc.Assertions == nil {
+						tc.Assertions = []*assertion.Assertion{}
+					}
+					tc.Assertions = append(tc.Assertions, as)
+
+				} else {
+					if captures, ok := mdLine.CaptureAll(`^\s*\*\s\[([^\]]+)\]\(([^\)]+)\)`); ok {
+						if sutReq == nil {
+							ex, err := p.executableParser.FromMarkdownFile(captures[2])
+							if err != nil {
+								return nil, err
+							}
+							ex.Title = captures[1]
+							if tc.Setups == nil {
+								tc.Setups = []*executable.Executable{}
+							}
+							tc.Setups = append(tc.Setups, ex)
+						} else {
+							ex, err := p.executableParser.FromMarkdownFile(captures[2])
+							if err != nil {
+								return nil, err
+							}
+							ex.Title = captures[1]
+							if tc.Teardowns == nil {
+								tc.Teardowns = []*executable.Executable{}
+							}
+							tc.Teardowns = append(tc.Teardowns, ex)
 						}
-						ex.Title = captures[1]
-						if tc.Setups == nil {
-							tc.Setups = []*executable.Executable{}
-						}
-						tc.Setups = append(tc.Setups, ex)
-					} else {
-						ex, err := p.executableParser.FromMarkdownFile(captures[2])
-						if err != nil {
-							return nil, err
-						}
-						ex.Title = captures[1]
-						if tc.Teardowns == nil {
-							tc.Teardowns = []*executable.Executable{}
-						}
-						tc.Teardowns = append(tc.Teardowns, ex)
 					}
 				}
 			}
