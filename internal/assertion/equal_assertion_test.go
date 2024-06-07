@@ -8,6 +8,18 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestEqualAssertionWithSameValue(t *testing.T) {
+	v1 := "10"
+	v2 := "10"
+
+	op := assertion.EqualAssertion{}
+
+	result, err := op.Assert(v1, v2)
+
+	assert.Nil(t, err)
+	assert.True(t, result)
+}
+
 func TestEqualAssertionWithDifferentType(t *testing.T) {
 	v1 := 3
 	v2 := "3"
@@ -16,6 +28,18 @@ func TestEqualAssertionWithDifferentType(t *testing.T) {
 
 	result, err := op.Assert(v1, v2)
 
-	assert.Equal(t, errors.New("3 (int) and 3 (string) have different type"), err)
+	assert.Equal(t, errors.New("type of 3 is expected to be string but int"), err)
+	assert.False(t, result)
+}
+
+func TestEqualAssertionWithDifferentValue(t *testing.T) {
+	v1 := "3"
+	v2 := "10"
+
+	op := assertion.EqualAssertion{}
+
+	result, err := op.Assert(v1, v2)
+
+	assert.Equal(t, errors.New("expecting 10 but got 3"), err)
 	assert.False(t, result)
 }
