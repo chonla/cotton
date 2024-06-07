@@ -35,4 +35,8 @@ All links defined as list after code block ` ```http` will be executed after tes
 
 ## Assertions
 
-* `$.form.result`=="success"
+Assertion defined as list in `<value><operator><expected>` format. All expected values without inline code block are string by default. To explicitly define type, use inline code block.
+
+* `$.form.result`==success
+* `$.form.result`==`"success"`
+* `$.form.result.length`==`1`
