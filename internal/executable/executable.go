@@ -5,14 +5,13 @@ import (
 	"cotton/internal/execution"
 	"cotton/internal/request"
 	"errors"
-	"net/http"
 	"slices"
 )
 
 // For setups and teardowns
 type Executable struct {
 	Title   string
-	Request *http.Request
+	Request *request.Request
 
 	Captures []*capture.Capture
 }
@@ -22,13 +21,13 @@ func (ex *Executable) Execute() (*execution.Execution, error) {
 		return nil, errors.New("no request to be made")
 	}
 
-	ex.Request.Close = true
+	// ex.Request.Close = true
 
-	_, err := http.DefaultClient.Do(ex.Request)
+	_, err := ex.Request.Do() // http.DefaultClient.Do(ex.Request)
 	if err != nil {
 		return nil, err
 	}
-	return nil, nil
+	return &execution.Execution{}, nil
 }
 
 func (ex *Executable) SimilarTo(anotherEx *Executable) bool {
@@ -36,5 +35,6 @@ func (ex *Executable) SimilarTo(anotherEx *Executable) bool {
 		slices.EqualFunc(ex.Captures, anotherEx.Captures, func(c1, c2 *capture.Capture) bool {
 			return c1.SimilarTo(c2)
 		}) &&
-		request.Similar(ex.Request, anotherEx.Request)
+		ex.Request.Similar(anotherEx.Request)
+	// request.Similar(ex.Request, anotherEx.Request)
 }

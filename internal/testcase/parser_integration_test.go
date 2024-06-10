@@ -4,10 +4,12 @@
 package testcase_test
 
 import (
+	"cotton/internal/assertion"
 	"cotton/internal/capture"
 	"cotton/internal/config"
 	"cotton/internal/executable"
 	"cotton/internal/reader"
+	"cotton/internal/request"
 	"cotton/internal/testcase"
 	"os"
 	"testing"
@@ -28,16 +30,19 @@ func TestParsingCompleteTestcaseMarkdownFile(t *testing.T) {
 
 	result, err := parser.FromMarkdownFile("<rootDir>/etc/examples/testcase.md")
 
-	expectedRequestInBefore, _ := reqParser.Parse(`GET /get-info HTTP/1.1
+	beforeReq, _ := reqParser.Parse(`GET /get-info HTTP/1.1
 Host: localhost`)
-	expectedRequestInAfter, _ := reqParser.Parse(`GET /time-taken HTTP/1.1
+	expectedRequestInBefore, _ := request.New(beforeReq)
+	afterReq, _ := reqParser.Parse(`GET /time-taken HTTP/1.1
 Host: localhost`)
-	expectedRequest, _ := reqParser.Parse(`POST /some-path HTTP/1.1
+	expectedRequestInAfter, _ := request.New(afterReq)
+	req, _ := reqParser.Parse(`POST /some-path HTTP/1.1
 Host: localhost
 
 {
     "login": "login_name"
 }`)
+	expectedRequest, _ := request.New(req)
 	expectedCapturesInBefore := []*capture.Capture{
 		{
 			Name:    "readiness",
@@ -68,12 +73,25 @@ Host: localhost
 			Captures: expectedCapturesInAfter,
 		},
 	}
+	expectedAssertions := []*assertion.Assertion{
+		{
+			Selector: "$.form.result",
+			Value:    "success",
+			Operator: &assertion.EqualAssertion{},
+		},
+		{
+			Selector: "$.form.result.length",
+			Value:    int(1),
+			Operator: &assertion.EqualAssertion{},
+		},
+	}
 	expected := &testcase.TestCase{
 		Title:       "This is title of test case written with ATX Heading 1",
 		Description: "The test case is described by providing paragraphs right after the test case title.\n\nThe description of test case can be single or multiple lines.\n\nCotton will consider only the first ATX Heading 1 as the test title.",
 		Setups:      expectedSetups,
 		Teardowns:   expectedTeardowns,
 		Request:     expectedRequest,
+		Assertions:  expectedAssertions,
 	}
 
 	assert.NoError(t, err)

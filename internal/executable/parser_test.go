@@ -1,13 +1,12 @@
 package executable_test
 
 import (
-	"bufio"
 	"cotton/internal/capture"
 	"cotton/internal/config"
 	"cotton/internal/executable"
 	"cotton/internal/line"
+	"cotton/internal/request"
 	"net/http"
-	"strings"
 	"testing"
 
 	"github.com/chonla/httpreqparser"
@@ -67,17 +66,18 @@ func TestGetHTTPRequestInHTTPCodeBlock(t *testing.T) {
 		"body",
 		"```",
 	}
-	expectedRequest, _ := http.ReadRequest(bufio.NewReader(strings.NewReader(`POST /some-path HTTP/1.0
+	req, _ := httpreqparser.New().Parse(`POST /some-path HTTP/1.0
 Host: url
 
 post
-body`)))
+body`)
+	expectedRequest, _ := request.New(req)
 
 	reader := new(MockFileReader)
 	reader.On("Read", "mock_file").Return(lines, nil)
 
 	reqParser := new(MockRequestParser)
-	reqParser.On("Parse", "POST /some-path HTTP/1.0\nHost: url\n\npost\nbody").Return(expectedRequest, nil)
+	reqParser.On("Parse", "POST /some-path HTTP/1.0\nHost: url\n\npost\nbody").Return(req, nil)
 
 	parser := executable.NewParser(config, reader, reqParser)
 	result, err := parser.FromMarkdownFile("mock_file")
@@ -90,7 +90,7 @@ body`)))
 	reqParser.AssertExpectations(t)
 }
 
-func TestDiscardHTTPRequestInNonHTTPCodeBlock(t *testing.T) {
+func TestDiscardHTTPRequestInNonHTTPCodeBlockWillCauseANilExecutable(t *testing.T) {
 	config := &config.Config{
 		RootDir: "",
 	}
@@ -113,10 +113,8 @@ func TestDiscardHTTPRequestInNonHTTPCodeBlock(t *testing.T) {
 	parser := executable.NewParser(config, reader, reqParser)
 	result, err := parser.FromMarkdownFile("mock_file")
 
-	assert.NoError(t, err)
-	assert.Equal(t, &executable.Executable{
-		Request: nil,
-	}, result)
+	assert.Error(t, err)
+	assert.Nil(t, result)
 	reader.AssertExpectations(t)
 	reqParser.AssertNotCalled(t, "Parse")
 }
@@ -144,17 +142,18 @@ func TestGetHTTPRequestInOtherHTTPCodeBlock(t *testing.T) {
 		"```",
 	}
 
-	expectedRequest, _ := httpreqparser.New().Parse(`POST /some-path HTTP/1.0
+	req, _ := httpreqparser.New().Parse(`POST /some-path HTTP/1.0
 Host: url
 
 post
 body`)
+	expectedRequest, _ := request.New(req)
 
 	reader := new(MockFileReader)
 	reader.On("Read", "mock_file").Return(lines, nil)
 
 	reqParser := new(MockRequestParser)
-	reqParser.On("Parse", "POST /some-path HTTP/1.0\nHost: url\n\npost\nbody").Return(expectedRequest, nil)
+	reqParser.On("Parse", "POST /some-path HTTP/1.0\nHost: url\n\npost\nbody").Return(req, nil)
 
 	parser := executable.NewParser(config, reader, reqParser)
 	result, err := parser.FromMarkdownFile("mock_file")
@@ -189,17 +188,18 @@ func TestGetHTTPRequestInOnlyFirstHTTPCodeBlock(t *testing.T) {
 		"body",
 		"```",
 	}
-	expectedRequest, _ := httpreqparser.New().Parse(`POST /this-should-be-collected HTTP/1.0
+	req, _ := httpreqparser.New().Parse(`POST /this-should-be-collected HTTP/1.0
 Host: url
 
 post
 body`)
+	expectedRequest, _ := request.New(req)
 
 	reader := new(MockFileReader)
 	reader.On("Read", "mock_file").Return(lines, nil)
 
 	reqParser := new(MockRequestParser)
-	reqParser.On("Parse", "POST /this-should-be-collected HTTP/1.0\nHost: url\n\npost\nbody").Return(expectedRequest, nil)
+	reqParser.On("Parse", "POST /this-should-be-collected HTTP/1.0\nHost: url\n\npost\nbody").Return(req, nil)
 
 	parser := executable.NewParser(config, reader, reqParser)
 	result, err := parser.FromMarkdownFile("mock_file")
@@ -230,11 +230,12 @@ func TestGetCaptures(t *testing.T) {
 		"* var2:`good.vibe`",
 	}
 
-	expectedRequest, _ := httpreqparser.New().Parse(`POST /this-should-be-collected HTTP/1.0
+	req, _ := httpreqparser.New().Parse(`POST /this-should-be-collected HTTP/1.0
 Host: url
 
 post
 body`)
+	expectedRequest, _ := request.New(req)
 	expectedCaptures := []*capture.Capture{
 		{
 			Name:    "var",
@@ -250,7 +251,7 @@ body`)
 	reader.On("Read", "mock_file").Return(lines, nil)
 
 	reqParser := new(MockRequestParser)
-	reqParser.On("Parse", "POST /this-should-be-collected HTTP/1.0\nHost: url\n\npost\nbody").Return(expectedRequest, nil)
+	reqParser.On("Parse", "POST /this-should-be-collected HTTP/1.0\nHost: url\n\npost\nbody").Return(req, nil)
 
 	parser := executable.NewParser(config, reader, reqParser)
 	result, err := parser.FromMarkdownFile("mock_file")

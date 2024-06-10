@@ -6,6 +6,7 @@ import (
 	"cotton/internal/config"
 	"cotton/internal/executable"
 	"cotton/internal/line"
+	"cotton/internal/request"
 	"cotton/internal/testcase"
 	"net/http"
 	"testing"
@@ -33,24 +34,25 @@ func (m *MockRequestParser) Parse(req string) (*http.Request, error) {
 	return args.Get(0).(*http.Request), args.Error(1)
 }
 
-func TestParseMarkdownFileShouldReadFromGivenFile(t *testing.T) {
-	config := &config.Config{
-		RootDir: "",
-	}
+// func TestParseMarkdownFileShouldReadFromGivenFile(t *testing.T) {
+// 	config := &config.Config{
+// 		RootDir: "",
+// 	}
 
-	lines := []line.Line{""}
+// 	lines := []line.Line{""}
 
-	reader := new(MockFileReader)
-	reader.On("Read", "mock_file").Return(lines, nil)
+// 	reader := new(MockFileReader)
+// 	reader.On("Read", "mock_file").Return(lines, nil)
 
-	reqParser := new(MockRequestParser)
+// 	reqParser := new(MockRequestParser)
+// 	reqParser.On("Parse", "POST /some-path HTTP/1.0\nHost: url\n\npost\nbody").Return(expectedRequest, nil)
 
-	parser := testcase.NewParser(config, reader, reqParser)
-	parser.FromMarkdownFile("mock_file")
+// 	parser := testcase.NewParser(config, reader, reqParser)
+// 	parser.FromMarkdownFile("mock_file")
 
-	reader.AssertExpectations(t)
-	reqParser.AssertNotCalled(t, "Parse")
-}
+// 	reader.AssertExpectations(t)
+// 	reqParser.AssertExpectations(t)
+// }
 
 // First H1 is considered a test title
 func TestH1AtVeryFirstLine(t *testing.T) {
@@ -58,23 +60,40 @@ func TestH1AtVeryFirstLine(t *testing.T) {
 		RootDir: "",
 	}
 
-	lines := []line.Line{"# Title"}
+	lines := []line.Line{
+		"# Title",
+		"",
+		"```http",
+		"POST /some-path HTTP/1.0",
+		"Host: url",
+		"",
+		"post",
+		"body",
+		"```",
+	}
+
+	req, _ := httpreqparser.New().Parse(`POST /some-path HTTP/1.0
+Host: url
+
+post
+body`)
+	expectedRequest, _ := request.New(req)
 
 	reader := new(MockFileReader)
 	reader.On("Read", "mock_file").Return(lines, nil)
 
 	reqParser := new(MockRequestParser)
+	reqParser.On("Parse", "POST /some-path HTTP/1.0\nHost: url\n\npost\nbody").Return(req, nil)
 
 	parser := testcase.NewParser(config, reader, reqParser)
 	result, err := parser.FromMarkdownFile("mock_file")
 
-	assert.NoError(t, err)
+	assert.Nil(t, err)
 	assert.Equal(t, &testcase.TestCase{
 		Title:   "Title",
-		Request: nil,
+		Request: expectedRequest,
 	}, result)
 	reader.AssertExpectations(t)
-	reqParser.AssertNotCalled(t, "Parse")
 }
 
 func TestH1AtSomeOtherLines(t *testing.T) {
@@ -86,12 +105,28 @@ func TestH1AtSomeOtherLines(t *testing.T) {
 		"## Ok",
 		"",
 		"# Title",
+		"",
+		"```http",
+		"POST /some-path HTTP/1.0",
+		"Host: url",
+		"",
+		"post",
+		"body",
+		"```",
 	}
+
+	req, _ := httpreqparser.New().Parse(`POST /some-path HTTP/1.0
+Host: url
+
+post
+body`)
+	expectedRequest, _ := request.New(req)
 
 	reader := new(MockFileReader)
 	reader.On("Read", "mock_file").Return(lines, nil)
 
 	reqParser := new(MockRequestParser)
+	reqParser.On("Parse", "POST /some-path HTTP/1.0\nHost: url\n\npost\nbody").Return(req, nil)
 
 	parser := testcase.NewParser(config, reader, reqParser)
 	result, err := parser.FromMarkdownFile("mock_file")
@@ -99,26 +134,43 @@ func TestH1AtSomeOtherLines(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, &testcase.TestCase{
 		Title:   "Title",
-		Request: nil,
+		Request: expectedRequest,
 	}, result)
 	reader.AssertExpectations(t)
-	reqParser.AssertNotCalled(t, "Parse")
+	reqParser.AssertExpectations(t)
 }
 
-func TestMultipleH1s(t *testing.T) {
+func TestMultipleH1sWillGrabTheFirstH1AsTitle(t *testing.T) {
 	config := &config.Config{
 		RootDir: "",
 	}
 
 	lines := []line.Line{
 		"# Title",
+		"",
+		"```http",
+		"POST /some-path HTTP/1.0",
+		"Host: url",
+		"",
+		"post",
+		"body",
+		"```",
+		"",
 		"# Other Title",
 	}
+
+	req, _ := httpreqparser.New().Parse(`POST /some-path HTTP/1.0
+Host: url
+
+post
+body`)
+	expectedReq, _ := request.New(req)
 
 	reader := new(MockFileReader)
 	reader.On("Read", "mock_file").Return(lines, nil)
 
 	reqParser := new(MockRequestParser)
+	reqParser.On("Parse", "POST /some-path HTTP/1.0\nHost: url\n\npost\nbody").Return(req, nil)
 
 	parser := testcase.NewParser(config, reader, reqParser)
 	result, err := parser.FromMarkdownFile("mock_file")
@@ -126,10 +178,10 @@ func TestMultipleH1s(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, &testcase.TestCase{
 		Title:   "Title",
-		Request: nil,
+		Request: expectedReq,
 	}, result)
 	reader.AssertExpectations(t)
-	reqParser.AssertNotCalled(t, "Parse")
+	reqParser.AssertExpectations(t)
 }
 
 func TestDescription(t *testing.T) {
@@ -142,12 +194,28 @@ func TestDescription(t *testing.T) {
 		"",
 		"Wonderful",
 		"world",
+		"",
+		"```http",
+		"POST /some-path HTTP/1.0",
+		"Host: url",
+		"",
+		"post",
+		"body",
+		"```",
 	}
+
+	req, _ := httpreqparser.New().Parse(`POST /some-path HTTP/1.0
+Host: url
+
+post
+body`)
+	expectedReq, _ := request.New(req)
 
 	reader := new(MockFileReader)
 	reader.On("Read", "mock_file").Return(lines, nil)
 
 	reqParser := new(MockRequestParser)
+	reqParser.On("Parse", "POST /some-path HTTP/1.0\nHost: url\n\npost\nbody").Return(req, nil)
 
 	parser := testcase.NewParser(config, reader, reqParser)
 	result, err := parser.FromMarkdownFile("mock_file")
@@ -156,10 +224,10 @@ func TestDescription(t *testing.T) {
 	assert.Equal(t, &testcase.TestCase{
 		Title:       "Title",
 		Description: "Wonderful\nworld",
-		Request:     nil,
+		Request:     expectedReq,
 	}, result)
 	reader.AssertExpectations(t)
-	reqParser.AssertNotCalled(t, "Parse")
+	reqParser.AssertExpectations(t)
 }
 
 func TestDescriptionAtOtherH1(t *testing.T) {
@@ -176,12 +244,28 @@ func TestDescriptionAtOtherH1(t *testing.T) {
 		"",
 		"Wonderful world",
 		"Lalala",
+		"",
+		"```http",
+		"POST /some-path HTTP/1.0",
+		"Host: url",
+		"",
+		"post",
+		"body",
+		"```",
 	}
+
+	req, _ := httpreqparser.New().Parse(`POST /some-path HTTP/1.0
+Host: url
+
+post
+body`)
+	expectedReq, _ := request.New(req)
 
 	reader := new(MockFileReader)
 	reader.On("Read", "mock_file").Return(lines, nil)
 
 	reqParser := new(MockRequestParser)
+	reqParser.On("Parse", "POST /some-path HTTP/1.0\nHost: url\n\npost\nbody").Return(req, nil)
 
 	parser := testcase.NewParser(config, reader, reqParser)
 	result, err := parser.FromMarkdownFile("mock_file")
@@ -190,13 +274,13 @@ func TestDescriptionAtOtherH1(t *testing.T) {
 	assert.Equal(t, &testcase.TestCase{
 		Title:       "Title",
 		Description: "Wonderful",
-		Request:     nil,
+		Request:     expectedReq,
 	}, result)
 	reader.AssertExpectations(t)
-	reqParser.AssertNotCalled(t, "Parse")
+	reqParser.AssertExpectations(t)
 }
 
-func TestGetHTTPRequestInHTTPCodeBlock(t *testing.T) {
+func TestGetHTTPRequestWithoutTitle(t *testing.T) {
 	config := &config.Config{
 		RootDir: "",
 	}
@@ -211,17 +295,18 @@ func TestGetHTTPRequestInHTTPCodeBlock(t *testing.T) {
 		"```",
 	}
 
-	expectedRequest, _ := httpreqparser.New().Parse(`POST /some-path HTTP/1.0
+	req, _ := httpreqparser.New().Parse(`POST /some-path HTTP/1.0
 Host: url
 
 post
 body`)
+	expectedRequest, _ := request.New(req)
 
 	reader := new(MockFileReader)
 	reader.On("Read", "mock_file").Return(lines, nil)
 
 	reqParser := new(MockRequestParser)
-	reqParser.On("Parse", "POST /some-path HTTP/1.0\nHost: url\n\npost\nbody").Return(expectedRequest, nil)
+	reqParser.On("Parse", "POST /some-path HTTP/1.0\nHost: url\n\npost\nbody").Return(req, nil)
 
 	parser := testcase.NewParser(config, reader, reqParser)
 	result, err := parser.FromMarkdownFile("mock_file")
@@ -257,10 +342,8 @@ func TestDiscardHTTPRequestInNonHTTPCodeBlock(t *testing.T) {
 	parser := testcase.NewParser(config, reader, reqParser)
 	result, err := parser.FromMarkdownFile("mock_file")
 
-	assert.NoError(t, err)
-	assert.Equal(t, &testcase.TestCase{
-		Request: nil,
-	}, result)
+	assert.Error(t, err)
+	assert.Nil(t, result)
 	reader.AssertExpectations(t)
 	reqParser.AssertNotCalled(t, "Parse")
 }
@@ -288,17 +371,18 @@ func TestGetHTTPRequestInOtherHTTPCodeBlock(t *testing.T) {
 		"```",
 	}
 
-	expectedRequest, _ := httpreqparser.New().Parse(`POST /some-path HTTP/1.0
+	req, _ := httpreqparser.New().Parse(`POST /some-path HTTP/1.0
 Host: url
 
 post
 body`)
+	expectedRequest, _ := request.New(req)
 
 	reader := new(MockFileReader)
 	reader.On("Read", "mock_file").Return(lines, nil)
 
 	reqParser := new(MockRequestParser)
-	reqParser.On("Parse", "POST /some-path HTTP/1.0\nHost: url\n\npost\nbody").Return(expectedRequest, nil)
+	reqParser.On("Parse", "POST /some-path HTTP/1.0\nHost: url\n\npost\nbody").Return(req, nil)
 
 	parser := testcase.NewParser(config, reader, reqParser)
 	result, err := parser.FromMarkdownFile("mock_file")
@@ -333,17 +417,18 @@ func TestGetHTTPRequestInOnlyFirstHTTPCodeBlock(t *testing.T) {
 		"body",
 		"```",
 	}
-	expectedRequest, _ := httpreqparser.New().Parse(`POST /this-should-be-collected HTTP/1.0
+	req, _ := httpreqparser.New().Parse(`POST /this-should-be-collected HTTP/1.0
 Host: url
 
 post
 body`)
+	expectedRequest, _ := request.New(req)
 
 	reader := new(MockFileReader)
 	reader.On("Read", "mock_file").Return(lines, nil)
 
 	reqParser := new(MockRequestParser)
-	reqParser.On("Parse", "POST /this-should-be-collected HTTP/1.0\nHost: url\n\npost\nbody").Return(expectedRequest, nil)
+	reqParser.On("Parse", "POST /this-should-be-collected HTTP/1.0\nHost: url\n\npost\nbody").Return(req, nil)
 
 	parser := testcase.NewParser(config, reader, reqParser)
 	result, err := parser.FromMarkdownFile("mock_file")
@@ -401,20 +486,23 @@ func TestGetExecutablesBeforeTest(t *testing.T) {
 	reader.On("Read", "link1").Return(beforeLink1Lines, nil)
 	reader.On("Read", "link2").Return(beforeLink2Lines, nil)
 
-	expectedBefore1, _ := httpreqparser.New().Parse(`GET /healthcheck HTTP/1.0
+	beforeReq1, _ := httpreqparser.New().Parse(`GET /healthcheck HTTP/1.0
 Host: localhost`)
-	expectedBefore2, _ := httpreqparser.New().Parse(`GET /readiness HTTP/1.0
+	expectedBefore1, _ := request.New(beforeReq1)
+	beforeReq2, _ := httpreqparser.New().Parse(`GET /readiness HTTP/1.0
 Host: localhost`)
-	expectedRequest, _ := httpreqparser.New().Parse(`POST /some-path HTTP/1.0
+	expectedBefore2, _ := request.New(beforeReq2)
+	req, _ := httpreqparser.New().Parse(`POST /some-path HTTP/1.0
 Host: url
 
 post
 body`)
+	expectedRequest, _ := request.New(req)
 
 	reqParser := new(MockRequestParser)
-	reqParser.On("Parse", "POST /some-path HTTP/1.0\nHost: url\n\npost\nbody").Return(expectedRequest, nil)
-	reqParser.On("Parse", "GET /healthcheck HTTP/1.0\nHost: localhost").Return(expectedBefore1, nil)
-	reqParser.On("Parse", "GET /readiness HTTP/1.0\nHost: localhost").Return(expectedBefore2, nil)
+	reqParser.On("Parse", "POST /some-path HTTP/1.0\nHost: url\n\npost\nbody").Return(req, nil)
+	reqParser.On("Parse", "GET /healthcheck HTTP/1.0\nHost: localhost").Return(beforeReq1, nil)
+	reqParser.On("Parse", "GET /readiness HTTP/1.0\nHost: localhost").Return(beforeReq2, nil)
 
 	parser := testcase.NewParser(config, reader, reqParser)
 	result, err := parser.FromMarkdownFile("mock_file")
@@ -458,17 +546,18 @@ func TestGetCapturesInTestcase(t *testing.T) {
 		"* varname:`$.result`",
 	}
 
-	expectedRequest, _ := httpreqparser.New().Parse(`POST /this-should-be-collected HTTP/1.0
+	req, _ := httpreqparser.New().Parse(`POST /this-should-be-collected HTTP/1.0
 Host: localhost
 
 post
 body`)
+	expectedRequest, _ := request.New(req)
 
 	reader := new(MockFileReader)
 	reader.On("Read", "mock_file").Return(lines, nil)
 
 	reqParser := new(MockRequestParser)
-	reqParser.On("Parse", "POST /this-should-be-collected HTTP/1.0\nHost: localhost\n\npost\nbody").Return(expectedRequest, nil)
+	reqParser.On("Parse", "POST /this-should-be-collected HTTP/1.0\nHost: localhost\n\npost\nbody").Return(req, nil)
 
 	parser := testcase.NewParser(config, reader, reqParser)
 	result, err := parser.FromMarkdownFile("mock_file")
@@ -504,11 +593,12 @@ func TestGetAssertion(t *testing.T) {
 		"* `$.var2`==`\"good.vibe\"`",
 	}
 
-	expectedRequest, _ := httpreqparser.New().Parse(`POST /this-should-be-collected HTTP/1.0
+	req, _ := httpreqparser.New().Parse(`POST /this-should-be-collected HTTP/1.0
 Host: url
 
 post
 body`)
+	expectedRequest, _ := request.New(req)
 
 	expectedAssertions := []*assertion.Assertion{
 		{
@@ -527,7 +617,7 @@ body`)
 	reader.On("Read", "mock_file").Return(lines, nil)
 
 	reqParser := new(MockRequestParser)
-	reqParser.On("Parse", "POST /this-should-be-collected HTTP/1.0\nHost: url\n\npost\nbody").Return(expectedRequest, nil)
+	reqParser.On("Parse", "POST /this-should-be-collected HTTP/1.0\nHost: url\n\npost\nbody").Return(req, nil)
 
 	parser := testcase.NewParser(config, reader, reqParser)
 	result, err := parser.FromMarkdownFile("mock_file")

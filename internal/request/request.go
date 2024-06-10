@@ -2,18 +2,43 @@ package request
 
 import (
 	"bytes"
+	"errors"
+	"fmt"
 	"net/http"
 	"net/http/httputil"
 )
 
-func Similar(req1, req2 *http.Request) bool {
-	req1Bytes, err := httputil.DumpRequest(req1, true)
-	if err != nil {
-		return false
+type Request struct {
+	request      *http.Request
+	plainRequest []byte
+}
+
+func New(req *http.Request) (*Request, error) {
+	if req == nil {
+		return nil, errors.New("unexpected nil request")
 	}
-	req2Bytes, err := httputil.DumpRequest(req2, true)
+	req.Close = true
+	reqBytes, err := httputil.DumpRequest(req, true)
 	if err != nil {
-		return false
+		return nil, err
 	}
-	return bytes.Equal(req1Bytes, req2Bytes)
+	return &Request{
+		request:      req,
+		plainRequest: reqBytes,
+	}, nil
+}
+
+func (r *Request) Similar(anotherRequest *Request) bool {
+	fmt.Println("-------------------")
+	fmt.Println("Expected")
+	fmt.Println(string(r.plainRequest))
+	fmt.Println("-------------------")
+	fmt.Println("Actual")
+	fmt.Println(string(anotherRequest.plainRequest))
+	fmt.Println("-------------------")
+	return bytes.Equal(r.plainRequest, anotherRequest.plainRequest)
+}
+
+func (r *Request) Do() (*http.Response, error) {
+	return http.DefaultClient.Do(r.request)
 }

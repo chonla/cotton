@@ -8,6 +8,7 @@ import (
 	"cotton/internal/config"
 	"cotton/internal/executable"
 	"cotton/internal/reader"
+	"cotton/internal/request"
 	"os"
 	"testing"
 
@@ -27,8 +28,9 @@ func TestParsingCompleteExecutableMarkdownFile(t *testing.T) {
 
 	result, err := parser.FromMarkdownFile("<rootDir>/etc/examples/executable_before.md")
 
-	expectedRequest, _ := reqParser.Parse(`GET /get-info HTTP/1.1
+	req, _ := reqParser.Parse(`GET /get-info HTTP/1.1
 Host: localhost`)
+	expectedRequest, _ := request.New(req)
 	expectedCaptures := []*capture.Capture{
 		{
 			Name:    "readiness",

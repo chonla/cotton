@@ -7,6 +7,8 @@ import (
 	"cotton/internal/executable"
 	"cotton/internal/line"
 	"cotton/internal/reader"
+	"cotton/internal/request"
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -46,12 +48,14 @@ func (p *Parser) FromMarkdownLines(mdLines []line.Line) (*TestCase, error) {
 
 	justTitle := false
 	collectingCodeBlockBackTick := false
+	titleCollected := false
 
 	tc := &TestCase{}
 	for _, mdLine := range mdLines {
-		if cap, ok := mdLine.Capture(`^ {0,3}#\s+(.*)`, 1); ok && !justTitle {
+		if cap, ok := mdLine.Capture(`^ {0,3}#\s+(.*)`, 1); ok && !justTitle && !titleCollected {
 			title = cap
 			justTitle = true
+			titleCollected = true
 			continue
 		}
 
@@ -101,10 +105,10 @@ func (p *Parser) FromMarkdownLines(mdLines []line.Line) (*TestCase, error) {
 						tc.Assertions = []*assertion.Assertion{}
 					}
 					tc.Assertions = append(tc.Assertions, as)
-
 				} else {
 					if captures, ok := mdLine.CaptureAll(`^\s*\*\s\[([^\]]+)\]\(([^\)]+)\)`); ok {
 						if sutReq == nil {
+							fmt.Printf("Parsing setup from %s\n", captures[2])
 							ex, err := p.executableParser.FromMarkdownFile(captures[2])
 							if err != nil {
 								return nil, err
@@ -133,7 +137,11 @@ func (p *Parser) FromMarkdownLines(mdLines []line.Line) (*TestCase, error) {
 
 	tc.Title = title
 	tc.Description = line.Line(strings.Join(description, "\n")).Trim().Value()
-	tc.Request = sutReq
+	wrappedReq, err := request.New(sutReq)
+	if err != nil {
+		return nil, err
+	}
+	tc.Request = wrappedReq
 
 	return tc, nil
 }

@@ -39,4 +39,3 @@ Assertion defined as list in `<value><operator><expected>` format. All LHS varia
 
 * `$.form.result` == `"success"`
 * `$.form.result.length` == `1`
-* `$.form.result` is defined

@@ -4,10 +4,12 @@
 package testcase_test
 
 import (
+	"cotton/internal/assertion"
 	"cotton/internal/capture"
 	"cotton/internal/config"
 	"cotton/internal/executable"
 	"cotton/internal/reader"
+	"cotton/internal/request"
 	"cotton/internal/testcase"
 	"os"
 	"testing"
@@ -25,21 +27,24 @@ func TestGetDataFromHttpBin(t *testing.T) {
 	reqParser := httpreqparser.New()
 	parser := testcase.NewParser(config, reader, reqParser)
 
-	result, err := parser.FromMarkdownFile("<rootDir>/etc/examples/httpbin.org/get.md")
+	tc, err := parser.FromMarkdownFile("<rootDir>/etc/examples/httpbin.org/get.md")
 
-	expectedRequest, _ := reqParser.Parse(`GET https://httpbin.org/get?key1=value1 HTTP/1.1`)
+	req, _ := reqParser.Parse(`GET https://httpbin.org/get?key1=value1 HTTP/1.1`)
+	expectedRequest, _ := request.New(req)
 
-	expectedBeforeRequest, _ := reqParser.Parse(`POST https://httpbin.org/post HTTP/1.1
+	beforeReq, _ := reqParser.Parse(`POST https://httpbin.org/post HTTP/1.1
 Content-Type: application/x-www-form-urlencoded
 Content-Length: 25
 
 secret=thisIsASecretValue`)
+	expectedBeforeRequest, _ := request.New(beforeReq)
 
-	expectedAfterRequest, _ := reqParser.Parse(`PATCH https://httpbin.org/patch HTTP/1.1
+	afterReq, _ := reqParser.Parse(`PATCH https://httpbin.org/patch HTTP/1.1
 Content-Type: application/x-www-form-urlencoded
 Content-Length: 19
 
 secret=updatedValue`)
+	expectedAfterRequest, _ := request.New(afterReq)
 
 	expectedBeforeCaptures := []*capture.Capture{
 		{
@@ -63,14 +68,26 @@ secret=updatedValue`)
 		},
 	}
 
+	expectedAssertions := []*assertion.Assertion{
+		{
+			Selector: "form.key1",
+			Value:    "value1",
+			Operator: &assertion.EqualAssertion{},
+		},
+	}
+
 	expected := &testcase.TestCase{
 		Title:       "Test GET on httpbin.org",
 		Description: "Test getting data from httpbin.org using multiple http requests.",
 		Setups:      expectedSetups,
 		Teardowns:   expectedTeardowns,
 		Request:     expectedRequest,
+		Assertions:  expectedAssertions,
 	}
 
+	result := tc.Execute()
+
 	assert.NoError(t, err)
-	assert.True(t, expected.SimilarTo(result))
+	assert.True(t, expected.SimilarTo(tc))
+	assert.NoError(t, result)
 }
