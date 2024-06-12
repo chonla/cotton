@@ -3,7 +3,6 @@ package request
 import (
 	"bytes"
 	"errors"
-	"fmt"
 	"net/http"
 	"net/http/httputil"
 )
@@ -29,13 +28,6 @@ func New(req *http.Request) (*Request, error) {
 }
 
 func (r *Request) Similar(anotherRequest *Request) bool {
-	fmt.Println("-------------------")
-	fmt.Println("Expected")
-	fmt.Println(string(r.plainRequest))
-	fmt.Println("-------------------")
-	fmt.Println("Actual")
-	fmt.Println(string(anotherRequest.plainRequest))
-	fmt.Println("-------------------")
 	return bytes.Equal(r.plainRequest, anotherRequest.plainRequest)
 }
 

@@ -3,6 +3,7 @@ package assertion
 import (
 	"cotton/internal/line"
 	"errors"
+	"fmt"
 	"reflect"
 	"strconv"
 )
@@ -64,4 +65,8 @@ func (a *Assertion) SimilarTo(anotherAssertion *Assertion) bool {
 		reflect.TypeOf(a.Value) == reflect.TypeOf(a.Value) &&
 		a.Value == anotherAssertion.Value &&
 		a.Operator.Name() == anotherAssertion.Operator.Name()
+}
+
+func (a *Assertion) String() string {
+	return fmt.Sprintf("%s %s %s", a.Selector, a.Operator.Name(), a.Value)
 }

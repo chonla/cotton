@@ -8,7 +8,6 @@ import (
 	"cotton/internal/line"
 	"cotton/internal/reader"
 	"cotton/internal/request"
-	"fmt"
 	"net/http"
 	"strings"
 
@@ -108,7 +107,6 @@ func (p *Parser) FromMarkdownLines(mdLines []line.Line) (*TestCase, error) {
 				} else {
 					if captures, ok := mdLine.CaptureAll(`^\s*\*\s\[([^\]]+)\]\(([^\)]+)\)`); ok {
 						if sutReq == nil {
-							fmt.Printf("Parsing setup from %s\n", captures[2])
 							ex, err := p.executableParser.FromMarkdownFile(captures[2])
 							if err != nil {
 								return nil, err

@@ -6,12 +6,10 @@ import (
 	"cotton/internal/line"
 	"cotton/internal/reader"
 	"cotton/internal/request"
-	"fmt"
 	"net/http"
 	"strings"
 
 	"github.com/chonla/httpreqparser"
-	"github.com/kr/pretty"
 )
 
 type Parser struct {
@@ -46,25 +44,19 @@ func (p *Parser) FromMarkdownLines(mdLines []line.Line) (*Executable, error) {
 	ex := &Executable{}
 	for _, mdLine := range mdLines {
 		if mdLine.LookLike("^```http$") && exReq == nil {
-			fmt.Println("START COLLECTING CODE BLOCK")
 			collectingCodeBlockBackTick = true
 			continue
 		}
 
 		if collectingCodeBlockBackTick {
 			if ok := mdLine.LookLike("^```$"); ok {
-				fmt.Println("END COLLECTING CODE BLOCK")
 				collectingCodeBlockBackTick = false
 
 				if len(req) > 0 {
 					requestString := line.Line(strings.Join(req, "\n")).Value()
-					fmt.Println("=============")
-					pretty.Println(requestString)
-					fmt.Println("=============")
 					httpRequest, err := p.requestParser.Parse(requestString)
 					if err == nil {
 						exReq = httpRequest
-						// pretty.Println(exReq)
 					}
 					req = nil
 				}
@@ -73,7 +65,6 @@ func (p *Parser) FromMarkdownLines(mdLines []line.Line) (*Executable, error) {
 					req = []string{}
 				}
 				req = append(req, mdLine.Value())
-				fmt.Println(mdLine.Value())
 			}
 		} else {
 			if cap, ok := capture.Try(mdLine); ok {

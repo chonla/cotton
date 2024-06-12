@@ -4,14 +4,14 @@ Test getting data from httpbin.org using multiple http requests.
 
 ## Test setting up
 
-* [Post some data to host](../../etc/examples/httpbin.org/post.md)
+* [Post some data to host](<rootDir>/etc/examples/httpbin.org/post.md)
 
 ```http
 GET https://httpbin.org/get?key1=value1 HTTP/1.1
 ```
 
-* [Patch some data to host](../../etc/examples/httpbin.org/patch.md)
+* [Patch some data to host](<rootDir>/etc/examples/httpbin.org/patch.md)
 
 ## Assertions
 
-* `form.key1`==`"value1"`
+* `Body.args.key1`==`"value1"`

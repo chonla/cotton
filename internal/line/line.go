@@ -78,3 +78,7 @@ func (l Line) Value() string {
 func (l Line) Replace(needle, with string) string {
 	return strings.ReplaceAll(string(l), needle, with)
 }
+
+func (l Line) Lower() Line {
+	return Line(strings.ToLower(string(l)))
+}
