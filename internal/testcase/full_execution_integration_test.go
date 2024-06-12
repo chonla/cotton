@@ -70,9 +70,16 @@ secret=updatedValue`)
 
 	expectedAssertions := []*assertion.Assertion{
 		{
-			Selector: "form.key1",
+			Selector: "Body.args.key1",
 			Value:    "value1",
 			Operator: &assertion.EqualAssertion{},
+		},
+	}
+
+	expectedAssertionResults := []testcase.AssertionResult{
+		{
+			Title:  "Body.args.key1 == value1",
+			Passed: true,
 		},
 	}
 
@@ -85,9 +92,15 @@ secret=updatedValue`)
 		Assertions:  expectedAssertions,
 	}
 
+	expectedTestResult := &testcase.TestResult{
+		Title:      "Test GET on httpbin.org",
+		Passed:     true,
+		Assertions: expectedAssertionResults,
+	}
+
 	result := tc.Execute()
 
 	assert.NoError(t, err)
 	assert.True(t, expected.SimilarTo(tc))
-	assert.NoError(t, result)
+	assert.Equal(t, expectedTestResult, result)
 }

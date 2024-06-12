@@ -9,7 +9,7 @@ type EqualAssertion struct {
 }
 
 func (a *EqualAssertion) Name() string {
-	return "eq"
+	return "=="
 }
 
 func (a *EqualAssertion) Assert(actual, expected interface{}) (bool, error) {
