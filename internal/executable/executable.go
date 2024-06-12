@@ -2,6 +2,7 @@ package executable
 
 import (
 	"cotton/internal/capture"
+	"cotton/internal/console"
 	"cotton/internal/execution"
 	"cotton/internal/request"
 	"errors"
@@ -16,10 +17,16 @@ type Executable struct {
 	Captures []*capture.Capture
 }
 
-func (ex *Executable) Execute() (*execution.Execution, error) {
+func (ex *Executable) Execute(logger console.Console) (*execution.Execution, error) {
+	if logger == nil {
+		logger = console.NewNilConsole()
+	}
+
 	if ex.Request == nil {
 		return nil, errors.New("no request to be made")
 	}
+
+	logger.Printfln(" * %s", ex.Title)
 
 	_, err := ex.Request.Do()
 	if err != nil {

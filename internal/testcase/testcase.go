@@ -3,6 +3,7 @@ package testcase
 import (
 	"cotton/internal/assertion"
 	"cotton/internal/capture"
+	"cotton/internal/console"
 	"cotton/internal/executable"
 	"cotton/internal/request"
 	"cotton/internal/response"
@@ -23,7 +24,11 @@ type TestCase struct {
 	Assertions []*assertion.Assertion
 }
 
-func (t *TestCase) Execute() *TestResult {
+func (t *TestCase) Execute(logger console.Console) *TestResult {
+	if logger == nil {
+		logger = console.NewNilConsole()
+	}
+
 	testResult := &TestResult{
 		Title:      t.Title,
 		Passed:     false,
@@ -36,8 +41,10 @@ func (t *TestCase) Execute() *TestResult {
 		return testResult
 	}
 
+	logger.Printfln("%s", t.Title)
+
 	for _, setup := range t.Setups {
-		_, err := setup.Execute()
+		_, err := setup.Execute(logger)
 		if err != nil {
 			testResult.Error = err
 			return testResult
@@ -78,7 +85,7 @@ func (t *TestCase) Execute() *TestResult {
 	}
 
 	for _, teardown := range t.Teardowns {
-		_, err := teardown.Execute()
+		_, err := teardown.Execute(logger)
 		if err != nil {
 			testResult.Error = err
 			return testResult

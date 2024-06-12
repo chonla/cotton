@@ -7,6 +7,7 @@ import (
 	"cotton/internal/assertion"
 	"cotton/internal/capture"
 	"cotton/internal/config"
+	"cotton/internal/console"
 	"cotton/internal/executable"
 	"cotton/internal/reader"
 	"cotton/internal/request"
@@ -111,7 +112,8 @@ secret=updatedValue`)
 		Assertions: expectedAssertionResults,
 	}
 
-	result := tc.Execute()
+	logger := console.NewNilConsole()
+	result := tc.Execute(logger)
 
 	assert.NoError(t, err)
 	assert.True(t, expected.SimilarTo(tc))

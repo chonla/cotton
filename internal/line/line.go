@@ -2,6 +2,7 @@ package line
 
 import (
 	"regexp"
+	"runtime"
 	"strings"
 
 	"github.com/samber/lo"
@@ -13,6 +14,13 @@ const (
 )
 
 type Line string
+
+func DetectLineSeparator() string {
+	if runtime.GOOS == "windows" {
+		return windowsLineSeparator
+	}
+	return nonWindowsLineSeparator
+}
 
 func FromMultilineString(content string) []Line {
 	normalized := normalizeLineSeparator(content)

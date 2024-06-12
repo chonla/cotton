@@ -2,6 +2,7 @@ package main
 
 import (
 	"cotton/internal/config"
+	"cotton/internal/console"
 	"cotton/internal/reader"
 	"cotton/internal/testcase"
 	"fmt"
@@ -25,7 +26,9 @@ func main() {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-	result := tc.Execute()
+
+	logger := console.NewTerminal()
+	result := tc.Execute(logger)
 
 	pretty.Println(result)
 }
