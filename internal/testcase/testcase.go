@@ -27,6 +27,7 @@ func (t *TestCase) Execute() *TestResult {
 		Title:      t.Title,
 		Passed:     false,
 		Assertions: []AssertionResult{},
+		Error:      nil,
 	}
 
 	if t.Request == nil {
