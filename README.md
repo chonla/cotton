@@ -23,3 +23,26 @@ Cotton allows users to write tests in more intuitive and readable way.
 ## Examples
 
 See the files in `etc/examples` directory.
+
+## TO DO
+
+* Three-tilded code block parsing
+* More assertion operators
+  * &gt;
+  * &lt;
+  * !=
+  * &gt;=
+  * &lt;=
+  * is null
+  * is undefined
+  * is not null
+  * is defined
+* Regular expression matching
+  * == (match)
+  * != (not match)
+* Captures integration
+* Debug mode
+* Command line
+* Cookbook
+* Colorized logging
+* HTML reports
