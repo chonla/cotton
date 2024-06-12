@@ -21,9 +21,7 @@ func (ex *Executable) Execute() (*execution.Execution, error) {
 		return nil, errors.New("no request to be made")
 	}
 
-	// ex.Request.Close = true
-
-	_, err := ex.Request.Do() // http.DefaultClient.Do(ex.Request)
+	_, err := ex.Request.Do()
 	if err != nil {
 		return nil, err
 	}

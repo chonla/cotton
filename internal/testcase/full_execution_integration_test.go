@@ -83,12 +83,16 @@ secret=updatedValue`)
 
 	expectedAssertionResults := []testcase.AssertionResult{
 		{
-			Title:  "Body.args.key1 == value1",
-			Passed: true,
+			Title:    "Body.args.key1 == value1",
+			Passed:   true,
+			Actual:   "value1",
+			Expected: "value1",
 		},
 		{
-			Title:  "Body.args.key2 == value2",
-			Passed: true,
+			Title:    "Body.args.key2 == value2",
+			Passed:   true,
+			Actual:   "value2",
+			Expected: "value2",
 		},
 	}
 

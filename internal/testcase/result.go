@@ -8,6 +8,8 @@ type TestResult struct {
 }
 
 type AssertionResult struct {
-	Title  string
-	Passed bool
+	Title    string
+	Passed   bool
+	Expected string
+	Actual   string
 }

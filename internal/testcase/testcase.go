@@ -7,6 +7,7 @@ import (
 	"cotton/internal/request"
 	"cotton/internal/response"
 	"errors"
+	"fmt"
 	"slices"
 )
 
@@ -69,8 +70,10 @@ func (t *TestCase) Execute() *TestResult {
 			return testResult
 		}
 		testResult.Assertions = append(testResult.Assertions, AssertionResult{
-			Title:  assertion.String(),
-			Passed: result,
+			Title:    assertion.String(),
+			Passed:   result,
+			Actual:   fmt.Sprintf("%v", actual),
+			Expected: fmt.Sprintf("%v", expected),
 		})
 	}
 
