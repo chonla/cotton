@@ -34,3 +34,7 @@ func (r *Request) Similar(anotherRequest *Request) bool {
 func (r *Request) Do() (*http.Response, error) {
 	return http.DefaultClient.Do(r.request)
 }
+
+func (r *Request) String() string {
+	return string(r.plainRequest)
+}

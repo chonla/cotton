@@ -29,7 +29,7 @@ func TestGetDataFromHttpBin(t *testing.T) {
 
 	tc, err := parser.FromMarkdownFile("<rootDir>/etc/examples/httpbin.org/get.md")
 
-	req, _ := reqParser.Parse(`GET https://httpbin.org/get?key1=value1 HTTP/1.1`)
+	req, _ := reqParser.Parse(`GET https://httpbin.org/get?key1=value1&key2=value2 HTTP/1.1`)
 	expectedRequest, _ := request.New(req)
 
 	beforeReq, _ := reqParser.Parse(`POST https://httpbin.org/post HTTP/1.1
@@ -74,11 +74,20 @@ secret=updatedValue`)
 			Value:    "value1",
 			Operator: &assertion.EqualAssertion{},
 		},
+		{
+			Selector: "Body.args.key2",
+			Value:    "value2",
+			Operator: &assertion.EqualAssertion{},
+		},
 	}
 
 	expectedAssertionResults := []testcase.AssertionResult{
 		{
 			Title:  "Body.args.key1 == value1",
+			Passed: true,
+		},
+		{
+			Title:  "Body.args.key2 == value2",
 			Passed: true,
 		},
 	}
