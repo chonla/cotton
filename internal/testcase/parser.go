@@ -47,6 +47,7 @@ func (p *Parser) FromMarkdownLines(mdLines []line.Line) (*TestCase, error) {
 
 	justTitle := false
 	collectingCodeBlockBackTick := false
+	collectingCodeBlockTilde := false
 	titleCollected := false
 
 	tc := &TestCase{}
@@ -61,6 +62,12 @@ func (p *Parser) FromMarkdownLines(mdLines []line.Line) (*TestCase, error) {
 		if mdLine.LookLike("^```http$") && sutReq == nil {
 			justTitle = false
 			collectingCodeBlockBackTick = true
+			continue
+		}
+
+		if mdLine.LookLike("^~~~http$") && sutReq == nil {
+			justTitle = false
+			collectingCodeBlockTilde = true
 			continue
 		}
 
@@ -93,39 +100,59 @@ func (p *Parser) FromMarkdownLines(mdLines []line.Line) (*TestCase, error) {
 				req = append(req, mdLine.Value())
 			}
 		} else {
-			if cap, ok := capture.Try(mdLine); ok {
-				if tc.Captures == nil {
-					tc.Captures = []*capture.Capture{}
-				}
-				tc.Captures = append(tc.Captures, cap)
-			} else {
-				if as, ok := assertion.Try(mdLine); ok {
-					if tc.Assertions == nil {
-						tc.Assertions = []*assertion.Assertion{}
+			if collectingCodeBlockTilde {
+				if ok := mdLine.LookLike("^~~~$"); ok {
+					collectingCodeBlockTilde = false
+
+					if len(req) > 0 {
+						requestString := line.Line(strings.Join(req, "\n")).Value()
+						httpRequest, err := p.requestParser.Parse(requestString)
+						if err == nil {
+							sutReq = httpRequest
+						}
+						req = nil
 					}
-					tc.Assertions = append(tc.Assertions, as)
 				} else {
-					if captures, ok := mdLine.CaptureAll(`^\s*\*\s\[([^\]]+)\]\(([^\)]+)\)`); ok {
-						if sutReq == nil {
-							ex, err := p.executableParser.FromMarkdownFile(captures[2])
-							if err != nil {
-								return nil, err
+					if req == nil {
+						req = []string{}
+					}
+					req = append(req, mdLine.Value())
+				}
+			} else {
+				if cap, ok := capture.Try(mdLine); ok {
+					if tc.Captures == nil {
+						tc.Captures = []*capture.Capture{}
+					}
+					tc.Captures = append(tc.Captures, cap)
+				} else {
+					if as, ok := assertion.Try(mdLine); ok {
+						if tc.Assertions == nil {
+							tc.Assertions = []*assertion.Assertion{}
+						}
+						tc.Assertions = append(tc.Assertions, as)
+					} else {
+						if captures, ok := mdLine.CaptureAll(`^\s*\*\s\[([^\]]+)\]\(([^\)]+)\)`); ok {
+							if sutReq == nil {
+								ex, err := p.executableParser.FromMarkdownFile(captures[2])
+								if err != nil {
+									return nil, err
+								}
+								ex.Title = captures[1]
+								if tc.Setups == nil {
+									tc.Setups = []*executable.Executable{}
+								}
+								tc.Setups = append(tc.Setups, ex)
+							} else {
+								ex, err := p.executableParser.FromMarkdownFile(captures[2])
+								if err != nil {
+									return nil, err
+								}
+								ex.Title = captures[1]
+								if tc.Teardowns == nil {
+									tc.Teardowns = []*executable.Executable{}
+								}
+								tc.Teardowns = append(tc.Teardowns, ex)
 							}
-							ex.Title = captures[1]
-							if tc.Setups == nil {
-								tc.Setups = []*executable.Executable{}
-							}
-							tc.Setups = append(tc.Setups, ex)
-						} else {
-							ex, err := p.executableParser.FromMarkdownFile(captures[2])
-							if err != nil {
-								return nil, err
-							}
-							ex.Title = captures[1]
-							if tc.Teardowns == nil {
-								tc.Teardowns = []*executable.Executable{}
-							}
-							tc.Teardowns = append(tc.Teardowns, ex)
 						}
 					}
 				}

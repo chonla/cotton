@@ -40,11 +40,17 @@ func (p *Parser) FromMarkdownLines(mdLines []line.Line) (*Executable, error) {
 	var exReq *http.Request
 
 	collectingCodeBlockBackTick := false
+	collectingCodeBlockTilde := false
 
 	ex := &Executable{}
 	for _, mdLine := range mdLines {
 		if mdLine.LookLike("^```http$") && exReq == nil {
 			collectingCodeBlockBackTick = true
+			continue
+		}
+
+		if mdLine.LookLike("^~~~http$") && exReq == nil {
+			collectingCodeBlockTilde = true
 			continue
 		}
 
@@ -67,11 +73,31 @@ func (p *Parser) FromMarkdownLines(mdLines []line.Line) (*Executable, error) {
 				req = append(req, mdLine.Value())
 			}
 		} else {
-			if cap, ok := capture.Try(mdLine); ok {
-				if ex.Captures == nil {
-					ex.Captures = []*capture.Capture{}
+			if collectingCodeBlockTilde {
+				if ok := mdLine.LookLike("^~~~$"); ok {
+					collectingCodeBlockTilde = false
+
+					if len(req) > 0 {
+						requestString := line.Line(strings.Join(req, "\n")).Value()
+						httpRequest, err := p.requestParser.Parse(requestString)
+						if err == nil {
+							exReq = httpRequest
+						}
+						req = nil
+					}
+				} else {
+					if req == nil {
+						req = []string{}
+					}
+					req = append(req, mdLine.Value())
 				}
-				ex.Captures = append(ex.Captures, cap)
+			} else {
+				if cap, ok := capture.Try(mdLine); ok {
+					if ex.Captures == nil {
+						ex.Captures = []*capture.Capture{}
+					}
+					ex.Captures = append(ex.Captures, cap)
+				}
 			}
 		}
 	}

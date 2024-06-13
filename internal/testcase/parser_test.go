@@ -319,6 +319,45 @@ body`)
 	reqParser.AssertExpectations(t)
 }
 
+func TestGetHTTPRequestFromThreeTildedCodeBlock(t *testing.T) {
+	config := &config.Config{
+		RootDir: "",
+	}
+
+	lines := []line.Line{
+		"~~~http",
+		"POST /some-path HTTP/1.0",
+		"Host: url",
+		"",
+		"post",
+		"body",
+		"~~~",
+	}
+
+	req, _ := httpreqparser.New().Parse(`POST /some-path HTTP/1.0
+Host: url
+
+post
+body`)
+	expectedRequest, _ := request.New(req)
+
+	reader := new(MockFileReader)
+	reader.On("Read", "mock_file").Return(lines, nil)
+
+	reqParser := new(MockRequestParser)
+	reqParser.On("Parse", "POST /some-path HTTP/1.0\nHost: url\n\npost\nbody").Return(req, nil)
+
+	parser := testcase.NewParser(config, reader, reqParser)
+	result, err := parser.FromMarkdownFile("mock_file")
+
+	assert.NoError(t, err)
+	assert.Equal(t, &testcase.TestCase{
+		Request: expectedRequest,
+	}, result)
+	reader.AssertExpectations(t)
+	reqParser.AssertExpectations(t)
+}
+
 func TestDiscardHTTPRequestInNonHTTPCodeBlock(t *testing.T) {
 	config := &config.Config{
 		RootDir: "",
@@ -364,6 +403,61 @@ func TestGetHTTPRequestInOtherHTTPCodeBlock(t *testing.T) {
 		"",
 		"```http",
 		"POST /some-path HTTP/1.0",
+		"Host: url",
+		"",
+		"post",
+		"body",
+		"```",
+	}
+
+	req, _ := httpreqparser.New().Parse(`POST /some-path HTTP/1.0
+Host: url
+
+post
+body`)
+	expectedRequest, _ := request.New(req)
+
+	reader := new(MockFileReader)
+	reader.On("Read", "mock_file").Return(lines, nil)
+
+	reqParser := new(MockRequestParser)
+	reqParser.On("Parse", "POST /some-path HTTP/1.0\nHost: url\n\npost\nbody").Return(req, nil)
+
+	parser := testcase.NewParser(config, reader, reqParser)
+	result, err := parser.FromMarkdownFile("mock_file")
+
+	assert.NoError(t, err)
+	assert.Equal(t, &testcase.TestCase{
+		Request: expectedRequest,
+	}, result)
+	reader.AssertExpectations(t)
+	reqParser.AssertExpectations(t)
+}
+
+func TestGetHTTPRequestInMixedHTTPCodeBlock(t *testing.T) {
+	config := &config.Config{
+		RootDir: "",
+	}
+
+	lines := []line.Line{
+		"```",
+		"POST /this-should-be-ignored HTTP/1.0",
+		"Host: url",
+		"",
+		"post",
+		"body",
+		"```",
+		"",
+		"~~~http",
+		"POST /some-path HTTP/1.0",
+		"Host: url",
+		"",
+		"post",
+		"body",
+		"~~~",
+		"",
+		"```http",
+		"POST /this-should-be-ignored-too HTTP/1.0",
 		"Host: url",
 		"",
 		"post",
