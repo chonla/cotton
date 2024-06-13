@@ -77,12 +77,12 @@ Host: localhost
 		{
 			Selector: "$.form.result",
 			Value:    "success",
-			Operator: &assertion.EqualAssertion{},
+			Operator: &assertion.EqAssertion{},
 		},
 		{
 			Selector: "$.form.result.length",
-			Value:    int(1),
-			Operator: &assertion.EqualAssertion{},
+			Value:    float64(1),
+			Operator: &assertion.EqAssertion{},
 		},
 	}
 	expected := &testcase.TestCase{

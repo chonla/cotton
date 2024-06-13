@@ -697,13 +697,13 @@ body`)
 	expectedAssertions := []*assertion.Assertion{
 		{
 			Selector: "$.var",
-			Value:    3,
-			Operator: &assertion.EqualAssertion{},
+			Value:    float64(3),
+			Operator: &assertion.EqAssertion{},
 		},
 		{
 			Selector: "$.var2",
 			Value:    "good.vibe",
-			Operator: &assertion.EqualAssertion{},
+			Operator: &assertion.EqAssertion{},
 		},
 	}
 

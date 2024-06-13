@@ -3,9 +3,11 @@ package response
 import (
 	"cotton/internal/line"
 	"errors"
+	"fmt"
 	"net/http"
 	"net/http/httputil"
 	"strconv"
+	"strings"
 
 	"github.com/tidwall/gjson"
 )
@@ -13,7 +15,9 @@ import (
 type Response struct {
 	response      *http.Response
 	plainResponse []byte
-	values        ValueMap
+	headerValues  ValueMap
+	wrappedBody   string
+	body          string
 }
 
 type ValueMap map[string]interface{}
@@ -29,10 +33,14 @@ func New(resp *http.Response) (*Response, error) {
 		return nil, err
 	}
 
+	body := extractBody(string(respBytes))
+
 	return &Response{
 		response:      resp,
 		plainResponse: respBytes,
-		values:        values,
+		headerValues:  values,
+		wrappedBody:   fmt.Sprintf(`{"Body":%s}`, body),
+		body:          body,
 	}, nil
 }
 
@@ -41,17 +49,26 @@ func (r *Response) String() string {
 }
 
 func (r *Response) ValueOf(key string) (interface{}, error) {
-	if capture, ok := line.Line(key).Trim().Capture(`^Body\.(.+)`, 1); ok {
-		value := gjson.Get(r.String(), capture)
+	k := line.Line(key).Trim()
+	if k.StartsWith("Body.") {
+		value := gjson.Get(r.wrappedBody, k.Value())
 		if value.Exists() {
 			return value.Value(), nil
 		}
 		return nil, errors.New("value not found")
 	}
-	if value, ok := r.values[key]; ok {
+	if value, ok := r.headerValues[key]; ok {
 		return value, nil
 	}
 	return nil, errors.New("value not found")
+}
+
+func extractBody(resp string) string {
+	idx := strings.Index(resp, "\r\n\r\n")
+	if idx == -1 {
+		return ""
+	}
+	return resp[idx+4:]
 }
 
 func parseHeaders(resp string) (ValueMap, error) {

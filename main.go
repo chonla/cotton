@@ -21,7 +21,7 @@ func main() {
 	reqParser := httpreqparser.New()
 	parser := testcase.NewParser(config, reader, reqParser)
 
-	tc, err := parser.FromMarkdownFile("<rootDir>/etc/examples/httpbin.org/get.md")
+	tc, err := parser.FromMarkdownFile("<rootDir>/etc/examples/jsonplaceholder/get_user.md")
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)

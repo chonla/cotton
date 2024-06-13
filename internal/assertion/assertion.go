@@ -41,7 +41,25 @@ func parseValue(mdLine line.Line) (interface{}, error) {
 		return cap, nil
 	}
 	if mdLine.LookLike(`^\d+$`) {
-		return strconv.Atoi(mdLine.Value())
+		// ALL numbers in JSON considered a floating point.
+		v, err := strconv.ParseFloat(mdLine.Value(), 64)
+		if err != nil {
+			return nil, err
+		}
+		return v, nil
+	}
+	if mdLine.LookLike(`^\d+\.\d+$`) {
+		v, err := strconv.ParseFloat(mdLine.Value(), 64)
+		if err != nil {
+			return nil, err
+		}
+		return v, nil
+	}
+	if mdLine.LookLike("true") {
+		return true, nil
+	}
+	if mdLine.LookLike("false") {
+		return false, nil
 	}
 	if mdLine.LookLike("null") {
 		return nil, nil
@@ -51,7 +69,10 @@ func parseValue(mdLine line.Line) (interface{}, error) {
 
 func New(op string) (AssertionOperator, error) {
 	if op == "==" {
-		return &EqualAssertion{}, nil
+		return &EqAssertion{}, nil
+	}
+	if op == ">" {
+		return &GtAssertion{}, nil
 	}
 	return nil, errors.New("unrecognized assertion")
 }
@@ -68,5 +89,5 @@ func (a *Assertion) SimilarTo(anotherAssertion *Assertion) bool {
 }
 
 func (a *Assertion) String() string {
-	return fmt.Sprintf("%s %s %s", a.Selector, a.Operator.Name(), a.Value)
+	return fmt.Sprintf("%s %s %v", a.Selector, a.Operator.Name(), a.Value)
 }

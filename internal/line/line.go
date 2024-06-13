@@ -90,3 +90,7 @@ func (l Line) Replace(needle, with string) string {
 func (l Line) Lower() Line {
 	return Line(strings.ToLower(string(l)))
 }
+
+func (l Line) StartsWith(partial string) bool {
+	return strings.HasPrefix(string(l), partial)
+}

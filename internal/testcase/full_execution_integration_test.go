@@ -73,12 +73,12 @@ secret=updatedValue`)
 		{
 			Selector: "Body.args.key1",
 			Value:    "value1",
-			Operator: &assertion.EqualAssertion{},
+			Operator: &assertion.EqAssertion{},
 		},
 		{
 			Selector: "Body.args.key2",
 			Value:    "value2",
-			Operator: &assertion.EqualAssertion{},
+			Operator: &assertion.EqAssertion{},
 		},
 	}
 
@@ -138,12 +138,12 @@ func TestGetDataFromHttpBinWithThreeTilkdedCodeBlock(t *testing.T) {
 		{
 			Selector: "Body.args.key1",
 			Value:    "value1",
-			Operator: &assertion.EqualAssertion{},
+			Operator: &assertion.EqAssertion{},
 		},
 		{
 			Selector: "Body.args.key2",
 			Value:    "value2",
-			Operator: &assertion.EqualAssertion{},
+			Operator: &assertion.EqAssertion{},
 		},
 	}
 

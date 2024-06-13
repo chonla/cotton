@@ -12,7 +12,7 @@ func TestEqualAssertionWithSameValue(t *testing.T) {
 	v1 := "10"
 	v2 := "10"
 
-	op := assertion.EqualAssertion{}
+	op := assertion.EqAssertion{}
 
 	result, err := op.Assert(v1, v2)
 
@@ -24,7 +24,7 @@ func TestEqualAssertionWithDifferentType(t *testing.T) {
 	v1 := 3
 	v2 := "3"
 
-	op := assertion.EqualAssertion{}
+	op := assertion.EqAssertion{}
 
 	result, err := op.Assert(v1, v2)
 
@@ -36,7 +36,7 @@ func TestEqualAssertionWithDifferentValue(t *testing.T) {
 	v1 := "3"
 	v2 := "10"
 
-	op := assertion.EqualAssertion{}
+	op := assertion.EqAssertion{}
 
 	result, err := op.Assert(v1, v2)
 
