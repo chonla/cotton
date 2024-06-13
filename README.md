@@ -28,7 +28,7 @@ See the files in `etc/examples` directory.
 
 * ~~Three-tilded code block parsing~~
 * More assertion operators
-  * &gt;
+  * ~~&gt;~~
   * &lt;
   * !=
   * &gt;=
