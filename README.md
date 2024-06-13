@@ -37,7 +37,7 @@ See the files in `etc/examples` directory.
   * is undefined
   * is not null
   * is defined
-* Regular expression matching
+* Regular expression assertion operands
   * == (match)
   * != (not match)
 * Captures integration
