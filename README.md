@@ -30,7 +30,7 @@ See the files in `etc/examples` directory.
 * More assertion operators
   * ~~&gt;~~
   * &lt;
-  * !=
+  * ~~!=~~
   * ~~&gt;=~~
   * &lt;=
   * is null
