@@ -28,18 +28,19 @@ See the files in `etc/examples` directory.
 
 * ~~Three-tilded code block parsing~~
 * More assertion operators
-  * ~~&gt;~~
-  * &lt;
-  * ~~!=~~
-  * ~~&gt;=~~
-  * &lt;=
+  * ~~== (Equal to)~~
+  * ~~&gt; (Greater than)~~
+  * &lt; (Less than)
+  * ~~!=~~ (Not equal to)
+  * ~~&gt;= (Greater than or equal to)~~
+  * &lt;= (Less than or equal to)
   * is null
   * is undefined
   * is not null
   * is defined
 * Regular expression assertion operands
-  * == (match)
-  * != (not match)
+  * == (Match)
+  * != (Not match)
 * Captures integration
 * Debug mode
 * Command line
