@@ -31,7 +31,7 @@ See the files in `etc/examples` directory.
   * ~~&gt;~~
   * &lt;
   * !=
-  * &gt;=
+  * ~~&gt;=~~
   * &lt;=
   * is null
   * is undefined

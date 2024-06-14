@@ -6,34 +6,34 @@ import (
 	"reflect"
 )
 
-type GtAssertion struct {
+type GteAssertion struct {
 }
 
-func (a *GtAssertion) Name() string {
-	return ">"
+func (a *GteAssertion) Name() string {
+	return ">="
 }
 
-func (a *GtAssertion) Assert(expected, actual interface{}) (bool, error) {
+func (a *GteAssertion) Assert(expected, actual interface{}) (bool, error) {
 	// actual > expect? : greater than works only on numerical data type
 
 	// try ints first
 	actualInt, isActualInt := kindof.Int(actual)
 	expectedInt, isExpectedInt := kindof.Int(expected)
 	if isActualInt && isExpectedInt {
-		if actualInt > expectedInt {
+		if actualInt >= expectedInt {
 			return true, nil
 		}
-		return false, fmt.Errorf("%v is expected to be greater than %v, but not", actualInt, expectedInt)
+		return false, fmt.Errorf("%v is expected to be greater than or equal to %v, but not", actualInt, expectedInt)
 	}
 
 	// try float
 	actualFloat, isActualFloat := kindof.Float(actual)
 	expectedFloat, isExpectedFloat := kindof.Float(expected)
 	if isActualFloat && isExpectedFloat {
-		if actualFloat > expectedFloat {
+		if actualFloat >= expectedFloat {
 			return true, nil
 		}
-		return false, fmt.Errorf("%v is expected to be greater than %v, but not", actualFloat, expectedFloat)
+		return false, fmt.Errorf("%v is expected to be greater than or equal to %v, but not", actualFloat, expectedFloat)
 	}
 
 	if !isExpectedFloat && !isExpectedInt {

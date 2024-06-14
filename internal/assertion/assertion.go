@@ -68,11 +68,13 @@ func parseValue(mdLine line.Line) (interface{}, error) {
 }
 
 func New(op string) (AssertionOperator, error) {
-	if op == "==" {
-		return &EqAssertion{}, nil
+	operatorMap := map[string]func() AssertionOperator{
+		"==": func() AssertionOperator { return &EqAssertion{} },
+		">":  func() AssertionOperator { return &GtAssertion{} },
+		">=": func() AssertionOperator { return &GteAssertion{} },
 	}
-	if op == ">" {
-		return &GtAssertion{}, nil
+	if ao, ok := operatorMap[op]; ok {
+		return ao(), nil
 	}
 	return nil, errors.New("unrecognized assertion")
 }

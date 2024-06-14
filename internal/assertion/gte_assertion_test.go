@@ -8,11 +8,11 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestGreaterThanAssertionWithSameDataTypeAndSuccess(t *testing.T) {
+func TestGreaterThanOrEqualAssertionWithSameDataTypeAndSuccessGreaterThanCase(t *testing.T) {
 	expected := float64(10)
 	actual := float64(11)
 
-	op := assertion.GtAssertion{}
+	op := assertion.GteAssertion{}
 
 	result, err := op.Assert(expected, actual)
 
@@ -20,23 +20,35 @@ func TestGreaterThanAssertionWithSameDataTypeAndSuccess(t *testing.T) {
 	assert.True(t, result)
 }
 
-func TestGreaterThanAssertionWithSameDataTypeAndFail(t *testing.T) {
+func TestGreaterThanOrEqualAssertionWithSameDataTypeAndSuccessEqualCase(t *testing.T) {
 	expected := float64(10)
 	actual := float64(10)
 
-	op := assertion.GtAssertion{}
+	op := assertion.GteAssertion{}
 
 	result, err := op.Assert(expected, actual)
 
-	assert.Equal(t, errors.New("10 is expected to be greater than 10, but not"), err)
+	assert.Nil(t, err)
+	assert.True(t, result)
+}
+
+func TestGreaterThanOrEqualAssertionWithSameDataTypeAndFail(t *testing.T) {
+	expected := float64(10)
+	actual := float64(9)
+
+	op := assertion.GteAssertion{}
+
+	result, err := op.Assert(expected, actual)
+
+	assert.Equal(t, errors.New("9 is expected to be greater than or equal to 10, but not"), err)
 	assert.False(t, result)
 }
 
-func TestGreaterThanAssertionWithInvalidActualDataType(t *testing.T) {
+func TestGreaterThanOrEqualAssertionWithInvalidActualDataType(t *testing.T) {
 	expected := float64(8)
 	actual := "10"
 
-	op := assertion.GtAssertion{}
+	op := assertion.GteAssertion{}
 
 	result, err := op.Assert(expected, actual)
 
@@ -44,11 +56,11 @@ func TestGreaterThanAssertionWithInvalidActualDataType(t *testing.T) {
 	assert.False(t, result)
 }
 
-func TestGreaterThanAssertionWithInvalidExpectedDataType(t *testing.T) {
+func TestGreaterThanOrEqualAssertionWithInvalidExpectedDataType(t *testing.T) {
 	expected := "8"
 	actual := float64(10)
 
-	op := assertion.GtAssertion{}
+	op := assertion.GteAssertion{}
 
 	result, err := op.Assert(expected, actual)
 
@@ -56,11 +68,11 @@ func TestGreaterThanAssertionWithInvalidExpectedDataType(t *testing.T) {
 	assert.False(t, result)
 }
 
-func TestGreaterThanAssertionWithInvalidExpectedAndActualDataType(t *testing.T) {
+func TestGreaterThanOrEqualAssertionWithInvalidExpectedAndActualDataType(t *testing.T) {
 	expected := "8"
 	actual := "10"
 
-	op := assertion.GtAssertion{}
+	op := assertion.GteAssertion{}
 
 	result, err := op.Assert(expected, actual)
 
