@@ -9,7 +9,7 @@ import (
 )
 
 type AssertionOperator interface {
-	Assert(actual, expected interface{}) (bool, error)
+	Assert(expected, actual interface{}) (bool, error)
 	Name() string
 }
 

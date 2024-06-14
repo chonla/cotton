@@ -12,7 +12,7 @@ func (a *EqAssertion) Name() string {
 	return "=="
 }
 
-func (a *EqAssertion) Assert(actual, expected interface{}) (bool, error) {
+func (a *EqAssertion) Assert(expected, actual interface{}) (bool, error) {
 	if reflect.TypeOf(actual) != reflect.TypeOf(expected) {
 		return false, fmt.Errorf("type of %v is expected to be %s but %s", actual, reflect.TypeOf(expected).Name(), reflect.TypeOf(actual).Name())
 	}

@@ -2,7 +2,6 @@ package assertion
 
 import (
 	"cotton/internal/kindof"
-	"errors"
 	"fmt"
 	"reflect"
 )
@@ -14,12 +13,8 @@ func (a *GtAssertion) Name() string {
 	return ">"
 }
 
-func (a *GtAssertion) Assert(actual, expected interface{}) (bool, error) {
+func (a *GtAssertion) Assert(expected, actual interface{}) (bool, error) {
 	// actual > expect?
-	if reflect.TypeOf(actual) != reflect.TypeOf(expected) {
-		return false, fmt.Errorf("type of %v is expected to be %s but %s", actual, reflect.TypeOf(expected).Name(), reflect.TypeOf(actual).Name())
-	}
-
 	// greater than works only on numerical data type
 
 	// try ints first
@@ -36,5 +31,9 @@ func (a *GtAssertion) Assert(actual, expected interface{}) (bool, error) {
 		return actualFloat > expectedFloat, nil
 	}
 
-	return false, errors.New("unexpected value comparison")
+	if !isExpectedFloat && !isExpectedInt {
+		return false, fmt.Errorf("type of %v is expected to be number, but %v", expected, reflect.TypeOf(expected).Name())
+	}
+
+	return false, fmt.Errorf("type of %v is expected to be number, but %v", actual, reflect.TypeOf(actual).Name())
 }
