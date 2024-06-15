@@ -33,7 +33,7 @@ See the files in `etc/examples` directory.
   * ~~&lt; (Less than)~~
   * ~~!=~~ (Not equal to)
   * ~~&gt;= (Greater than or equal to)~~
-  * &lt;= (Less than or equal to)
+  * ~~&lt;= (Less than or equal to)~~
   * is null
   * is undefined
   * is not null
