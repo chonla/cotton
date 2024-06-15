@@ -30,7 +30,7 @@ See the files in `etc/examples` directory.
 * More assertion operators
   * ~~== (Equal to)~~
   * ~~&gt; (Greater than)~~
-  * &lt; (Less than)
+  * ~~&lt; (Less than)~~
   * ~~!=~~ (Not equal to)
   * ~~&gt;= (Greater than or equal to)~~
   * &lt;= (Less than or equal to)
