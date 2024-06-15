@@ -73,6 +73,8 @@ func New(op string) (AssertionOperator, error) {
 		"!=": func() AssertionOperator { return &NeAssertion{} },
 		">":  func() AssertionOperator { return &GtAssertion{} },
 		">=": func() AssertionOperator { return &GteAssertion{} },
+		"<":  func() AssertionOperator { return &LtAssertion{} },
+		"<=": func() AssertionOperator { return &LteAssertion{} },
 	}
 	if ao, ok := operatorMap[op]; ok {
 		return ao(), nil

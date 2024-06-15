@@ -1,51 +1,58 @@
 package response
 
 import (
+	"bytes"
 	"cotton/internal/line"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
 	"net/http/httputil"
 	"strconv"
-	"strings"
 
 	"github.com/tidwall/gjson"
 )
 
 type Response struct {
-	response      *http.Response
-	plainResponse []byte
-	headerValues  ValueMap
-	wrappedBody   string
-	body          string
+	response     *http.Response
+	headerValues ValueMap
+	wrappedBody  string
+	body         string
+	fullResponse string
 }
 
 type ValueMap map[string]interface{}
 
 func New(resp *http.Response) (*Response, error) {
-	respBytes, err := httputil.DumpResponse(resp, true)
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	resp.Body = io.NopCloser(bytes.NewBuffer(body))
+
+	bodyString := string(body)
+
+	headerBytes, err := httputil.DumpResponse(resp, false)
 	if err != nil {
 		return nil, err
 	}
 
-	values, err := parseHeaders(string(respBytes))
+	values, err := parseHeaders(string(headerBytes))
 	if err != nil {
 		return nil, err
 	}
-
-	body := extractBody(string(respBytes))
 
 	return &Response{
-		response:      resp,
-		plainResponse: respBytes,
-		headerValues:  values,
-		wrappedBody:   fmt.Sprintf(`{"Body":%s}`, body),
-		body:          body,
+		response:     resp,
+		headerValues: values,
+		wrappedBody:  fmt.Sprintf(`{"Body":%s}`, bodyString),
+		body:         bodyString,
+		fullResponse: fmt.Sprintf("%s\r\n\r\n%s", string(headerBytes), bodyString),
 	}, nil
 }
 
 func (r *Response) String() string {
-	return string(r.plainResponse)
+	return string(r.fullResponse)
 }
 
 func (r *Response) ValueOf(key string) (interface{}, error) {
@@ -55,20 +62,12 @@ func (r *Response) ValueOf(key string) (interface{}, error) {
 		if value.Exists() {
 			return value.Value(), nil
 		}
-		return nil, errors.New("value not found")
+		return nil, errors.New("value not found in response body")
 	}
 	if value, ok := r.headerValues[key]; ok {
 		return value, nil
 	}
 	return nil, errors.New("value not found")
-}
-
-func extractBody(resp string) string {
-	idx := strings.Index(resp, "\r\n\r\n")
-	if idx == -1 {
-		return ""
-	}
-	return resp[idx+4:]
 }
 
 func parseHeaders(resp string) (ValueMap, error) {
