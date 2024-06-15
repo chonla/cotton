@@ -35,9 +35,9 @@ See the files in `etc/examples` directory.
   * ~~&gt;= (Greater than or equal to)~~
   * ~~&lt;= (Less than or equal to)~~
   * is null
-  * is undefined
+  * is undefined (or not present)
   * is not null
-  * is defined
+  * is defined (or present)
 * Regular expression assertion operands
   * == (Match)
   * != (Not match)
