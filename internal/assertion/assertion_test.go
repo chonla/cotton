@@ -5,6 +5,7 @@ import (
 	"cotton/internal/line"
 	"testing"
 
+	"github.com/samber/mo"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -14,7 +15,7 @@ func TestParseEqualAssertionWithInteger(t *testing.T) {
 	expected := &assertion.Assertion{
 		Selector: "$.form.value",
 		Value:    float64(30),
-		Operator: &assertion.EqAssertion{},
+		Operator: mo.NewEither3Arg3[assertion.UndefinedOperator, assertion.UnaryAssertionOperator, assertion.BinaryAssertionOperator](&assertion.EqAssertion{}),
 	}
 
 	result, ok := assertion.Try(mdLine)
@@ -29,7 +30,7 @@ func TestParseGreaterThanAssertionWithInteger(t *testing.T) {
 	expected := &assertion.Assertion{
 		Selector: "$.form.value",
 		Value:    float64(30),
-		Operator: &assertion.GtAssertion{},
+		Operator: mo.NewEither3Arg3[assertion.UndefinedOperator, assertion.UnaryAssertionOperator, assertion.BinaryAssertionOperator](&assertion.GtAssertion{}),
 	}
 
 	result, ok := assertion.Try(mdLine)
@@ -44,7 +45,7 @@ func TestParseEqualAssertionWithString(t *testing.T) {
 	expected := &assertion.Assertion{
 		Selector: "$.form.value",
 		Value:    "30",
-		Operator: &assertion.EqAssertion{},
+		Operator: mo.NewEither3Arg3[assertion.UndefinedOperator, assertion.UnaryAssertionOperator, assertion.BinaryAssertionOperator](&assertion.EqAssertion{}),
 	}
 
 	result, ok := assertion.Try(mdLine)

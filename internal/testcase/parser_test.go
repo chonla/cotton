@@ -12,6 +12,7 @@ import (
 	"testing"
 
 	"github.com/chonla/httpreqparser"
+	"github.com/samber/mo"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -698,12 +699,12 @@ body`)
 		{
 			Selector: "$.var",
 			Value:    float64(3),
-			Operator: &assertion.EqAssertion{},
+			Operator: mo.NewEither3Arg3[assertion.UndefinedOperator, assertion.UnaryAssertionOperator, assertion.BinaryAssertionOperator](&assertion.EqAssertion{}),
 		},
 		{
 			Selector: "$.var2",
 			Value:    "good.vibe",
-			Operator: &assertion.EqAssertion{},
+			Operator: mo.NewEither3Arg3[assertion.UndefinedOperator, assertion.UnaryAssertionOperator, assertion.BinaryAssertionOperator](&assertion.EqAssertion{}),
 		},
 	}
 

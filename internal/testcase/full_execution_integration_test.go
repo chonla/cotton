@@ -16,6 +16,7 @@ import (
 	"testing"
 
 	"github.com/chonla/httpreqparser"
+	"github.com/samber/mo"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -73,12 +74,12 @@ secret=updatedValue`)
 		{
 			Selector: "Body.args.key1",
 			Value:    "value1",
-			Operator: &assertion.EqAssertion{},
+			Operator: mo.NewEither3Arg3[assertion.UndefinedOperator, assertion.UnaryAssertionOperator, assertion.BinaryAssertionOperator](&assertion.EqAssertion{}),
 		},
 		{
 			Selector: "Body.args.key2",
 			Value:    "value2",
-			Operator: &assertion.EqAssertion{},
+			Operator: mo.NewEither3Arg3[assertion.UndefinedOperator, assertion.UnaryAssertionOperator, assertion.BinaryAssertionOperator](&assertion.EqAssertion{}),
 		},
 	}
 
@@ -138,12 +139,12 @@ func TestGetDataFromHttpBinWithThreeTilkdedCodeBlock(t *testing.T) {
 		{
 			Selector: "Body.args.key1",
 			Value:    "value1",
-			Operator: &assertion.EqAssertion{},
+			Operator: mo.NewEither3Arg3[assertion.UndefinedOperator, assertion.UnaryAssertionOperator, assertion.BinaryAssertionOperator](&assertion.EqAssertion{}),
 		},
 		{
 			Selector: "Body.args.key2",
 			Value:    "value2",
-			Operator: &assertion.EqAssertion{},
+			Operator: mo.NewEither3Arg3[assertion.UndefinedOperator, assertion.UnaryAssertionOperator, assertion.BinaryAssertionOperator](&assertion.EqAssertion{}),
 		},
 	}
 

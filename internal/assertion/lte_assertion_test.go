@@ -2,6 +2,7 @@ package assertion_test
 
 import (
 	"cotton/internal/assertion"
+	"cotton/internal/response"
 	"errors"
 	"testing"
 
@@ -10,7 +11,11 @@ import (
 
 func TestLessThanOrEqualAssertionWithSameDataTypeAndSuccessLessThanCase(t *testing.T) {
 	expected := float64(10)
-	actual := float64(9)
+	actual := &response.DataValue{
+		Value:       float64(9),
+		TypeName:    "float64",
+		IsUndefined: false,
+	}
 
 	op := assertion.LteAssertion{}
 
@@ -22,7 +27,11 @@ func TestLessThanOrEqualAssertionWithSameDataTypeAndSuccessLessThanCase(t *testi
 
 func TestLessThanOrEqualAssertionWithSameDataTypeAndSuccessEqualCase(t *testing.T) {
 	expected := float64(10)
-	actual := float64(10)
+	actual := &response.DataValue{
+		Value:       float64(10),
+		TypeName:    "float64",
+		IsUndefined: false,
+	}
 
 	op := assertion.LteAssertion{}
 
@@ -34,7 +43,11 @@ func TestLessThanOrEqualAssertionWithSameDataTypeAndSuccessEqualCase(t *testing.
 
 func TestLessThanOrEqualAssertionWithSameDataTypeAndFail(t *testing.T) {
 	expected := float64(10)
-	actual := float64(11)
+	actual := &response.DataValue{
+		Value:       float64(11),
+		TypeName:    "float64",
+		IsUndefined: false,
+	}
 
 	op := assertion.LteAssertion{}
 
@@ -46,7 +59,11 @@ func TestLessThanOrEqualAssertionWithSameDataTypeAndFail(t *testing.T) {
 
 func TestLessThanOrEqualAssertionWithInvalidActualDataType(t *testing.T) {
 	expected := float64(8)
-	actual := "10"
+	actual := &response.DataValue{
+		Value:       "10",
+		TypeName:    "string",
+		IsUndefined: false,
+	}
 
 	op := assertion.LteAssertion{}
 
@@ -58,7 +75,11 @@ func TestLessThanOrEqualAssertionWithInvalidActualDataType(t *testing.T) {
 
 func TestLessThanOrEqualAssertionWithInvalidExpectedDataType(t *testing.T) {
 	expected := "8"
-	actual := float64(10)
+	actual := &response.DataValue{
+		Value:       float64(10),
+		TypeName:    "float64",
+		IsUndefined: false,
+	}
 
 	op := assertion.LteAssertion{}
 
@@ -70,7 +91,11 @@ func TestLessThanOrEqualAssertionWithInvalidExpectedDataType(t *testing.T) {
 
 func TestLessThanOrEqualAssertionWithInvalidExpectedAndActualDataType(t *testing.T) {
 	expected := "8"
-	actual := "10"
+	actual := &response.DataValue{
+		Value:       "10",
+		TypeName:    "string",
+		IsUndefined: false,
+	}
 
 	op := assertion.LteAssertion{}
 

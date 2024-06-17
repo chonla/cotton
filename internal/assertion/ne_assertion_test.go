@@ -2,6 +2,7 @@ package assertion_test
 
 import (
 	"cotton/internal/assertion"
+	"cotton/internal/response"
 	"errors"
 	"testing"
 
@@ -9,7 +10,11 @@ import (
 )
 
 func TestNotEqualAssertionWithSameValue(t *testing.T) {
-	actual := "10"
+	actual := &response.DataValue{
+		Value:       "10",
+		TypeName:    "string",
+		IsUndefined: false,
+	}
 	expected := "10"
 
 	op := assertion.NeAssertion{}
@@ -21,7 +26,11 @@ func TestNotEqualAssertionWithSameValue(t *testing.T) {
 }
 
 func TestNotEqualAssertionWithDifferentType(t *testing.T) {
-	actual := 3
+	actual := &response.DataValue{
+		Value:       3,
+		TypeName:    "int",
+		IsUndefined: false,
+	}
 	expected := "3"
 
 	op := assertion.NeAssertion{}
@@ -33,7 +42,11 @@ func TestNotEqualAssertionWithDifferentType(t *testing.T) {
 }
 
 func TestNotEqualAssertionWithDifferentValue(t *testing.T) {
-	actual := "3"
+	actual := &response.DataValue{
+		Value:       "3",
+		TypeName:    "string",
+		IsUndefined: false,
+	}
 	expected := "10"
 
 	op := assertion.NeAssertion{}

@@ -6,6 +6,7 @@ require (
 	github.com/chonla/httpreqparser v0.0.2
 	github.com/kr/pretty v0.3.1
 	github.com/samber/lo v1.39.0
+	github.com/samber/mo v1.11.0
 	github.com/stretchr/testify v1.9.0
 	github.com/tidwall/gjson v1.17.1
 )

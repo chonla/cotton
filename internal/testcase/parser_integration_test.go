@@ -15,6 +15,7 @@ import (
 	"testing"
 
 	"github.com/chonla/httpreqparser"
+	"github.com/samber/mo"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -77,12 +78,12 @@ Host: localhost
 		{
 			Selector: "$.form.result",
 			Value:    "success",
-			Operator: &assertion.EqAssertion{},
+			Operator: mo.NewEither3Arg3[assertion.UndefinedOperator, assertion.UnaryAssertionOperator, assertion.BinaryAssertionOperator](&assertion.EqAssertion{}),
 		},
 		{
 			Selector: "$.form.result.length",
 			Value:    float64(1),
-			Operator: &assertion.EqAssertion{},
+			Operator: mo.NewEither3Arg3[assertion.UndefinedOperator, assertion.UnaryAssertionOperator, assertion.BinaryAssertionOperator](&assertion.EqAssertion{}),
 		},
 	}
 	expected := &testcase.TestCase{

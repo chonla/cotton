@@ -71,10 +71,25 @@ func (t *TestCase) Execute(logger console.Console) *TestResult {
 			return testResult
 		}
 		expected := assertion.Value
-		result, err := assertion.Operator.Assert(actual, expected)
-		if err != nil {
-			testResult.Error = err
+		if assertion.Operator.IsArg1() {
+			testResult.Error = errors.New("unexpected assertion found")
 			return testResult
+		}
+		var result bool
+		if assertion.Operator.IsArg2() {
+			result, err = assertion.Operator.Arg2OrEmpty().Assert(actual)
+			if err != nil {
+				testResult.Error = err
+				return testResult
+			}
+		} else {
+			if assertion.Operator.IsArg3() {
+				result, err = assertion.Operator.Arg3OrEmpty().Assert(expected, actual)
+			}
+			if err != nil {
+				testResult.Error = err
+				return testResult
+			}
 		}
 		testResult.Assertions = append(testResult.Assertions, AssertionResult{
 			Title:    assertion.String(),

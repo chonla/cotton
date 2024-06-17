@@ -2,24 +2,37 @@ package assertion
 
 import (
 	"cotton/internal/line"
+	"cotton/internal/response"
 	"errors"
 	"fmt"
 	"reflect"
 	"strconv"
+
+	"github.com/samber/mo"
 )
 
-type AssertionOperator interface {
-	Assert(expected, actual interface{}) (bool, error)
+type UndefinedOperator interface {
+	Name() string
+}
+
+type UnaryAssertionOperator interface {
+	Assert(actual *response.DataValue) (bool, error)
+	Name() string
+}
+
+type BinaryAssertionOperator interface {
+	Assert(expected interface{}, actual *response.DataValue) (bool, error)
 	Name() string
 }
 
 type Assertion struct {
 	Selector string
 	Value    interface{}
-	Operator AssertionOperator
+	Operator mo.Either3[UndefinedOperator, UnaryAssertionOperator, BinaryAssertionOperator]
 }
 
 func Try(mdLine line.Line) (*Assertion, bool) {
+	// binary assertion operator
 	if caps, ok := mdLine.CaptureAll("\\s*\\*\\s+`([^`]+)`\\s*(.+)\\s*`([^`]+)`"); ok {
 		op, err := New(line.Line(caps[2]).Trim().Value())
 		if err == nil {
@@ -31,6 +44,17 @@ func Try(mdLine line.Line) (*Assertion, bool) {
 					Operator: op,
 				}, true
 			}
+		}
+	}
+	// unary assertion operator
+	if caps, ok := mdLine.CaptureAll("\\s*\\*\\s+`([^`]+)`\\s*(.+)"); ok {
+		op, err := New(line.Line(caps[2]).Trim().Value())
+		if err == nil {
+			return &Assertion{
+				Selector: line.Line(caps[1]).Trim().Value(),
+				Value:    nil,
+				Operator: op,
+			}, true
 		}
 	}
 	return nil, false
@@ -67,19 +91,34 @@ func parseValue(mdLine line.Line) (interface{}, error) {
 	return nil, errors.New("unexpected value")
 }
 
-func New(op string) (AssertionOperator, error) {
-	operatorMap := map[string]func() AssertionOperator{
-		"==": func() AssertionOperator { return &EqAssertion{} },
-		"!=": func() AssertionOperator { return &NeAssertion{} },
-		">":  func() AssertionOperator { return &GtAssertion{} },
-		">=": func() AssertionOperator { return &GteAssertion{} },
-		"<":  func() AssertionOperator { return &LtAssertion{} },
-		"<=": func() AssertionOperator { return &LteAssertion{} },
+func New(op string) (mo.Either3[UndefinedOperator, UnaryAssertionOperator, BinaryAssertionOperator], error) {
+	operatorMap := map[string]func() mo.Either3[UndefinedOperator, UnaryAssertionOperator, BinaryAssertionOperator]{
+		"==": func() mo.Either3[UndefinedOperator, UnaryAssertionOperator, BinaryAssertionOperator] {
+			return mo.NewEither3Arg3[UndefinedOperator, UnaryAssertionOperator, BinaryAssertionOperator](&EqAssertion{})
+		},
+		"!=": func() mo.Either3[UndefinedOperator, UnaryAssertionOperator, BinaryAssertionOperator] {
+			return mo.NewEither3Arg3[UndefinedOperator, UnaryAssertionOperator, BinaryAssertionOperator](&NeAssertion{})
+		},
+		">": func() mo.Either3[UndefinedOperator, UnaryAssertionOperator, BinaryAssertionOperator] {
+			return mo.NewEither3Arg3[UndefinedOperator, UnaryAssertionOperator, BinaryAssertionOperator](&GtAssertion{})
+		},
+		">=": func() mo.Either3[UndefinedOperator, UnaryAssertionOperator, BinaryAssertionOperator] {
+			return mo.NewEither3Arg3[UndefinedOperator, UnaryAssertionOperator, BinaryAssertionOperator](&GteAssertion{})
+		},
+		"<": func() mo.Either3[UndefinedOperator, UnaryAssertionOperator, BinaryAssertionOperator] {
+			return mo.NewEither3Arg3[UndefinedOperator, UnaryAssertionOperator, BinaryAssertionOperator](&LtAssertion{})
+		},
+		"<=": func() mo.Either3[UndefinedOperator, UnaryAssertionOperator, BinaryAssertionOperator] {
+			return mo.NewEither3Arg3[UndefinedOperator, UnaryAssertionOperator, BinaryAssertionOperator](&LteAssertion{})
+		},
+		"is undefined": func() mo.Either3[UndefinedOperator, UnaryAssertionOperator, BinaryAssertionOperator] {
+			return mo.NewEither3Arg2[UndefinedOperator, UnaryAssertionOperator, BinaryAssertionOperator](&UndefinedAssertion{})
+		},
 	}
 	if ao, ok := operatorMap[op]; ok {
 		return ao(), nil
 	}
-	return nil, errors.New("unrecognized assertion")
+	return mo.NewEither3Arg1[UndefinedOperator, UnaryAssertionOperator, BinaryAssertionOperator](nil), errors.New("unrecognized assertion")
 }
 
 func (a *Assertion) SimilarTo(anotherAssertion *Assertion) bool {
@@ -87,12 +126,40 @@ func (a *Assertion) SimilarTo(anotherAssertion *Assertion) bool {
 		return false
 	}
 
-	return a.Selector == anotherAssertion.Selector &&
-		reflect.TypeOf(a.Value) == reflect.TypeOf(a.Value) &&
-		a.Value == anotherAssertion.Value &&
-		a.Operator.Name() == anotherAssertion.Operator.Name()
+	if a.Operator.IsArg1() && anotherAssertion.Operator.IsArg1() {
+		return a.Selector == anotherAssertion.Selector &&
+			reflect.TypeOf(a.Value) == reflect.TypeOf(a.Value) &&
+			a.Value == anotherAssertion.Value
+	}
+
+	if a.Operator.IsArg2() && anotherAssertion.Operator.IsArg2() {
+		return a.Selector == anotherAssertion.Selector &&
+			reflect.TypeOf(a.Value) == reflect.TypeOf(a.Value) &&
+			a.Value == anotherAssertion.Value &&
+			a.Operator.Arg2OrEmpty().Name() == anotherAssertion.Operator.Arg2OrEmpty().Name()
+	}
+
+	if a.Operator.IsArg3() && anotherAssertion.Operator.IsArg3() {
+		return a.Selector == anotherAssertion.Selector &&
+			reflect.TypeOf(a.Value) == reflect.TypeOf(a.Value) &&
+			a.Value == anotherAssertion.Value &&
+			a.Operator.Arg3OrEmpty().Name() == anotherAssertion.Operator.Arg3OrEmpty().Name()
+	}
+
+	return false
 }
 
 func (a *Assertion) String() string {
-	return fmt.Sprintf("%s %s %v", a.Selector, a.Operator.Name(), a.Value)
+	if a.Operator.IsArg1() {
+		return "undefined operator"
+	}
+	// unary
+	if a.Operator.IsArg2() {
+		return fmt.Sprintf("%s %s", a.Selector, a.Operator.Arg2OrEmpty().Name())
+	}
+	// binary
+	if a.Operator.IsArg3() {
+		return fmt.Sprintf("%s %s %v", a.Selector, a.Operator.Arg3OrEmpty().Name(), a.Value)
+	}
+	return "unexpected operator"
 }

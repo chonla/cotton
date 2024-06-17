@@ -8,6 +8,7 @@ import (
 	"io"
 	"net/http"
 	"net/http/httputil"
+	"reflect"
 	"strconv"
 
 	"github.com/tidwall/gjson"
@@ -55,19 +56,42 @@ func (r *Response) String() string {
 	return string(r.fullResponse)
 }
 
-func (r *Response) ValueOf(key string) (interface{}, error) {
+func (r *Response) ValueOf(key string) (*DataValue, error) {
+	if r.response == nil {
+		return nil, errors.New("invalid state of response")
+	}
 	k := line.Line(key).Trim()
 	if k.StartsWith("Body.") {
 		value := gjson.Get(r.wrappedBody, k.Value())
 		if value.Exists() {
-			return value.Value(), nil
+			typeName := "unknown"
+			if value.Value() != nil {
+				typeName = reflect.TypeOf(value.Value()).Name()
+			}
+			return &DataValue{
+				Value:       value.Value(),
+				TypeName:    typeName,
+				IsUndefined: false,
+			}, nil
 		}
-		return nil, errors.New("value not found in response body")
+		return &DataValue{
+			Value:       nil,
+			TypeName:    "",
+			IsUndefined: true,
+		}, nil
 	}
 	if value, ok := r.headerValues[key]; ok {
-		return value, nil
+		return &DataValue{
+			Value:       value,
+			TypeName:    "string",
+			IsUndefined: false,
+		}, nil
 	}
-	return nil, errors.New("value not found")
+	return &DataValue{
+		Value:       nil,
+		TypeName:    "",
+		IsUndefined: true,
+	}, nil
 }
 
 func parseHeaders(resp string) (ValueMap, error) {

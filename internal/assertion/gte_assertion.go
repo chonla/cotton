@@ -2,6 +2,8 @@ package assertion
 
 import (
 	"cotton/internal/kindof"
+	"cotton/internal/response"
+	"errors"
 	"fmt"
 	"reflect"
 )
@@ -13,11 +15,14 @@ func (a *GteAssertion) Name() string {
 	return ">="
 }
 
-func (a *GteAssertion) Assert(expected, actual interface{}) (bool, error) {
+func (a *GteAssertion) Assert(expected interface{}, actual *response.DataValue) (bool, error) {
 	// actual >= expect? : greater than or equal to works only on numerical data type
+	if actual.IsUndefined {
+		return false, errors.New("unexpected undefined value")
+	}
 
 	// try ints first
-	actualInt, isActualInt := kindof.Int(actual)
+	actualInt, isActualInt := kindof.Int(actual.Value)
 	expectedInt, isExpectedInt := kindof.Int(expected)
 	if isActualInt && isExpectedInt {
 		if actualInt >= expectedInt {
@@ -27,7 +32,7 @@ func (a *GteAssertion) Assert(expected, actual interface{}) (bool, error) {
 	}
 
 	// try float
-	actualFloat, isActualFloat := kindof.Float(actual)
+	actualFloat, isActualFloat := kindof.Float(actual.Value)
 	expectedFloat, isExpectedFloat := kindof.Float(expected)
 	if isActualFloat && isExpectedFloat {
 		if actualFloat >= expectedFloat {
@@ -40,5 +45,5 @@ func (a *GteAssertion) Assert(expected, actual interface{}) (bool, error) {
 		return false, fmt.Errorf("type of %v is expected to be number, but %v", expected, reflect.TypeOf(expected).Name())
 	}
 
-	return false, fmt.Errorf("type of %v is expected to be number, but %v", actual, reflect.TypeOf(actual).Name())
+	return false, fmt.Errorf("type of %v is expected to be number, but %v", actual, actual.TypeName)
 }

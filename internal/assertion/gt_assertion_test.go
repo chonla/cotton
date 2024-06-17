@@ -2,6 +2,7 @@ package assertion_test
 
 import (
 	"cotton/internal/assertion"
+	"cotton/internal/response"
 	"errors"
 	"testing"
 
@@ -10,7 +11,11 @@ import (
 
 func TestGreaterThanAssertionWithSameDataTypeAndSuccess(t *testing.T) {
 	expected := float64(10)
-	actual := float64(11)
+	actual := &response.DataValue{
+		Value:       float64(11),
+		TypeName:    "float64",
+		IsUndefined: false,
+	}
 
 	op := assertion.GtAssertion{}
 
@@ -22,7 +27,11 @@ func TestGreaterThanAssertionWithSameDataTypeAndSuccess(t *testing.T) {
 
 func TestGreaterThanAssertionWithSameDataTypeAndFail(t *testing.T) {
 	expected := float64(10)
-	actual := float64(10)
+	actual := &response.DataValue{
+		Value:       float64(10),
+		TypeName:    "float64",
+		IsUndefined: false,
+	}
 
 	op := assertion.GtAssertion{}
 
@@ -34,7 +43,11 @@ func TestGreaterThanAssertionWithSameDataTypeAndFail(t *testing.T) {
 
 func TestGreaterThanAssertionWithInvalidActualDataType(t *testing.T) {
 	expected := float64(8)
-	actual := "10"
+	actual := &response.DataValue{
+		Value:       "10",
+		TypeName:    "string",
+		IsUndefined: false,
+	}
 
 	op := assertion.GtAssertion{}
 
@@ -46,7 +59,11 @@ func TestGreaterThanAssertionWithInvalidActualDataType(t *testing.T) {
 
 func TestGreaterThanAssertionWithInvalidExpectedDataType(t *testing.T) {
 	expected := "8"
-	actual := float64(10)
+	actual := &response.DataValue{
+		Value:       float64(10),
+		TypeName:    "float64",
+		IsUndefined: false,
+	}
 
 	op := assertion.GtAssertion{}
 
@@ -58,7 +75,11 @@ func TestGreaterThanAssertionWithInvalidExpectedDataType(t *testing.T) {
 
 func TestGreaterThanAssertionWithInvalidExpectedAndActualDataType(t *testing.T) {
 	expected := "8"
-	actual := "10"
+	actual := &response.DataValue{
+		Value:       "10",
+		TypeName:    "string",
+		IsUndefined: false,
+	}
 
 	op := assertion.GtAssertion{}
 
