@@ -114,6 +114,9 @@ func New(op string) (mo.Either3[UndefinedOperator, UnaryAssertionOperator, Binar
 		"is undefined": func() mo.Either3[UndefinedOperator, UnaryAssertionOperator, BinaryAssertionOperator] {
 			return mo.NewEither3Arg2[UndefinedOperator, UnaryAssertionOperator, BinaryAssertionOperator](&UndefinedAssertion{})
 		},
+		"is defined": func() mo.Either3[UndefinedOperator, UnaryAssertionOperator, BinaryAssertionOperator] {
+			return mo.NewEither3Arg2[UndefinedOperator, UnaryAssertionOperator, BinaryAssertionOperator](&DefinedAssertion{})
+		},
 	}
 	if ao, ok := operatorMap[op]; ok {
 		return ao(), nil

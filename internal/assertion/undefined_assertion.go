@@ -16,5 +16,5 @@ func (a *UndefinedAssertion) Assert(actual *response.DataValue) (bool, error) {
 	if actual.IsUndefined {
 		return true, nil
 	}
-	return false, fmt.Errorf("expecting undefined but got %v", actual)
+	return false, fmt.Errorf("expecting value to be undefined, but got %v", actual)
 }

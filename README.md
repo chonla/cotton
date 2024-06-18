@@ -35,7 +35,8 @@ See the files in `etc/examples` directory.
   * ~~&gt;= (Greater than or equal to)~~
   * ~~&lt;= (Less than or equal to)~~
   * ~~is undefined (or not present)~~
-  * is defined (or present)
+  * ~~is defined (or present)~~
+* More readable logging
 * Regular expression assertion operands
   * == (Match)
   * != (Not match)

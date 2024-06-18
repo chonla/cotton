@@ -35,6 +35,6 @@ func TestUndefinedAssertionWithNotUndefined(t *testing.T) {
 
 	result, err := op.Assert(actual)
 
-	assert.Equal(t, errors.New("expecting undefined but got 4"), err)
+	assert.Equal(t, errors.New("expecting value to be undefined, but got 4"), err)
 	assert.False(t, result)
 }
