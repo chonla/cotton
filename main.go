@@ -2,14 +2,13 @@ package main
 
 import (
 	"cotton/internal/config"
-	"cotton/internal/console"
+	"cotton/internal/logger"
 	"cotton/internal/reader"
 	"cotton/internal/testcase"
 	"fmt"
 	"os"
 
 	"github.com/chonla/httpreqparser"
-	"github.com/kr/pretty"
 )
 
 func main() {
@@ -27,8 +26,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	logger := console.NewTerminal()
-	result := tc.Execute(logger)
-
-	pretty.Println(result)
+	log := logger.NewTerminalLogger()
+	result := tc.Execute(log)
+	log.PrintTestResult(result.Passed)
 }
