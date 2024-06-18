@@ -136,14 +136,14 @@ func (a *Assertion) SimilarTo(anotherAssertion *Assertion) bool {
 		return a.Selector == anotherAssertion.Selector &&
 			reflect.TypeOf(a.Value) == reflect.TypeOf(a.Value) &&
 			a.Value == anotherAssertion.Value &&
-			a.Operator.Arg2OrEmpty().Name() == anotherAssertion.Operator.Arg2OrEmpty().Name()
+			a.Operator.MustArg2().Name() == anotherAssertion.Operator.MustArg2().Name()
 	}
 
 	if a.Operator.IsArg3() && anotherAssertion.Operator.IsArg3() {
 		return a.Selector == anotherAssertion.Selector &&
 			reflect.TypeOf(a.Value) == reflect.TypeOf(a.Value) &&
 			a.Value == anotherAssertion.Value &&
-			a.Operator.Arg3OrEmpty().Name() == anotherAssertion.Operator.Arg3OrEmpty().Name()
+			a.Operator.MustArg3().Name() == anotherAssertion.Operator.MustArg3().Name()
 	}
 
 	return false
@@ -155,11 +155,11 @@ func (a *Assertion) String() string {
 	}
 	// unary
 	if a.Operator.IsArg2() {
-		return fmt.Sprintf("%s %s", a.Selector, a.Operator.Arg2OrEmpty().Name())
+		return fmt.Sprintf("%s %s", a.Selector, a.Operator.MustArg2().Name())
 	}
 	// binary
 	if a.Operator.IsArg3() {
-		return fmt.Sprintf("%s %s %v", a.Selector, a.Operator.Arg3OrEmpty().Name(), a.Value)
+		return fmt.Sprintf("%s %s %v", a.Selector, a.Operator.MustArg3().Name(), a.Value)
 	}
 	return "unexpected operator"
 }
