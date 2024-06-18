@@ -7,10 +7,11 @@ import (
 	"cotton/internal/assertion"
 	"cotton/internal/capture"
 	"cotton/internal/config"
-	"cotton/internal/console"
 	"cotton/internal/executable"
+	"cotton/internal/logger"
 	"cotton/internal/reader"
 	"cotton/internal/request"
+	"cotton/internal/result"
 	"cotton/internal/testcase"
 	"os"
 	"testing"
@@ -83,7 +84,7 @@ secret=updatedValue`)
 		},
 	}
 
-	expectedAssertionResults := []testcase.AssertionResult{
+	expectedAssertionResults := []result.AssertionResult{
 		{
 			Title:    "Body.args.key1 == value1",
 			Passed:   true,
@@ -107,14 +108,14 @@ secret=updatedValue`)
 		Assertions:  expectedAssertions,
 	}
 
-	expectedTestResult := &testcase.TestResult{
+	expectedTestResult := &result.TestResult{
 		Title:      "Test GET on httpbin.org",
 		Passed:     true,
 		Assertions: expectedAssertionResults,
 	}
 
-	logger := console.NewNilConsole()
-	result := tc.Execute(logger)
+	log := logger.NewNilLogger(false)
+	result := tc.Execute(log)
 
 	assert.NoError(t, err)
 	assert.True(t, expected.SimilarTo(tc))
@@ -148,7 +149,7 @@ func TestGetDataFromHttpBinWithThreeTilkdedCodeBlock(t *testing.T) {
 		},
 	}
 
-	expectedAssertionResults := []testcase.AssertionResult{
+	expectedAssertionResults := []result.AssertionResult{
 		{
 			Title:    "Body.args.key1 == value1",
 			Passed:   true,
@@ -170,14 +171,14 @@ func TestGetDataFromHttpBinWithThreeTilkdedCodeBlock(t *testing.T) {
 		Assertions:  expectedAssertions,
 	}
 
-	expectedTestResult := &testcase.TestResult{
+	expectedTestResult := &result.TestResult{
 		Title:      "Test GET on httpbin.org with three-tilded code block",
 		Passed:     true,
 		Assertions: expectedAssertionResults,
 	}
 
-	logger := console.NewNilConsole()
-	result := tc.Execute(logger)
+	log := logger.NewNilLogger(false)
+	result := tc.Execute(log)
 
 	assert.NoError(t, err)
 	assert.True(t, expected.SimilarTo(tc))
