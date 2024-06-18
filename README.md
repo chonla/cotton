@@ -41,8 +41,8 @@ See the files in `etc/examples` directory.
   * == (Match)
   * != (Not match)
 * Captures integration
-* Debug mode
-* Command line
+* ~~Debug mode~~
+* CLI
 * Cookbook
 * Colorized logging
 * HTML reports
