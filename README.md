@@ -38,7 +38,7 @@ See the files in `etc/examples` directory.
   * ~~is defined (or present)~~
 * ~~More readable logging~~
 * Regular expression assertion operands
-  * == (Match)
+  * ~~== (Match)~~
   * != (Not match)
 * Captures integration
 * ~~Debug mode~~

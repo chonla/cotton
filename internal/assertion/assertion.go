@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
+	"regexp"
 	"strconv"
 
 	"github.com/samber/mo"
@@ -46,6 +47,20 @@ func Try(mdLine line.Line) (*Assertion, bool) {
 			}
 		}
 	}
+	// binary assertion operator for regex
+	if caps, ok := mdLine.CaptureAll("\\s*\\*\\s+`([^`]+)`\\s*(.+)\\s*/(.+)/"); ok {
+		op, err := NewRegex(line.Line(caps[2]).Trim().Value())
+		if err == nil {
+			value, err := parseRegexValue(line.Line(caps[3]).Trim())
+			if err == nil {
+				return &Assertion{
+					Selector: line.Line(caps[1]).Trim().Value(),
+					Value:    value,
+					Operator: op,
+				}, true
+			}
+		}
+	}
 	// unary assertion operator
 	if caps, ok := mdLine.CaptureAll("\\s*\\*\\s+`([^`]+)`\\s*(.+)"); ok {
 		op, err := New(line.Line(caps[2]).Trim().Value())
@@ -58,6 +73,10 @@ func Try(mdLine line.Line) (*Assertion, bool) {
 		}
 	}
 	return nil, false
+}
+
+func parseRegexValue(mdLine line.Line) (interface{}, error) {
+	return regexp.Compile(mdLine.Value())
 }
 
 func parseValue(mdLine line.Line) (interface{}, error) {
@@ -89,6 +108,21 @@ func parseValue(mdLine line.Line) (interface{}, error) {
 		return nil, nil
 	}
 	return nil, errors.New("unexpected value")
+}
+
+func NewRegex(op string) (mo.Either3[UndefinedOperator, UnaryAssertionOperator, BinaryAssertionOperator], error) {
+	operatorMap := map[string]func() mo.Either3[UndefinedOperator, UnaryAssertionOperator, BinaryAssertionOperator]{
+		"==": func() mo.Either3[UndefinedOperator, UnaryAssertionOperator, BinaryAssertionOperator] {
+			return mo.NewEither3Arg3[UndefinedOperator, UnaryAssertionOperator, BinaryAssertionOperator](&EqAssertion{})
+		},
+		"!=": func() mo.Either3[UndefinedOperator, UnaryAssertionOperator, BinaryAssertionOperator] {
+			return mo.NewEither3Arg3[UndefinedOperator, UnaryAssertionOperator, BinaryAssertionOperator](&NeAssertion{})
+		},
+	}
+	if ao, ok := operatorMap[op]; ok {
+		return ao(), nil
+	}
+	return mo.NewEither3Arg1[UndefinedOperator, UnaryAssertionOperator, BinaryAssertionOperator](nil), errors.New("unrecognized assertion")
 }
 
 func New(op string) (mo.Either3[UndefinedOperator, UnaryAssertionOperator, BinaryAssertionOperator], error) {
@@ -162,7 +196,12 @@ func (a *Assertion) String() string {
 	}
 	// binary
 	if a.Operator.IsArg3() {
-		return fmt.Sprintf("%s %s %v", a.Selector, a.Operator.MustArg3().Name(), a.Value)
+		aType := reflect.TypeOf(a.Value)
+		aValue := a.Value
+		if aType != nil && aType.String() == "*regexp.Regexp" {
+			aValue = fmt.Sprintf("/%v/", aValue)
+		}
+		return fmt.Sprintf("%s %s %v", a.Selector, a.Operator.MustArg3().Name(), aValue)
 	}
 	return "unexpected operator"
 }

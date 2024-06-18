@@ -26,7 +26,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	debug := false
+	debug := true
 
 	log := logger.NewTerminalLogger(debug)
 	result := tc.Execute(log)

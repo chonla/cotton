@@ -4,6 +4,7 @@ import (
 	"cotton/internal/assertion"
 	"cotton/internal/response"
 	"errors"
+	"regexp"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -12,6 +13,7 @@ import (
 func TestEqualAssertionWithSameValue(t *testing.T) {
 	actual := &response.DataValue{
 		Value:       "10",
+		TypeName:    "string",
 		IsUndefined: false,
 	}
 	expected := "10"
@@ -70,4 +72,20 @@ func TestEqualAssertionWithUndefinedValue(t *testing.T) {
 
 	assert.Equal(t, errors.New("unexpected undefined value"), err)
 	assert.False(t, result)
+}
+
+func TestEqualAssertionWithRegexMatchValue(t *testing.T) {
+	actual := &response.DataValue{
+		Value:       "108271X",
+		TypeName:    "string",
+		IsUndefined: false,
+	}
+	expected, _ := regexp.Compile("^10")
+
+	op := assertion.EqAssertion{}
+
+	result, err := op.Assert(expected, actual)
+
+	assert.Nil(t, err)
+	assert.True(t, result)
 }
