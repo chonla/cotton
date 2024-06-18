@@ -44,5 +44,5 @@ See the files in `etc/examples` directory.
 * ~~Debug mode~~
 * CLI
 * Cookbook
-* Colorized logging
+* ~~Colorized logging~~
 * HTML reports
