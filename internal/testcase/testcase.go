@@ -7,6 +7,7 @@ import (
 	"cotton/internal/logger"
 	"cotton/internal/request"
 	"cotton/internal/response"
+	"cotton/internal/result"
 	"errors"
 	"fmt"
 	"slices"
@@ -24,15 +25,15 @@ type TestCase struct {
 	Assertions []*assertion.Assertion
 }
 
-func (t *TestCase) Execute(log logger.Logger) *TestResult {
+func (t *TestCase) Execute(log logger.Logger) *result.TestResult {
 	if log == nil {
-		log = logger.NewNilLogger()
+		log = logger.NewNilLogger(false)
 	}
 
-	testResult := &TestResult{
+	testResult := &result.TestResult{
 		Title:      t.Title,
 		Passed:     false,
-		Assertions: []AssertionResult{},
+		Assertions: []result.AssertionResult{},
 		Error:      nil,
 	}
 
@@ -75,28 +76,25 @@ func (t *TestCase) Execute(log logger.Logger) *TestResult {
 			testResult.Error = errors.New("unexpected assertion found")
 			return testResult
 		}
-		var result bool
+		var passed bool
 		if assertion.Operator.IsArg2() {
-			result, err = assertion.Operator.MustArg2().Assert(actual)
-			if err != nil {
-				testResult.Error = err
-				return testResult
-			}
+			passed, err = assertion.Operator.MustArg2().Assert(actual)
 		} else {
 			if assertion.Operator.IsArg3() {
-				result, err = assertion.Operator.MustArg3().Assert(expected, actual)
-			}
-			if err != nil {
-				testResult.Error = err
-				return testResult
+				passed, err = assertion.Operator.MustArg3().Assert(expected, actual)
 			}
 		}
-		testResult.Assertions = append(testResult.Assertions, AssertionResult{
+		testResult.Assertions = append(testResult.Assertions, result.AssertionResult{
 			Title:    assertion.String(),
-			Passed:   result,
+			Passed:   passed,
 			Actual:   fmt.Sprintf("%v", actual),
 			Expected: fmt.Sprintf("%v", expected),
+			Error:    err,
 		})
+		if err != nil {
+			testResult.Error = err
+			return testResult
+		}
 	}
 
 	for _, teardown := range t.Teardowns {

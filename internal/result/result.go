@@ -1,4 +1,4 @@
-package testcase
+package result
 
 type TestResult struct {
 	Title      string
@@ -12,4 +12,5 @@ type AssertionResult struct {
 	Passed   bool
 	Expected string
 	Actual   string
+	Error    error
 }

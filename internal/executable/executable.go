@@ -19,7 +19,7 @@ type Executable struct {
 
 func (ex *Executable) Execute(log logger.Logger) (*execution.Execution, error) {
 	if log == nil {
-		log = logger.NewNilLogger()
+		log = logger.NewNilLogger(false)
 	}
 
 	if ex.Request == nil {

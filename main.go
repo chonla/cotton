@@ -26,7 +26,10 @@ func main() {
 		os.Exit(1)
 	}
 
-	log := logger.NewTerminalLogger()
+	debug := false
+
+	log := logger.NewTerminalLogger(debug)
 	result := tc.Execute(log)
 	log.PrintTestResult(result.Passed)
+	log.PrintAssertionResults(result.Assertions)
 }

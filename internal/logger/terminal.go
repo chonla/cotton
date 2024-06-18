@@ -2,16 +2,21 @@ package logger
 
 import (
 	"cotton/internal/line"
+	"cotton/internal/result"
 
 	"fmt"
 
 	"github.com/fatih/color"
 )
 
-type TerminalLogger struct{}
+type TerminalLogger struct {
+	debug bool
+}
 
-func NewTerminalLogger() Logger {
-	return &TerminalLogger{}
+func NewTerminalLogger(debug bool) Logger {
+	return &TerminalLogger{
+		debug: debug,
+	}
 }
 
 func (c *TerminalLogger) PrintTestCaseTitle(title string) error {
@@ -27,6 +32,35 @@ func (c *TerminalLogger) PrintTestResult(passed bool) error {
 		val = color.New(color.FgRed).Add(color.Bold).Sprint("FAILED")
 	}
 	_, err := fmt.Println(val)
+	return err
+}
+
+func (c *TerminalLogger) PrintAssertionResults(assertionResults []result.AssertionResult) error {
+	if !c.debug {
+		return nil
+	}
+
+	for _, assertionResult := range assertionResults {
+		err := c.PrintAssertionResult(assertionResult)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (c *TerminalLogger) PrintAssertionResult(assertionResult result.AssertionResult) error {
+	var val string
+	if assertionResult.Passed {
+		val = color.New(color.FgGreen).Add(color.Bold).Sprint("PASSED")
+	} else {
+		val = color.New(color.FgRed).Add(color.Bold).Sprint("FAILED")
+	}
+	_, err := fmt.Printf("* %s ... %s\n", assertionResult.Title, val)
+	if err == nil && !assertionResult.Passed {
+		errMsg := color.New(color.FgRed).Add(color.Bold).Sprint(assertionResult.Error)
+		_, err = fmt.Printf("  %s\n", errMsg)
+	}
 	return err
 }
 
