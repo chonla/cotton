@@ -37,9 +37,9 @@ See the files in `etc/examples` directory.
   * ~~is undefined (or not present)~~
   * ~~is defined (or present)~~
 * ~~More readable logging~~
-* Regular expression assertion operands
+* ~~Regular expression assertion operands~~
   * ~~== (Match)~~
-  * != (Not match)
+  * ~~!= (Not match)~~
 * Captures integration
 * ~~Debug mode~~
 * CLI
