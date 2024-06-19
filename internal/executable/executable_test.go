@@ -81,7 +81,7 @@ func TestParsingCaptureFromResponse(t *testing.T) {
 
 	log := logger.NewNilLogger(true)
 
-	result, err := ex.Execute(log)
+	result, err := ex.Execute(variable.New(), log)
 
 	assert.NoError(t, err)
 	assert.Equal(t, expectedVariables, result.Variables)

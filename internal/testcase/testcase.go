@@ -48,7 +48,7 @@ func (t *TestCase) Execute(log logger.Logger) *result.TestResult {
 	sessionVars := variable.New()
 
 	for _, setup := range t.Setups {
-		execution, err := setup.Execute(log)
+		execution, err := setup.Execute(sessionVars, log)
 		if err != nil {
 			testResult.Error = err
 			return testResult
@@ -112,7 +112,7 @@ func (t *TestCase) Execute(log logger.Logger) *result.TestResult {
 	}
 
 	for _, teardown := range t.Teardowns {
-		execution, err := teardown.Execute(log)
+		execution, err := teardown.Execute(sessionVars, log)
 		if err != nil {
 			testResult.Error = err
 			return testResult

@@ -19,7 +19,7 @@ type Executable struct {
 	Captures []*capture.Capture
 }
 
-func (ex *Executable) Execute(log logger.Logger) (*execution.Execution, error) {
+func (ex *Executable) Execute(initialVars *variable.Variables, log logger.Logger) (*execution.Execution, error) {
 	if log == nil {
 		log = logger.NewNilLogger(false)
 	}
@@ -51,7 +51,7 @@ func (ex *Executable) Execute(log logger.Logger) (*execution.Execution, error) {
 	}
 
 	return &execution.Execution{
-		Variables: vars,
+		Variables: initialVars.MergeWith(vars),
 	}, nil
 }
 

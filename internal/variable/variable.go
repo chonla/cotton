@@ -20,13 +20,21 @@ func (v *Variables) ValueOf(name string) (interface{}, error) {
 	return nil, errors.New("value not found")
 }
 
-func (v *Variables) Set(name string, value interface{}) {
-	v.values[name] = value
-	keys := []string{}
-	for k := range v.values {
-		keys = append(keys, k)
+func (v *Variables) nameExists(name string) bool {
+	for _, existingName := range v.names {
+		if existingName == name {
+			return true
+		}
 	}
-	v.names = keys
+	return false
+}
+
+func (v *Variables) Set(name string, value interface{}) {
+	if !v.nameExists(name) {
+		v.names = append(v.names, name)
+	}
+
+	v.values[name] = value
 }
 
 func (v *Variables) Names() []string {
