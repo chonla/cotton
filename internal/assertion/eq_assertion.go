@@ -21,6 +21,7 @@ func (a *EqAssertion) Assert(expected interface{}, actual *response.DataValue) (
 	}
 	expectedType := reflect.TypeOf(expected)
 	if expectedType != nil && expectedType.String() == "*regexp.Regexp" {
+		// value matching with regexp must be string
 		if actual.TypeName == "string" {
 			result := expected.(*regexp.Regexp).MatchString(actual.Value.(string))
 			if !result {
