@@ -5,6 +5,8 @@ import (
 	"cotton/internal/execution"
 	"cotton/internal/logger"
 	"cotton/internal/request"
+	"cotton/internal/response"
+	"cotton/internal/variable"
 	"errors"
 	"slices"
 )
@@ -12,7 +14,7 @@ import (
 // For setups and teardowns
 type Executable struct {
 	Title   string
-	Request *request.Request
+	Request request.Request
 
 	Captures []*capture.Capture
 }
@@ -28,11 +30,29 @@ func (ex *Executable) Execute(log logger.Logger) (*execution.Execution, error) {
 
 	log.Printfln(" * %s", ex.Title)
 
-	_, err := ex.Request.Do()
+	r, err := ex.Request.Do()
 	if err != nil {
 		return nil, err
 	}
-	return &execution.Execution{}, nil
+	defer r.Body.Close()
+
+	resp, err := response.New(r)
+	if err != nil {
+		return nil, err
+	}
+
+	vars := variable.New()
+	for _, cap := range ex.Captures {
+		value, err := resp.ValueOf(cap.Selector)
+		if err != nil {
+			return nil, err
+		}
+		vars.Set(cap.Name, value)
+	}
+
+	return &execution.Execution{
+		Variables: vars,
+	}, nil
 }
 
 func (ex *Executable) SimilarTo(anotherEx *Executable) bool {
@@ -41,5 +61,4 @@ func (ex *Executable) SimilarTo(anotherEx *Executable) bool {
 			return c1.SimilarTo(c2)
 		}) &&
 		ex.Request.Similar(anotherEx.Request)
-	// request.Similar(ex.Request, anotherEx.Request)
 }

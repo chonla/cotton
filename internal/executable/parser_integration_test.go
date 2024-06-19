@@ -33,12 +33,12 @@ Host: localhost`)
 	expectedRequest, _ := request.New(req)
 	expectedCaptures := []*capture.Capture{
 		{
-			Name:    "readiness",
-			Locator: "$.readiness",
+			Name:     "readiness",
+			Selector: "$.readiness",
 		},
 		{
-			Name:    "version",
-			Locator: "$.version",
+			Name:     "version",
+			Selector: "$.version",
 		},
 	}
 	expectedExecutable := &executable.Executable{

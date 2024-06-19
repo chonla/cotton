@@ -46,18 +46,18 @@ Host: localhost
 	expectedRequest, _ := request.New(req)
 	expectedCapturesInBefore := []*capture.Capture{
 		{
-			Name:    "readiness",
-			Locator: "$.readiness",
+			Name:     "readiness",
+			Selector: "$.readiness",
 		},
 		{
-			Name:    "version",
-			Locator: "$.version",
+			Name:     "version",
+			Selector: "$.version",
 		},
 	}
 	expectedCapturesInAfter := []*capture.Capture{
 		{
-			Name:    "time",
-			Locator: "$.millisec",
+			Name:     "time",
+			Selector: "$.millisec",
 		},
 	}
 	expectedSetups := []*executable.Executable{

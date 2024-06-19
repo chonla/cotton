@@ -615,8 +615,8 @@ body`)
 				Request: expectedBefore2,
 				Captures: []*capture.Capture{
 					{
-						Name:    "readiness",
-						Locator: "$.readiness.status",
+						Name:     "readiness",
+						Selector: "$.readiness.status",
 					},
 				},
 			},
@@ -662,8 +662,8 @@ body`)
 		Request: expectedRequest,
 		Captures: []*capture.Capture{
 			{
-				Name:    "varname",
-				Locator: "$.result",
+				Name:     "varname",
+				Selector: "$.result",
 			},
 		},
 	}, result)

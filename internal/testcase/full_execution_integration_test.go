@@ -51,8 +51,8 @@ secret=updatedValue`)
 
 	expectedBeforeCaptures := []*capture.Capture{
 		{
-			Name:    "secret",
-			Locator: "$.form.secret",
+			Name:     "secret",
+			Selector: "$.form.secret",
 		},
 	}
 
@@ -122,7 +122,7 @@ secret=updatedValue`)
 	assert.Equal(t, expectedTestResult, result)
 }
 
-func TestGetDataFromHttpBinWithThreeTilkdedCodeBlock(t *testing.T) {
+func TestGetDataFromHttpBinWithThreeTildedCodeBlock(t *testing.T) {
 	curdir, _ := os.Getwd()
 	config := &config.Config{
 		RootDir: curdir + "/../..",

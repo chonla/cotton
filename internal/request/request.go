@@ -7,12 +7,19 @@ import (
 	"net/http/httputil"
 )
 
-type Request struct {
+type Request interface {
+	Data() []byte
+	Do() (*http.Response, error)
+	Similar(anotherRequest Request) bool
+	String() string
+}
+
+type HTTPRequest struct {
 	request      *http.Request
 	plainRequest []byte
 }
 
-func New(req *http.Request) (*Request, error) {
+func New(req *http.Request) (*HTTPRequest, error) {
 	if req == nil {
 		return nil, errors.New("unexpected nil request")
 	}
@@ -21,20 +28,24 @@ func New(req *http.Request) (*Request, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &Request{
+	return &HTTPRequest{
 		request:      req,
 		plainRequest: reqBytes,
 	}, nil
 }
 
-func (r *Request) Similar(anotherRequest *Request) bool {
-	return bytes.Equal(r.plainRequest, anotherRequest.plainRequest)
+func (r *HTTPRequest) Similar(anotherRequest Request) bool {
+	return bytes.Equal(r.plainRequest, anotherRequest.Data())
 }
 
-func (r *Request) Do() (*http.Response, error) {
+func (r *HTTPRequest) Do() (*http.Response, error) {
 	return http.DefaultClient.Do(r.request)
 }
 
-func (r *Request) String() string {
+func (r *HTTPRequest) String() string {
 	return string(r.plainRequest)
+}
+
+func (r *HTTPRequest) Data() []byte {
+	return r.plainRequest
 }

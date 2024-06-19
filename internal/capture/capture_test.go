@@ -15,8 +15,8 @@ func TestCaptureFromPlainAssignment(t *testing.T) {
 
 	assert.True(t, ok)
 	assert.Equal(t, &capture.Capture{
-		Name:    "name",
-		Locator: "$.data.firstname",
+		Name:     "name",
+		Selector: "$.data.firstname",
 	}, result)
 }
 
@@ -27,8 +27,8 @@ func TestCaptureFromInlineAssignment(t *testing.T) {
 
 	assert.True(t, ok)
 	assert.Equal(t, &capture.Capture{
-		Name:    "name",
-		Locator: "$.data.firstname",
+		Name:     "name",
+		Selector: "$.data.firstname",
 	}, result)
 }
 
@@ -39,8 +39,8 @@ func TestCaptureFromMoreIndentsPlainAssignment(t *testing.T) {
 
 	assert.True(t, ok)
 	assert.Equal(t, &capture.Capture{
-		Name:    "name",
-		Locator: "$.data.firstname",
+		Name:     "name",
+		Selector: "$.data.firstname",
 	}, result)
 }
 
@@ -51,7 +51,7 @@ func TestCaptureFromPlainAssignmentWithWhiteSpaces(t *testing.T) {
 
 	assert.True(t, ok)
 	assert.Equal(t, &capture.Capture{
-		Name:    "name",
-		Locator: "$.data.firstname",
+		Name:     "name",
+		Selector: "$.data.firstname",
 	}, result)
 }

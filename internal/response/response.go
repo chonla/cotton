@@ -14,7 +14,7 @@ import (
 	"github.com/tidwall/gjson"
 )
 
-type Response struct {
+type HTTPResponse struct {
 	response     *http.Response
 	headerValues ValueMap
 	wrappedBody  string
@@ -24,7 +24,7 @@ type Response struct {
 
 type ValueMap map[string]interface{}
 
-func New(resp *http.Response) (*Response, error) {
+func New(resp *http.Response) (*HTTPResponse, error) {
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
@@ -43,7 +43,7 @@ func New(resp *http.Response) (*Response, error) {
 		return nil, err
 	}
 
-	return &Response{
+	return &HTTPResponse{
 		response:     resp,
 		headerValues: values,
 		wrappedBody:  fmt.Sprintf(`{"Body":%s}`, bodyString),
@@ -52,11 +52,11 @@ func New(resp *http.Response) (*Response, error) {
 	}, nil
 }
 
-func (r *Response) String() string {
+func (r *HTTPResponse) String() string {
 	return string(r.fullResponse)
 }
 
-func (r *Response) ValueOf(key string) (*DataValue, error) {
+func (r *HTTPResponse) ValueOf(key string) (*DataValue, error) {
 	if r.response == nil {
 		return nil, errors.New("invalid state of response")
 	}

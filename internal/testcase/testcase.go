@@ -8,6 +8,7 @@ import (
 	"cotton/internal/request"
 	"cotton/internal/response"
 	"cotton/internal/result"
+	"cotton/internal/variable"
 	"errors"
 	"fmt"
 	"slices"
@@ -17,7 +18,7 @@ import (
 type TestCase struct {
 	Title       string
 	Description string
-	Request     *request.Request
+	Request     *request.HTTPRequest
 
 	Captures   []*capture.Capture
 	Setups     []*executable.Executable
@@ -44,12 +45,15 @@ func (t *TestCase) Execute(log logger.Logger) *result.TestResult {
 
 	log.PrintTestCaseTitle(t.Title)
 
+	sessionVars := variable.New()
+
 	for _, setup := range t.Setups {
-		_, err := setup.Execute(log)
+		execution, err := setup.Execute(log)
 		if err != nil {
 			testResult.Error = err
 			return testResult
 		}
+		sessionVars = sessionVars.MergeWith(execution.Variables)
 	}
 
 	r, err := t.Request.Do()
@@ -63,6 +67,16 @@ func (t *TestCase) Execute(log logger.Logger) *result.TestResult {
 	if err != nil {
 		testResult.Error = err
 		return testResult
+	}
+
+	// capture response
+	for _, cap := range t.Captures {
+		value, err := resp.ValueOf(cap.Selector)
+		if err != nil {
+			testResult.Error = err
+			return testResult
+		}
+		sessionVars.Set(cap.Name, value)
 	}
 
 	for _, assertion := range t.Assertions {
@@ -98,11 +112,12 @@ func (t *TestCase) Execute(log logger.Logger) *result.TestResult {
 	}
 
 	for _, teardown := range t.Teardowns {
-		_, err := teardown.Execute(log)
+		execution, err := teardown.Execute(log)
 		if err != nil {
 			testResult.Error = err
 			return testResult
 		}
+		sessionVars = sessionVars.MergeWith(execution.Variables)
 	}
 
 	testResult.Passed = true

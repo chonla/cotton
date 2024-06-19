@@ -331,12 +331,12 @@ body`)
 	expectedRequest, _ := request.New(req)
 	expectedCaptures := []*capture.Capture{
 		{
-			Name:    "var",
-			Locator: "sample",
+			Name:     "var",
+			Selector: "sample",
 		},
 		{
-			Name:    "var2",
-			Locator: "good.vibe",
+			Name:     "var2",
+			Selector: "good.vibe",
 		},
 	}
 
