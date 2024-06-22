@@ -7,12 +7,12 @@ import (
 	"cotton/internal/capture"
 	"cotton/internal/config"
 	"cotton/internal/executable"
+	"cotton/internal/httphelper"
+	"cotton/internal/logger"
 	"cotton/internal/reader"
-	"cotton/internal/request"
 	"os"
 	"testing"
 
-	"github.com/chonla/httpreqparser"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -22,29 +22,25 @@ func TestParsingCompleteExecutableMarkdownFile(t *testing.T) {
 		RootDir: curdir + "/../..",
 	}
 
-	reader := reader.New(os.ReadFile)
-	reqParser := httpreqparser.New()
-	parser := executable.NewParser(config, reader, reqParser)
+	parserOptions := &executable.ParserOptions{
+		Configurator:  config,
+		FileReader:    reader.New(os.ReadFile),
+		RequestParser: &httphelper.HTTPRequestParser{},
+		Logger:        logger.NewNilLogger(false),
+	}
+	executableOptions := &executable.ExecutableOptions{
+		RequestParser: &httphelper.HTTPRequestParser{},
+		Logger:        logger.NewNilLogger(false),
+	}
+
+	parser := executable.NewParser(parserOptions)
+	expectedExecutable := executable.New("Untitled", `GET /get-info HTTP/1.1
+Host: localhost`, executableOptions)
+	expectedExecutable.AddCapture(capture.New("readiness", "$.readiness"))
+	expectedExecutable.AddCapture(capture.New("version", "$.version"))
 
 	result, err := parser.FromMarkdownFile("<rootDir>/etc/examples/executable_before.md")
 
-	req, _ := reqParser.Parse(`GET /get-info HTTP/1.1
-Host: localhost`)
-	expectedRequest, _ := request.New(req)
-	expectedCaptures := []*capture.Capture{
-		{
-			Name:     "readiness",
-			Selector: "$.readiness",
-		},
-		{
-			Name:     "version",
-			Selector: "$.version",
-		},
-	}
-	expectedExecutable := &executable.Executable{
-		Request:  expectedRequest,
-		Captures: expectedCaptures,
-	}
 	assert.NoError(t, err)
-	assert.True(t, expectedExecutable.SimilarTo(result))
+	assert.Equal(t, expectedExecutable, result)
 }

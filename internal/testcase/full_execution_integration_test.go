@@ -8,16 +8,15 @@ import (
 	"cotton/internal/capture"
 	"cotton/internal/config"
 	"cotton/internal/executable"
+	"cotton/internal/httphelper"
 	"cotton/internal/logger"
 	"cotton/internal/reader"
-	"cotton/internal/request"
 	"cotton/internal/result"
 	"cotton/internal/testcase"
+	"cotton/internal/variable"
 	"os"
 	"testing"
 
-	"github.com/chonla/httpreqparser"
-	"github.com/samber/mo"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -26,63 +25,55 @@ func TestGetDataFromHttpBin(t *testing.T) {
 	config := &config.Config{
 		RootDir: curdir + "/../..",
 	}
-	reader := reader.New(os.ReadFile)
-	reqParser := httpreqparser.New()
-	parser := testcase.NewParser(config, reader, reqParser)
 
+	executableParserOptions := &executable.ParserOptions{
+		Configurator:  config,
+		FileReader:    reader.New(os.ReadFile),
+		RequestParser: &httphelper.HTTPRequestParser{},
+		Logger:        logger.NewNilLogger(false),
+	}
+	executableParser := executable.NewParser(executableParserOptions)
+
+	parserOptions := &testcase.ParserOptions{
+		Configurator:     config,
+		FileReader:       reader.New(os.ReadFile),
+		RequestParser:    &httphelper.HTTPRequestParser{},
+		Logger:           logger.NewNilLogger(false),
+		ExecutableParser: executableParser,
+	}
+
+	executableOptions := &executable.ExecutableOptions{
+		RequestParser: &httphelper.HTTPRequestParser{},
+		Logger:        logger.NewNilLogger(false),
+	}
+
+	testcaseOptions := &testcase.TestCaseOptions{
+		RequestParser: &httphelper.HTTPRequestParser{},
+		Logger:        logger.NewNilLogger(false),
+	}
+
+	parser := testcase.NewParser(parserOptions)
 	tc, err := parser.FromMarkdownFile("<rootDir>/etc/examples/httpbin.org/get.md")
 
-	req, _ := reqParser.Parse(`GET https://httpbin.org/get?key1=value1&key2=value2 HTTP/1.1`)
-	expectedRequest, _ := request.New(req)
-
-	beforeReq, _ := reqParser.Parse(`POST https://httpbin.org/post HTTP/1.1
+	expectedSetup := executable.New("Post some data to host", `POST https://httpbin.org/post HTTP/1.1
 Content-Type: application/x-www-form-urlencoded
 Content-Length: 25
 
-secret=thisIsASecretValue`)
-	expectedBeforeRequest, _ := request.New(beforeReq)
+secret=thisIsASecretValue`, executableOptions)
+	expectedSetup.AddCapture(capture.New("secret", "$.form.secret"))
 
-	afterReq, _ := reqParser.Parse(`PATCH https://httpbin.org/patch HTTP/1.1
+	expectedTeardown := executable.New("Patch some data to host", `PATCH https://httpbin.org/patch HTTP/1.1
 Content-Type: application/x-www-form-urlencoded
 Content-Length: 19
 
-secret=updatedValue`)
-	expectedAfterRequest, _ := request.New(afterReq)
+secret=updatedValue`, executableOptions)
 
-	expectedBeforeCaptures := []*capture.Capture{
-		{
-			Name:     "secret",
-			Selector: "$.form.secret",
-		},
-	}
-
-	expectedSetups := []*executable.Executable{
-		{
-			Title:    "Post some data to host",
-			Request:  expectedBeforeRequest,
-			Captures: expectedBeforeCaptures,
-		},
-	}
-
-	expectedTeardowns := []*executable.Executable{
-		{
-			Title:   "Patch some data to host",
-			Request: expectedAfterRequest,
-		},
-	}
-
-	expectedAssertions := []*assertion.Assertion{
-		{
-			Selector: "Body.args.key1",
-			Value:    "value1",
-			Operator: mo.NewEither3Arg3[assertion.UndefinedOperator, assertion.UnaryAssertionOperator, assertion.BinaryAssertionOperator](&assertion.EqAssertion{}),
-		},
-		{
-			Selector: "Body.args.key2",
-			Value:    "value2",
-			Operator: mo.NewEither3Arg3[assertion.UndefinedOperator, assertion.UnaryAssertionOperator, assertion.BinaryAssertionOperator](&assertion.EqAssertion{}),
-		},
-	}
+	eqOp, _ := assertion.NewOp("==")
+	expectedTestcase := testcase.New("Test GET on httpbin.org", "Test getting data from httpbin.org using multiple http requests.", "GET https://httpbin.org/get?key1=value1&key2=value2 HTTP/1.1", testcaseOptions)
+	expectedTestcase.AddSetup(expectedSetup)
+	expectedTestcase.AddTeardown(expectedTeardown)
+	expectedTestcase.AddAssertion(assertion.New("Body.args.key1", eqOp, "value1"))
+	expectedTestcase.AddAssertion(assertion.New("Body.args.key2", eqOp, "value2"))
 
 	expectedAssertionResults := []result.AssertionResult{
 		{
@@ -97,15 +88,6 @@ secret=updatedValue`)
 			Actual:   "value2",
 			Expected: "value2",
 		},
-	}
-
-	expected := &testcase.TestCase{
-		Title:       "Test GET on httpbin.org",
-		Description: "Test getting data from httpbin.org using multiple http requests.",
-		Setups:      expectedSetups,
-		Teardowns:   expectedTeardowns,
-		Request:     expectedRequest,
-		Assertions:  expectedAssertions,
 	}
 
 	expectedTestResult := &result.TestResult{
@@ -114,11 +96,11 @@ secret=updatedValue`)
 		Assertions: expectedAssertionResults,
 	}
 
-	log := logger.NewNilLogger(false)
-	result := tc.Execute(log)
+	initialVars := variable.New()
+	result := tc.Execute(initialVars)
 
 	assert.NoError(t, err)
-	assert.True(t, expected.SimilarTo(tc))
+	assert.Equal(t, expectedTestcase, tc)
 	assert.Equal(t, expectedTestResult, result)
 }
 
@@ -127,27 +109,55 @@ func TestGetDataFromHttpBinWithThreeTildedCodeBlock(t *testing.T) {
 	config := &config.Config{
 		RootDir: curdir + "/../..",
 	}
-	reader := reader.New(os.ReadFile)
-	reqParser := httpreqparser.New()
-	parser := testcase.NewParser(config, reader, reqParser)
 
+	executableParserOptions := &executable.ParserOptions{
+		Configurator:  config,
+		FileReader:    reader.New(os.ReadFile),
+		RequestParser: &httphelper.HTTPRequestParser{},
+		Logger:        logger.NewNilLogger(false),
+	}
+	executableParser := executable.NewParser(executableParserOptions)
+
+	parserOptions := &testcase.ParserOptions{
+		Configurator:     config,
+		FileReader:       reader.New(os.ReadFile),
+		RequestParser:    &httphelper.HTTPRequestParser{},
+		Logger:           logger.NewNilLogger(false),
+		ExecutableParser: executableParser,
+	}
+
+	executableOptions := &executable.ExecutableOptions{
+		RequestParser: &httphelper.HTTPRequestParser{},
+		Logger:        logger.NewNilLogger(false),
+	}
+
+	testcaseOptions := &testcase.TestCaseOptions{
+		RequestParser: &httphelper.HTTPRequestParser{},
+		Logger:        logger.NewNilLogger(false),
+	}
+
+	parser := testcase.NewParser(parserOptions)
 	tc, err := parser.FromMarkdownFile("<rootDir>/etc/examples/httpbin.org/3tildes.md")
 
-	req, _ := reqParser.Parse(`GET https://httpbin.org/get?key1=value1&key2=value2 HTTP/1.1`)
-	expectedRequest, _ := request.New(req)
+	expectedSetup := executable.New("Post some data to host", `POST https://httpbin.org/post HTTP/1.1
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 25
 
-	expectedAssertions := []*assertion.Assertion{
-		{
-			Selector: "Body.args.key1",
-			Value:    "value1",
-			Operator: mo.NewEither3Arg3[assertion.UndefinedOperator, assertion.UnaryAssertionOperator, assertion.BinaryAssertionOperator](&assertion.EqAssertion{}),
-		},
-		{
-			Selector: "Body.args.key2",
-			Value:    "value2",
-			Operator: mo.NewEither3Arg3[assertion.UndefinedOperator, assertion.UnaryAssertionOperator, assertion.BinaryAssertionOperator](&assertion.EqAssertion{}),
-		},
-	}
+secret=thisIsASecretValue`, executableOptions)
+	expectedSetup.AddCapture(capture.New("secret", "$.form.secret"))
+
+	expectedTeardown := executable.New("Patch some data to host", `PATCH https://httpbin.org/patch HTTP/1.1
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 19
+
+secret=updatedValue`, executableOptions)
+
+	eqOp, _ := assertion.NewOp("==")
+	expectedTestcase := testcase.New("Test GET on httpbin.org with three-tilded code block", "Test getting data from httpbin.org using multiple http requests.", "GET https://httpbin.org/get?key1=value1&key2=value2 HTTP/1.1", testcaseOptions)
+	expectedTestcase.AddSetup(expectedSetup)
+	expectedTestcase.AddTeardown(expectedTeardown)
+	expectedTestcase.AddAssertion(assertion.New("Body.args.key1", eqOp, "value1"))
+	expectedTestcase.AddAssertion(assertion.New("Body.args.key2", eqOp, "value2"))
 
 	expectedAssertionResults := []result.AssertionResult{
 		{
@@ -164,23 +174,16 @@ func TestGetDataFromHttpBinWithThreeTildedCodeBlock(t *testing.T) {
 		},
 	}
 
-	expected := &testcase.TestCase{
-		Title:       "Test GET on httpbin.org with three-tilded code block",
-		Description: "Test getting data from httpbin.org using multiple http requests.",
-		Request:     expectedRequest,
-		Assertions:  expectedAssertions,
-	}
-
 	expectedTestResult := &result.TestResult{
 		Title:      "Test GET on httpbin.org with three-tilded code block",
 		Passed:     true,
 		Assertions: expectedAssertionResults,
 	}
 
-	log := logger.NewNilLogger(false)
-	result := tc.Execute(log)
+	initialVars := variable.New()
+	result := tc.Execute(initialVars)
 
 	assert.NoError(t, err)
-	assert.True(t, expected.SimilarTo(tc))
+	assert.Equal(t, expectedTestcase, tc)
 	assert.Equal(t, expectedTestResult, result)
 }

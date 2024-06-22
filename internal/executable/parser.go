@@ -3,53 +3,63 @@ package executable
 import (
 	"cotton/internal/capture"
 	"cotton/internal/config"
+	"cotton/internal/httphelper"
 	"cotton/internal/line"
+	"cotton/internal/logger"
 	"cotton/internal/reader"
-	"cotton/internal/request"
-	"net/http"
+	"errors"
 	"strings"
-
-	"github.com/chonla/httpreqparser"
 )
 
-type Parser struct {
-	config        *config.Config
-	fileReader    reader.Reader
-	requestParser httpreqparser.Parser
+type ParserOptions struct {
+	Configurator  *config.Config
+	FileReader    reader.Reader
+	RequestParser httphelper.RequestParser
+	Logger        logger.Logger
 }
 
-func NewParser(config *config.Config, fileReader reader.Reader, requestParser httpreqparser.Parser) *Parser {
-	return &Parser{
-		config:        config,
-		fileReader:    fileReader,
-		requestParser: requestParser,
+type Parser interface {
+	FromMarkdownFile(mdFileName string) (*Executable, error)
+	FromMarkdownLines(mdLines []line.Line) (*Executable, error)
+}
+
+type ExecutableParser struct {
+	options *ParserOptions
+}
+
+func NewParser(options *ParserOptions) *ExecutableParser {
+	return &ExecutableParser{
+		options: options,
 	}
 }
 
-func (p *Parser) FromMarkdownFile(mdFileName string) (*Executable, error) {
-	mdFullPath := p.config.ResolvePath(mdFileName)
-	lines, err := p.fileReader.Read(mdFullPath)
+func (p *ExecutableParser) FromMarkdownFile(mdFileName string) (*Executable, error) {
+	mdFullPath := p.options.Configurator.ResolvePath(mdFileName)
+	lines, err := p.options.FileReader.Read(mdFullPath)
 	if err != nil {
 		return nil, err
 	}
 	return p.FromMarkdownLines(lines)
 }
 
-func (p *Parser) FromMarkdownLines(mdLines []line.Line) (*Executable, error) {
+func (p *ExecutableParser) FromMarkdownLines(mdLines []line.Line) (*Executable, error) {
 	var req []string
-	var exReq *http.Request
 
 	collectingCodeBlockBackTick := false
 	collectingCodeBlockTilde := false
 
-	ex := &Executable{}
+	exReqFound := false
+	exTitle := "Untitled"
+	exReqRaw := ""
+	exCaptures := []*capture.Capture{}
+
 	for _, mdLine := range mdLines {
-		if mdLine.LookLike("^```http$") && exReq == nil {
+		if mdLine.LookLike("^```http$") && !exReqFound {
 			collectingCodeBlockBackTick = true
 			continue
 		}
 
-		if mdLine.LookLike("^~~~http$") && exReq == nil {
+		if mdLine.LookLike("^~~~http$") && !exReqFound {
 			collectingCodeBlockTilde = true
 			continue
 		}
@@ -59,11 +69,8 @@ func (p *Parser) FromMarkdownLines(mdLines []line.Line) (*Executable, error) {
 				collectingCodeBlockBackTick = false
 
 				if len(req) > 0 {
-					requestString := line.Line(strings.Join(req, "\n")).Value()
-					httpRequest, err := p.requestParser.Parse(requestString)
-					if err == nil {
-						exReq = httpRequest
-					}
+					exReqRaw = line.Line(strings.Join(req, "\n")).Value()
+					exReqFound = true
 					req = nil
 				}
 			} else {
@@ -78,11 +85,8 @@ func (p *Parser) FromMarkdownLines(mdLines []line.Line) (*Executable, error) {
 					collectingCodeBlockTilde = false
 
 					if len(req) > 0 {
-						requestString := line.Line(strings.Join(req, "\n")).Value()
-						httpRequest, err := p.requestParser.Parse(requestString)
-						if err == nil {
-							exReq = httpRequest
-						}
+						exReqRaw = line.Line(strings.Join(req, "\n")).Value()
+						exReqFound = true
 						req = nil
 					}
 				} else {
@@ -93,20 +97,24 @@ func (p *Parser) FromMarkdownLines(mdLines []line.Line) (*Executable, error) {
 				}
 			} else {
 				if cap, ok := capture.Try(mdLine); ok {
-					if ex.Captures == nil {
-						ex.Captures = []*capture.Capture{}
-					}
-					ex.Captures = append(ex.Captures, cap)
+					exCaptures = append(exCaptures, cap)
 				}
 			}
 		}
 	}
 
-	wrappedReq, err := request.New(exReq)
-	if err != nil {
-		return nil, err
+	if !exReqFound {
+		return nil, errors.New("no callable request")
 	}
-	ex.Request = wrappedReq
+
+	options := &ExecutableOptions{
+		RequestParser: p.options.RequestParser,
+		Logger:        p.options.Logger,
+	}
+	ex := New(exTitle, exReqRaw, options)
+	for _, cap := range exCaptures {
+		ex.AddCapture(cap)
+	}
 
 	return ex, nil
 }

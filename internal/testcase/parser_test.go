@@ -5,55 +5,15 @@ import (
 	"cotton/internal/capture"
 	"cotton/internal/config"
 	"cotton/internal/executable"
+	"cotton/internal/httphelper"
 	"cotton/internal/line"
-	"cotton/internal/request"
+	"cotton/internal/logger"
+	"cotton/internal/reader"
 	"cotton/internal/testcase"
-	"net/http"
 	"testing"
 
-	"github.com/chonla/httpreqparser"
-	"github.com/samber/mo"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 )
-
-type MockFileReader struct {
-	mock.Mock
-}
-
-func (m *MockFileReader) Read(fileName string) ([]line.Line, error) {
-	args := m.Called(fileName)
-	return args.Get(0).([]line.Line), args.Error(1)
-}
-
-type MockRequestParser struct {
-	mock.Mock
-}
-
-func (m *MockRequestParser) Parse(req string) (*http.Request, error) {
-	args := m.Called(req)
-	return args.Get(0).(*http.Request), args.Error(1)
-}
-
-// func TestParseMarkdownFileShouldReadFromGivenFile(t *testing.T) {
-// 	config := &config.Config{
-// 		RootDir: "",
-// 	}
-
-// 	lines := []line.Line{""}
-
-// 	reader := new(MockFileReader)
-// 	reader.On("Read", "mock_file").Return(lines, nil)
-
-// 	reqParser := new(MockRequestParser)
-// 	reqParser.On("Parse", "POST /some-path HTTP/1.0\nHost: url\n\npost\nbody").Return(expectedRequest, nil)
-
-// 	parser := testcase.NewParser(config, reader, reqParser)
-// 	parser.FromMarkdownFile("mock_file")
-
-// 	reader.AssertExpectations(t)
-// 	reqParser.AssertExpectations(t)
-// }
 
 // First H1 is considered a test title
 func TestH1AtVeryFirstLine(t *testing.T) {
@@ -73,28 +33,40 @@ func TestH1AtVeryFirstLine(t *testing.T) {
 		"```",
 	}
 
-	req, _ := httpreqparser.New().Parse(`POST /some-path HTTP/1.0
+	mockFileReader := new(reader.MockFileReader)
+	mockFileReader.On("Read", "mock_file").Return(lines, nil)
+
+	mockHTTPRequestParser := new(httphelper.MockHTTPRequestParser)
+
+	mockLogger := new(logger.MockLogger)
+
+	mockExecutableParser := new(executable.MockExecutableParser)
+
+	options := &testcase.ParserOptions{
+		Configurator:     config,
+		FileReader:       mockFileReader,
+		RequestParser:    mockHTTPRequestParser,
+		Logger:           mockLogger,
+		ExecutableParser: mockExecutableParser,
+	}
+
+	testcaseOptions := &testcase.TestCaseOptions{
+		Logger:        mockLogger,
+		RequestParser: mockHTTPRequestParser,
+	}
+	expectedRawRequest := `POST /some-path HTTP/1.0
 Host: url
 
 post
-body`)
-	expectedRequest, _ := request.New(req)
+body`
+	expectedTestCase := testcase.New("Title", "", expectedRawRequest, testcaseOptions)
 
-	reader := new(MockFileReader)
-	reader.On("Read", "mock_file").Return(lines, nil)
-
-	reqParser := new(MockRequestParser)
-	reqParser.On("Parse", "POST /some-path HTTP/1.0\nHost: url\n\npost\nbody").Return(req, nil)
-
-	parser := testcase.NewParser(config, reader, reqParser)
+	parser := testcase.NewParser(options)
 	result, err := parser.FromMarkdownFile("mock_file")
 
 	assert.Nil(t, err)
-	assert.Equal(t, &testcase.TestCase{
-		Title:   "Title",
-		Request: expectedRequest,
-	}, result)
-	reader.AssertExpectations(t)
+	assert.Equal(t, expectedTestCase, result)
+	mockFileReader.AssertExpectations(t)
 }
 
 func TestH1AtSomeOtherLines(t *testing.T) {
@@ -116,29 +88,41 @@ func TestH1AtSomeOtherLines(t *testing.T) {
 		"```",
 	}
 
-	req, _ := httpreqparser.New().Parse(`POST /some-path HTTP/1.0
+	mockFileReader := new(reader.MockFileReader)
+	mockFileReader.On("Read", "mock_file").Return(lines, nil)
+
+	mockHTTPRequestParser := new(httphelper.MockHTTPRequestParser)
+
+	mockLogger := new(logger.MockLogger)
+
+	mockExecutableParser := new(executable.MockExecutableParser)
+
+	options := &testcase.ParserOptions{
+		Configurator:     config,
+		FileReader:       mockFileReader,
+		RequestParser:    mockHTTPRequestParser,
+		Logger:           mockLogger,
+		ExecutableParser: mockExecutableParser,
+	}
+
+	testcaseOptions := &testcase.TestCaseOptions{
+		Logger:        mockLogger,
+		RequestParser: mockHTTPRequestParser,
+	}
+	expectedRawRequest := `POST /some-path HTTP/1.0
 Host: url
 
 post
-body`)
-	expectedRequest, _ := request.New(req)
+body`
+	expectedTestCase := testcase.New("Title", "", expectedRawRequest, testcaseOptions)
 
-	reader := new(MockFileReader)
-	reader.On("Read", "mock_file").Return(lines, nil)
-
-	reqParser := new(MockRequestParser)
-	reqParser.On("Parse", "POST /some-path HTTP/1.0\nHost: url\n\npost\nbody").Return(req, nil)
-
-	parser := testcase.NewParser(config, reader, reqParser)
+	parser := testcase.NewParser(options)
 	result, err := parser.FromMarkdownFile("mock_file")
 
 	assert.NoError(t, err)
-	assert.Equal(t, &testcase.TestCase{
-		Title:   "Title",
-		Request: expectedRequest,
-	}, result)
-	reader.AssertExpectations(t)
-	reqParser.AssertExpectations(t)
+	assert.Equal(t, expectedTestCase, result)
+	mockFileReader.AssertExpectations(t)
+	mockHTTPRequestParser.AssertExpectations(t)
 }
 
 func TestMultipleH1sWillGrabTheFirstH1AsTitle(t *testing.T) {
@@ -160,29 +144,41 @@ func TestMultipleH1sWillGrabTheFirstH1AsTitle(t *testing.T) {
 		"# Other Title",
 	}
 
-	req, _ := httpreqparser.New().Parse(`POST /some-path HTTP/1.0
+	mockFileReader := new(reader.MockFileReader)
+	mockFileReader.On("Read", "mock_file").Return(lines, nil)
+
+	mockHTTPRequestParser := new(httphelper.MockHTTPRequestParser)
+
+	mockLogger := new(logger.MockLogger)
+
+	mockExecutableParser := new(executable.MockExecutableParser)
+
+	options := &testcase.ParserOptions{
+		Configurator:     config,
+		FileReader:       mockFileReader,
+		RequestParser:    mockHTTPRequestParser,
+		Logger:           mockLogger,
+		ExecutableParser: mockExecutableParser,
+	}
+
+	testcaseOptions := &testcase.TestCaseOptions{
+		Logger:        mockLogger,
+		RequestParser: mockHTTPRequestParser,
+	}
+	expectedRawRequest := `POST /some-path HTTP/1.0
 Host: url
 
 post
-body`)
-	expectedReq, _ := request.New(req)
+body`
+	expectedTestCase := testcase.New("Title", "", expectedRawRequest, testcaseOptions)
 
-	reader := new(MockFileReader)
-	reader.On("Read", "mock_file").Return(lines, nil)
-
-	reqParser := new(MockRequestParser)
-	reqParser.On("Parse", "POST /some-path HTTP/1.0\nHost: url\n\npost\nbody").Return(req, nil)
-
-	parser := testcase.NewParser(config, reader, reqParser)
+	parser := testcase.NewParser(options)
 	result, err := parser.FromMarkdownFile("mock_file")
 
 	assert.NoError(t, err)
-	assert.Equal(t, &testcase.TestCase{
-		Title:   "Title",
-		Request: expectedReq,
-	}, result)
-	reader.AssertExpectations(t)
-	reqParser.AssertExpectations(t)
+	assert.Equal(t, expectedTestCase, result)
+	mockFileReader.AssertExpectations(t)
+	mockHTTPRequestParser.AssertExpectations(t)
 }
 
 func TestDescription(t *testing.T) {
@@ -205,30 +201,41 @@ func TestDescription(t *testing.T) {
 		"```",
 	}
 
-	req, _ := httpreqparser.New().Parse(`POST /some-path HTTP/1.0
+	mockFileReader := new(reader.MockFileReader)
+	mockFileReader.On("Read", "mock_file").Return(lines, nil)
+
+	mockHTTPRequestParser := new(httphelper.MockHTTPRequestParser)
+
+	mockLogger := new(logger.MockLogger)
+
+	mockExecutableParser := new(executable.MockExecutableParser)
+
+	options := &testcase.ParserOptions{
+		Configurator:     config,
+		FileReader:       mockFileReader,
+		RequestParser:    mockHTTPRequestParser,
+		Logger:           mockLogger,
+		ExecutableParser: mockExecutableParser,
+	}
+
+	testcaseOptions := &testcase.TestCaseOptions{
+		Logger:        mockLogger,
+		RequestParser: mockHTTPRequestParser,
+	}
+	expectedRawRequest := `POST /some-path HTTP/1.0
 Host: url
 
 post
-body`)
-	expectedReq, _ := request.New(req)
+body`
+	expectedTestCase := testcase.New("Title", "Wonderful\nworld", expectedRawRequest, testcaseOptions)
 
-	reader := new(MockFileReader)
-	reader.On("Read", "mock_file").Return(lines, nil)
-
-	reqParser := new(MockRequestParser)
-	reqParser.On("Parse", "POST /some-path HTTP/1.0\nHost: url\n\npost\nbody").Return(req, nil)
-
-	parser := testcase.NewParser(config, reader, reqParser)
+	parser := testcase.NewParser(options)
 	result, err := parser.FromMarkdownFile("mock_file")
 
 	assert.NoError(t, err)
-	assert.Equal(t, &testcase.TestCase{
-		Title:       "Title",
-		Description: "Wonderful\nworld",
-		Request:     expectedReq,
-	}, result)
-	reader.AssertExpectations(t)
-	reqParser.AssertExpectations(t)
+	assert.Equal(t, expectedTestCase, result)
+	mockFileReader.AssertExpectations(t)
+	mockHTTPRequestParser.AssertExpectations(t)
 }
 
 func TestDescriptionAtOtherH1(t *testing.T) {
@@ -255,30 +262,41 @@ func TestDescriptionAtOtherH1(t *testing.T) {
 		"```",
 	}
 
-	req, _ := httpreqparser.New().Parse(`POST /some-path HTTP/1.0
+	mockFileReader := new(reader.MockFileReader)
+	mockFileReader.On("Read", "mock_file").Return(lines, nil)
+
+	mockHTTPRequestParser := new(httphelper.MockHTTPRequestParser)
+
+	mockLogger := new(logger.MockLogger)
+
+	mockExecutableParser := new(executable.MockExecutableParser)
+
+	options := &testcase.ParserOptions{
+		Configurator:     config,
+		FileReader:       mockFileReader,
+		RequestParser:    mockHTTPRequestParser,
+		Logger:           mockLogger,
+		ExecutableParser: mockExecutableParser,
+	}
+
+	testcaseOptions := &testcase.TestCaseOptions{
+		Logger:        mockLogger,
+		RequestParser: mockHTTPRequestParser,
+	}
+	expectedRawRequest := `POST /some-path HTTP/1.0
 Host: url
 
 post
-body`)
-	expectedReq, _ := request.New(req)
+body`
+	expectedTestCase := testcase.New("Title", "Wonderful", expectedRawRequest, testcaseOptions)
 
-	reader := new(MockFileReader)
-	reader.On("Read", "mock_file").Return(lines, nil)
-
-	reqParser := new(MockRequestParser)
-	reqParser.On("Parse", "POST /some-path HTTP/1.0\nHost: url\n\npost\nbody").Return(req, nil)
-
-	parser := testcase.NewParser(config, reader, reqParser)
+	parser := testcase.NewParser(options)
 	result, err := parser.FromMarkdownFile("mock_file")
 
 	assert.NoError(t, err)
-	assert.Equal(t, &testcase.TestCase{
-		Title:       "Title",
-		Description: "Wonderful",
-		Request:     expectedReq,
-	}, result)
-	reader.AssertExpectations(t)
-	reqParser.AssertExpectations(t)
+	assert.Equal(t, expectedTestCase, result)
+	mockFileReader.AssertExpectations(t)
+	mockHTTPRequestParser.AssertExpectations(t)
 }
 
 func TestGetHTTPRequestWithoutTitle(t *testing.T) {
@@ -296,28 +314,41 @@ func TestGetHTTPRequestWithoutTitle(t *testing.T) {
 		"```",
 	}
 
-	req, _ := httpreqparser.New().Parse(`POST /some-path HTTP/1.0
+	mockFileReader := new(reader.MockFileReader)
+	mockFileReader.On("Read", "mock_file").Return(lines, nil)
+
+	mockHTTPRequestParser := new(httphelper.MockHTTPRequestParser)
+
+	mockLogger := new(logger.MockLogger)
+
+	mockExecutableParser := new(executable.MockExecutableParser)
+
+	options := &testcase.ParserOptions{
+		Configurator:     config,
+		FileReader:       mockFileReader,
+		RequestParser:    mockHTTPRequestParser,
+		Logger:           mockLogger,
+		ExecutableParser: mockExecutableParser,
+	}
+
+	testcaseOptions := &testcase.TestCaseOptions{
+		Logger:        mockLogger,
+		RequestParser: mockHTTPRequestParser,
+	}
+	expectedRawRequest := `POST /some-path HTTP/1.0
 Host: url
 
 post
-body`)
-	expectedRequest, _ := request.New(req)
+body`
+	expectedTestCase := testcase.New("", "", expectedRawRequest, testcaseOptions)
 
-	reader := new(MockFileReader)
-	reader.On("Read", "mock_file").Return(lines, nil)
-
-	reqParser := new(MockRequestParser)
-	reqParser.On("Parse", "POST /some-path HTTP/1.0\nHost: url\n\npost\nbody").Return(req, nil)
-
-	parser := testcase.NewParser(config, reader, reqParser)
+	parser := testcase.NewParser(options)
 	result, err := parser.FromMarkdownFile("mock_file")
 
 	assert.NoError(t, err)
-	assert.Equal(t, &testcase.TestCase{
-		Request: expectedRequest,
-	}, result)
-	reader.AssertExpectations(t)
-	reqParser.AssertExpectations(t)
+	assert.Equal(t, expectedTestCase, result)
+	mockFileReader.AssertExpectations(t)
+	mockHTTPRequestParser.AssertExpectations(t)
 }
 
 func TestGetHTTPRequestFromThreeTildedCodeBlock(t *testing.T) {
@@ -335,28 +366,41 @@ func TestGetHTTPRequestFromThreeTildedCodeBlock(t *testing.T) {
 		"~~~",
 	}
 
-	req, _ := httpreqparser.New().Parse(`POST /some-path HTTP/1.0
+	mockFileReader := new(reader.MockFileReader)
+	mockFileReader.On("Read", "mock_file").Return(lines, nil)
+
+	mockHTTPRequestParser := new(httphelper.MockHTTPRequestParser)
+
+	mockLogger := new(logger.MockLogger)
+
+	mockExecutableParser := new(executable.MockExecutableParser)
+
+	options := &testcase.ParserOptions{
+		Configurator:     config,
+		FileReader:       mockFileReader,
+		RequestParser:    mockHTTPRequestParser,
+		Logger:           mockLogger,
+		ExecutableParser: mockExecutableParser,
+	}
+
+	testcaseOptions := &testcase.TestCaseOptions{
+		Logger:        mockLogger,
+		RequestParser: mockHTTPRequestParser,
+	}
+	expectedRawRequest := `POST /some-path HTTP/1.0
 Host: url
 
 post
-body`)
-	expectedRequest, _ := request.New(req)
+body`
+	expectedTestCase := testcase.New("", "", expectedRawRequest, testcaseOptions)
 
-	reader := new(MockFileReader)
-	reader.On("Read", "mock_file").Return(lines, nil)
-
-	reqParser := new(MockRequestParser)
-	reqParser.On("Parse", "POST /some-path HTTP/1.0\nHost: url\n\npost\nbody").Return(req, nil)
-
-	parser := testcase.NewParser(config, reader, reqParser)
+	parser := testcase.NewParser(options)
 	result, err := parser.FromMarkdownFile("mock_file")
 
 	assert.NoError(t, err)
-	assert.Equal(t, &testcase.TestCase{
-		Request: expectedRequest,
-	}, result)
-	reader.AssertExpectations(t)
-	reqParser.AssertExpectations(t)
+	assert.Equal(t, expectedTestCase, result)
+	mockFileReader.AssertExpectations(t)
+	mockHTTPRequestParser.AssertExpectations(t)
 }
 
 func TestDiscardHTTPRequestInNonHTTPCodeBlock(t *testing.T) {
@@ -374,18 +418,30 @@ func TestDiscardHTTPRequestInNonHTTPCodeBlock(t *testing.T) {
 		"```",
 	}
 
-	reader := new(MockFileReader)
-	reader.On("Read", "mock_file").Return(lines, nil)
+	mockFileReader := new(reader.MockFileReader)
+	mockFileReader.On("Read", "mock_file").Return(lines, nil)
 
-	reqParser := new(MockRequestParser)
+	mockHTTPRequestParser := new(httphelper.MockHTTPRequestParser)
 
-	parser := testcase.NewParser(config, reader, reqParser)
+	mockLogger := new(logger.MockLogger)
+
+	mockExecutableParser := new(executable.MockExecutableParser)
+
+	options := &testcase.ParserOptions{
+		Configurator:     config,
+		FileReader:       mockFileReader,
+		RequestParser:    mockHTTPRequestParser,
+		Logger:           mockLogger,
+		ExecutableParser: mockExecutableParser,
+	}
+
+	parser := testcase.NewParser(options)
 	result, err := parser.FromMarkdownFile("mock_file")
 
 	assert.Error(t, err)
 	assert.Nil(t, result)
-	reader.AssertExpectations(t)
-	reqParser.AssertNotCalled(t, "Parse")
+	mockFileReader.AssertExpectations(t)
+	mockHTTPRequestParser.AssertNotCalled(t, "Parse")
 }
 
 func TestGetHTTPRequestInOtherHTTPCodeBlock(t *testing.T) {
@@ -411,28 +467,41 @@ func TestGetHTTPRequestInOtherHTTPCodeBlock(t *testing.T) {
 		"```",
 	}
 
-	req, _ := httpreqparser.New().Parse(`POST /some-path HTTP/1.0
+	mockFileReader := new(reader.MockFileReader)
+	mockFileReader.On("Read", "mock_file").Return(lines, nil)
+
+	mockHTTPRequestParser := new(httphelper.MockHTTPRequestParser)
+
+	mockLogger := new(logger.MockLogger)
+
+	mockExecutableParser := new(executable.MockExecutableParser)
+
+	options := &testcase.ParserOptions{
+		Configurator:     config,
+		FileReader:       mockFileReader,
+		RequestParser:    mockHTTPRequestParser,
+		Logger:           mockLogger,
+		ExecutableParser: mockExecutableParser,
+	}
+
+	testcaseOptions := &testcase.TestCaseOptions{
+		Logger:        mockLogger,
+		RequestParser: mockHTTPRequestParser,
+	}
+	expectedRawRequest := `POST /some-path HTTP/1.0
 Host: url
 
 post
-body`)
-	expectedRequest, _ := request.New(req)
+body`
+	expectedTestCase := testcase.New("", "", expectedRawRequest, testcaseOptions)
 
-	reader := new(MockFileReader)
-	reader.On("Read", "mock_file").Return(lines, nil)
-
-	reqParser := new(MockRequestParser)
-	reqParser.On("Parse", "POST /some-path HTTP/1.0\nHost: url\n\npost\nbody").Return(req, nil)
-
-	parser := testcase.NewParser(config, reader, reqParser)
+	parser := testcase.NewParser(options)
 	result, err := parser.FromMarkdownFile("mock_file")
 
 	assert.NoError(t, err)
-	assert.Equal(t, &testcase.TestCase{
-		Request: expectedRequest,
-	}, result)
-	reader.AssertExpectations(t)
-	reqParser.AssertExpectations(t)
+	assert.Equal(t, expectedTestCase, result)
+	mockFileReader.AssertExpectations(t)
+	mockHTTPRequestParser.AssertExpectations(t)
 }
 
 func TestGetHTTPRequestInMixedHTTPCodeBlock(t *testing.T) {
@@ -466,28 +535,41 @@ func TestGetHTTPRequestInMixedHTTPCodeBlock(t *testing.T) {
 		"```",
 	}
 
-	req, _ := httpreqparser.New().Parse(`POST /some-path HTTP/1.0
+	mockFileReader := new(reader.MockFileReader)
+	mockFileReader.On("Read", "mock_file").Return(lines, nil)
+
+	mockHTTPRequestParser := new(httphelper.MockHTTPRequestParser)
+
+	mockLogger := new(logger.MockLogger)
+
+	mockExecutableParser := new(executable.MockExecutableParser)
+
+	options := &testcase.ParserOptions{
+		Configurator:     config,
+		FileReader:       mockFileReader,
+		RequestParser:    mockHTTPRequestParser,
+		Logger:           mockLogger,
+		ExecutableParser: mockExecutableParser,
+	}
+
+	testcaseOptions := &testcase.TestCaseOptions{
+		Logger:        mockLogger,
+		RequestParser: mockHTTPRequestParser,
+	}
+	expectedRawRequest := `POST /some-path HTTP/1.0
 Host: url
 
 post
-body`)
-	expectedRequest, _ := request.New(req)
+body`
+	expectedTestCase := testcase.New("", "", expectedRawRequest, testcaseOptions)
 
-	reader := new(MockFileReader)
-	reader.On("Read", "mock_file").Return(lines, nil)
-
-	reqParser := new(MockRequestParser)
-	reqParser.On("Parse", "POST /some-path HTTP/1.0\nHost: url\n\npost\nbody").Return(req, nil)
-
-	parser := testcase.NewParser(config, reader, reqParser)
+	parser := testcase.NewParser(options)
 	result, err := parser.FromMarkdownFile("mock_file")
 
 	assert.NoError(t, err)
-	assert.Equal(t, &testcase.TestCase{
-		Request: expectedRequest,
-	}, result)
-	reader.AssertExpectations(t)
-	reqParser.AssertExpectations(t)
+	assert.Equal(t, expectedTestCase, result)
+	mockFileReader.AssertExpectations(t)
+	mockHTTPRequestParser.AssertExpectations(t)
 }
 
 func TestGetHTTPRequestInOnlyFirstHTTPCodeBlock(t *testing.T) {
@@ -512,28 +594,41 @@ func TestGetHTTPRequestInOnlyFirstHTTPCodeBlock(t *testing.T) {
 		"body",
 		"```",
 	}
-	req, _ := httpreqparser.New().Parse(`POST /this-should-be-collected HTTP/1.0
+	mockFileReader := new(reader.MockFileReader)
+	mockFileReader.On("Read", "mock_file").Return(lines, nil)
+
+	mockHTTPRequestParser := new(httphelper.MockHTTPRequestParser)
+
+	mockLogger := new(logger.MockLogger)
+
+	mockExecutableParser := new(executable.MockExecutableParser)
+
+	options := &testcase.ParserOptions{
+		Configurator:     config,
+		FileReader:       mockFileReader,
+		RequestParser:    mockHTTPRequestParser,
+		Logger:           mockLogger,
+		ExecutableParser: mockExecutableParser,
+	}
+
+	testcaseOptions := &testcase.TestCaseOptions{
+		Logger:        mockLogger,
+		RequestParser: mockHTTPRequestParser,
+	}
+	expectedRawRequest := `POST /this-should-be-collected HTTP/1.0
 Host: url
 
 post
-body`)
-	expectedRequest, _ := request.New(req)
+body`
+	expectedTestCase := testcase.New("", "", expectedRawRequest, testcaseOptions)
 
-	reader := new(MockFileReader)
-	reader.On("Read", "mock_file").Return(lines, nil)
-
-	reqParser := new(MockRequestParser)
-	reqParser.On("Parse", "POST /this-should-be-collected HTTP/1.0\nHost: url\n\npost\nbody").Return(req, nil)
-
-	parser := testcase.NewParser(config, reader, reqParser)
+	parser := testcase.NewParser(options)
 	result, err := parser.FromMarkdownFile("mock_file")
 
 	assert.NoError(t, err)
-	assert.Equal(t, &testcase.TestCase{
-		Request: expectedRequest,
-	}, result)
-	reader.AssertExpectations(t)
-	reqParser.AssertExpectations(t)
+	assert.Equal(t, expectedTestCase, result)
+	mockFileReader.AssertExpectations(t)
+	mockHTTPRequestParser.AssertExpectations(t)
 }
 
 func TestGetExecutablesBeforeTest(t *testing.T) {
@@ -558,70 +653,118 @@ func TestGetExecutablesBeforeTest(t *testing.T) {
 		"```",
 	}
 
-	beforeLink1Lines := []line.Line{
-		"This is before first step",
-		"```http",
-		"GET /healthcheck HTTP/1.0",
-		"Host: localhost",
-		"```",
+	mockHTTPRequestParser := new(httphelper.MockHTTPRequestParser)
+	mockLogger := new(logger.MockLogger)
+
+	executableOption := &executable.ExecutableOptions{
+		Logger:        mockLogger,
+		RequestParser: mockHTTPRequestParser,
+	}
+	mockSetup1 := executable.New("link to executable", "GET /healthcheck HTTP/1.0\nHost: localhost", executableOption)
+	mockSetup2 := executable.New("link to another executable", "GET /readiness HTTP/1.0\nHost: localhost", executableOption)
+	mockSetup2.AddCapture(capture.New("readiness", "$.readiness.status"))
+
+	mockFileReader := new(reader.MockFileReader)
+	mockFileReader.On("Read", "mock_file").Return(lines, nil)
+
+	mockExecutableParser := new(executable.MockExecutableParser)
+	mockExecutableParser.On("FromMarkdownFile", "link1").Return(mockSetup1, nil)
+	mockExecutableParser.On("FromMarkdownFile", "link2").Return(mockSetup2, nil)
+
+	options := &testcase.ParserOptions{
+		Configurator:     config,
+		FileReader:       mockFileReader,
+		RequestParser:    mockHTTPRequestParser,
+		Logger:           mockLogger,
+		ExecutableParser: mockExecutableParser,
 	}
 
-	beforeLink2Lines := []line.Line{
-		"This is before second step",
-		"```http",
-		"GET /readiness HTTP/1.0",
-		"Host: localhost",
-		"```",
-		"# Capture part",
-		"* readiness:`$.readiness.status`",
+	testcaseOptions := &testcase.TestCaseOptions{
+		Logger:        mockLogger,
+		RequestParser: mockHTTPRequestParser,
 	}
-
-	reader := new(MockFileReader)
-	reader.On("Read", "mock_file").Return(lines, nil)
-	reader.On("Read", "link1").Return(beforeLink1Lines, nil)
-	reader.On("Read", "link2").Return(beforeLink2Lines, nil)
-
-	beforeReq1, _ := httpreqparser.New().Parse(`GET /healthcheck HTTP/1.0
-Host: localhost`)
-	expectedBefore1, _ := request.New(beforeReq1)
-	beforeReq2, _ := httpreqparser.New().Parse(`GET /readiness HTTP/1.0
-Host: localhost`)
-	expectedBefore2, _ := request.New(beforeReq2)
-	req, _ := httpreqparser.New().Parse(`POST /some-path HTTP/1.0
+	expectedRawRequest := `POST /some-path HTTP/1.0
 Host: url
 
 post
-body`)
-	expectedRequest, _ := request.New(req)
+body`
+	expectedTestCase := testcase.New("", "", expectedRawRequest, testcaseOptions)
+	expectedTestCase.AddSetup(mockSetup1)
+	expectedTestCase.AddSetup(mockSetup2)
 
-	reqParser := new(MockRequestParser)
-	reqParser.On("Parse", "POST /some-path HTTP/1.0\nHost: url\n\npost\nbody").Return(req, nil)
-	reqParser.On("Parse", "GET /healthcheck HTTP/1.0\nHost: localhost").Return(beforeReq1, nil)
-	reqParser.On("Parse", "GET /readiness HTTP/1.0\nHost: localhost").Return(beforeReq2, nil)
-
-	parser := testcase.NewParser(config, reader, reqParser)
+	parser := testcase.NewParser(options)
 	result, err := parser.FromMarkdownFile("mock_file")
 
 	assert.NoError(t, err)
-	assert.Equal(t, &testcase.TestCase{
-		Request: expectedRequest,
-		Setups: []*executable.Executable{
-			{
-				Title:   "link to executable",
-				Request: expectedBefore1,
-			},
-			{
-				Title:   "link to another executable",
-				Request: expectedBefore2,
-				Captures: []*capture.Capture{
-					{
-						Name:     "readiness",
-						Selector: "$.readiness.status",
-					},
-				},
-			},
-		},
-	}, result)
+	assert.Equal(t, expectedTestCase, result)
+}
+
+func TestGetExecutablesAfterTest(t *testing.T) {
+	config := &config.Config{
+		RootDir: "",
+	}
+
+	lines := []line.Line{
+		"## Method under test",
+		"",
+		"```http",
+		"POST /some-path HTTP/1.0",
+		"Host: url",
+		"",
+		"post",
+		"body",
+		"```",
+		"",
+		"## After",
+		"",
+		"* [link to executable](link1)",
+		"* [link to another executable](link2)",
+	}
+
+	mockHTTPRequestParser := new(httphelper.MockHTTPRequestParser)
+	mockLogger := new(logger.MockLogger)
+
+	executableOption := &executable.ExecutableOptions{
+		Logger:        mockLogger,
+		RequestParser: mockHTTPRequestParser,
+	}
+	mockTeardown1 := executable.New("link to executable", "GET /healthcheck HTTP/1.0\nHost: localhost", executableOption)
+	mockTeardown2 := executable.New("link to another executable", "GET /readiness HTTP/1.0\nHost: localhost", executableOption)
+	mockTeardown2.AddCapture(capture.New("readiness", "$.readiness.status"))
+
+	mockFileReader := new(reader.MockFileReader)
+	mockFileReader.On("Read", "mock_file").Return(lines, nil)
+
+	mockExecutableParser := new(executable.MockExecutableParser)
+	mockExecutableParser.On("FromMarkdownFile", "link1").Return(mockTeardown1, nil)
+	mockExecutableParser.On("FromMarkdownFile", "link2").Return(mockTeardown2, nil)
+
+	options := &testcase.ParserOptions{
+		Configurator:     config,
+		FileReader:       mockFileReader,
+		RequestParser:    mockHTTPRequestParser,
+		Logger:           mockLogger,
+		ExecutableParser: mockExecutableParser,
+	}
+
+	testcaseOptions := &testcase.TestCaseOptions{
+		Logger:        mockLogger,
+		RequestParser: mockHTTPRequestParser,
+	}
+	expectedRawRequest := `POST /some-path HTTP/1.0
+Host: url
+
+post
+body`
+	expectedTestCase := testcase.New("", "", expectedRawRequest, testcaseOptions)
+	expectedTestCase.AddTeardown(mockTeardown1)
+	expectedTestCase.AddTeardown(mockTeardown2)
+
+	parser := testcase.NewParser(options)
+	result, err := parser.FromMarkdownFile("mock_file")
+
+	assert.NoError(t, err)
+	assert.Equal(t, expectedTestCase, result)
 }
 
 func TestGetCapturesInTestcase(t *testing.T) {
@@ -632,7 +775,7 @@ func TestGetCapturesInTestcase(t *testing.T) {
 	lines := []line.Line{
 		"```http",
 		"POST /this-should-be-collected HTTP/1.0",
-		"Host: localhost",
+		"Host: url",
 		"",
 		"post",
 		"body",
@@ -641,32 +784,40 @@ func TestGetCapturesInTestcase(t *testing.T) {
 		"* varname:`$.result`",
 	}
 
-	req, _ := httpreqparser.New().Parse(`POST /this-should-be-collected HTTP/1.0
-Host: localhost
+	mockFileReader := new(reader.MockFileReader)
+	mockFileReader.On("Read", "mock_file").Return(lines, nil)
+
+	mockHTTPRequestParser := new(httphelper.MockHTTPRequestParser)
+
+	mockLogger := new(logger.MockLogger)
+
+	mockExecutableParser := new(executable.MockExecutableParser)
+
+	options := &testcase.ParserOptions{
+		Configurator:     config,
+		FileReader:       mockFileReader,
+		RequestParser:    mockHTTPRequestParser,
+		Logger:           mockLogger,
+		ExecutableParser: mockExecutableParser,
+	}
+
+	testcaseOptions := &testcase.TestCaseOptions{
+		Logger:        mockLogger,
+		RequestParser: mockHTTPRequestParser,
+	}
+	expectedRawRequest := `POST /this-should-be-collected HTTP/1.0
+Host: url
 
 post
-body`)
-	expectedRequest, _ := request.New(req)
+body`
+	expectedTestCase := testcase.New("", "", expectedRawRequest, testcaseOptions)
+	expectedTestCase.AddCapture(capture.New("varname", "$.result"))
 
-	reader := new(MockFileReader)
-	reader.On("Read", "mock_file").Return(lines, nil)
-
-	reqParser := new(MockRequestParser)
-	reqParser.On("Parse", "POST /this-should-be-collected HTTP/1.0\nHost: localhost\n\npost\nbody").Return(req, nil)
-
-	parser := testcase.NewParser(config, reader, reqParser)
+	parser := testcase.NewParser(options)
 	result, err := parser.FromMarkdownFile("mock_file")
 
 	assert.NoError(t, err)
-	assert.Equal(t, &testcase.TestCase{
-		Request: expectedRequest,
-		Captures: []*capture.Capture{
-			{
-				Name:     "varname",
-				Selector: "$.result",
-			},
-		},
-	}, result)
+	assert.Equal(t, expectedTestCase, result)
 
 }
 
@@ -688,38 +839,40 @@ func TestGetAssertion(t *testing.T) {
 		"* `$.var2`==`\"good.vibe\"`",
 	}
 
-	req, _ := httpreqparser.New().Parse(`POST /this-should-be-collected HTTP/1.0
+	mockFileReader := new(reader.MockFileReader)
+	mockFileReader.On("Read", "mock_file").Return(lines, nil)
+
+	mockHTTPRequestParser := new(httphelper.MockHTTPRequestParser)
+
+	mockLogger := new(logger.MockLogger)
+
+	mockExecutableParser := new(executable.MockExecutableParser)
+
+	options := &testcase.ParserOptions{
+		Configurator:     config,
+		FileReader:       mockFileReader,
+		RequestParser:    mockHTTPRequestParser,
+		Logger:           mockLogger,
+		ExecutableParser: mockExecutableParser,
+	}
+
+	testcaseOptions := &testcase.TestCaseOptions{
+		Logger:        mockLogger,
+		RequestParser: mockHTTPRequestParser,
+	}
+	expectedRawRequest := `POST /this-should-be-collected HTTP/1.0
 Host: url
 
 post
-body`)
-	expectedRequest, _ := request.New(req)
+body`
+	eqOp, _ := assertion.NewOp("==")
+	expectedTestCase := testcase.New("", "", expectedRawRequest, testcaseOptions)
+	expectedTestCase.AddAssertion(assertion.New("$.var", eqOp, float64(3)))
+	expectedTestCase.AddAssertion(assertion.New("$.var2", eqOp, "good.vibe"))
 
-	expectedAssertions := []*assertion.Assertion{
-		{
-			Selector: "$.var",
-			Value:    float64(3),
-			Operator: mo.NewEither3Arg3[assertion.UndefinedOperator, assertion.UnaryAssertionOperator, assertion.BinaryAssertionOperator](&assertion.EqAssertion{}),
-		},
-		{
-			Selector: "$.var2",
-			Value:    "good.vibe",
-			Operator: mo.NewEither3Arg3[assertion.UndefinedOperator, assertion.UnaryAssertionOperator, assertion.BinaryAssertionOperator](&assertion.EqAssertion{}),
-		},
-	}
-
-	reader := new(MockFileReader)
-	reader.On("Read", "mock_file").Return(lines, nil)
-
-	reqParser := new(MockRequestParser)
-	reqParser.On("Parse", "POST /this-should-be-collected HTTP/1.0\nHost: url\n\npost\nbody").Return(req, nil)
-
-	parser := testcase.NewParser(config, reader, reqParser)
+	parser := testcase.NewParser(options)
 	result, err := parser.FromMarkdownFile("mock_file")
 
 	assert.NoError(t, err)
-	assert.Equal(t, &testcase.TestCase{
-		Request:    expectedRequest,
-		Assertions: expectedAssertions,
-	}, result)
+	assert.Equal(t, expectedTestCase, result)
 }

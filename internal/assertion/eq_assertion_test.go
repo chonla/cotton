@@ -2,7 +2,7 @@ package assertion_test
 
 import (
 	"cotton/internal/assertion"
-	"cotton/internal/response"
+	"cotton/internal/value"
 	"errors"
 	"regexp"
 	"testing"
@@ -11,11 +11,7 @@ import (
 )
 
 func TestEqualAssertionWithSameValue(t *testing.T) {
-	actual := &response.DataValue{
-		Value:       "10",
-		TypeName:    "string",
-		IsUndefined: false,
-	}
+	actual := value.New("10")
 	expected := "10"
 
 	op := assertion.EqAssertion{}
@@ -27,11 +23,7 @@ func TestEqualAssertionWithSameValue(t *testing.T) {
 }
 
 func TestEqualAssertionWithDifferentType(t *testing.T) {
-	actual := &response.DataValue{
-		Value:       3,
-		TypeName:    "int",
-		IsUndefined: false,
-	}
+	actual := value.New(3)
 	expected := "3"
 
 	op := assertion.EqAssertion{}
@@ -43,11 +35,7 @@ func TestEqualAssertionWithDifferentType(t *testing.T) {
 }
 
 func TestEqualAssertionWithDifferentValue(t *testing.T) {
-	actual := &response.DataValue{
-		Value:       "3",
-		TypeName:    "string",
-		IsUndefined: false,
-	}
+	actual := value.New("3")
 	expected := "10"
 
 	op := assertion.EqAssertion{}
@@ -59,11 +47,7 @@ func TestEqualAssertionWithDifferentValue(t *testing.T) {
 }
 
 func TestEqualAssertionWithUndefinedValue(t *testing.T) {
-	actual := &response.DataValue{
-		Value:       nil,
-		TypeName:    "",
-		IsUndefined: true,
-	}
+	actual := value.NewUndefined()
 	expected := "10"
 
 	op := assertion.EqAssertion{}
@@ -75,11 +59,7 @@ func TestEqualAssertionWithUndefinedValue(t *testing.T) {
 }
 
 func TestEqualAssertionWithRegexMatchValue(t *testing.T) {
-	actual := &response.DataValue{
-		Value:       "108271X",
-		TypeName:    "string",
-		IsUndefined: false,
-	}
+	actual := value.New("108271X")
 	expected, _ := regexp.Compile("^10")
 
 	op := assertion.EqAssertion{}
@@ -91,11 +71,7 @@ func TestEqualAssertionWithRegexMatchValue(t *testing.T) {
 }
 
 func TestEqualAssertionWithRegexUnmatchValue(t *testing.T) {
-	actual := &response.DataValue{
-		Value:       "108271X",
-		TypeName:    "string",
-		IsUndefined: false,
-	}
+	actual := value.New("108271X")
 	expected, _ := regexp.Compile("^11")
 
 	op := assertion.EqAssertion{}
@@ -107,11 +83,7 @@ func TestEqualAssertionWithRegexUnmatchValue(t *testing.T) {
 }
 
 func TestEqualAssertionWithRegexAgainstNonString(t *testing.T) {
-	actual := &response.DataValue{
-		Value:       10827,
-		TypeName:    "int",
-		IsUndefined: false,
-	}
+	actual := value.New(10827)
 	expected, _ := regexp.Compile("^10")
 
 	op := assertion.EqAssertion{}

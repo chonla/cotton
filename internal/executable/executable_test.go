@@ -3,86 +3,106 @@ package executable_test
 import (
 	"cotton/internal/capture"
 	"cotton/internal/executable"
+	"cotton/internal/httphelper"
 	"cotton/internal/logger"
-	"cotton/internal/request"
-	"cotton/internal/response"
+	"cotton/internal/value"
 	"cotton/internal/variable"
-	"net/http"
-	"net/http/httptest"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 )
 
-type MockHTTPRequest struct {
-	mock.Mock
+func TestNewReturnEmptyExecutable(t *testing.T) {
+	mockReqParser := new(httphelper.MockHTTPRequestParser)
+	mockLogger := new(logger.MockLogger)
+
+	options := &executable.ExecutableOptions{
+		RequestParser: mockReqParser,
+		Logger:        mockLogger,
+	}
+
+	result := executable.New("title", "req", options)
+
+	assert.Equal(t, "title", result.Title())
+	assert.Equal(t, "req", result.RawRequest())
+	assert.Equal(t, []*capture.Capture{}, result.Captures())
 }
 
-func (m *MockHTTPRequest) Similar(anotherRequest request.Request) bool {
-	margs := m.Called(anotherRequest)
-	return margs.Bool(0)
+func TestAddCaptures(t *testing.T) {
+	mockReqParser := new(httphelper.MockHTTPRequestParser)
+	mockLogger := new(logger.MockLogger)
+
+	options := &executable.ExecutableOptions{
+		RequestParser: mockReqParser,
+		Logger:        mockLogger,
+	}
+
+	ex := executable.New("title", "req", options)
+	ex.AddCapture(capture.New("key", "value"))
+
+	result := ex.Captures()
+
+	assert.Equal(t, 1, len(result))
+	assert.Equal(t, "key", result[0].Name)
+	assert.Equal(t, "value", result[0].Selector)
 }
 
-func (m *MockHTTPRequest) Data() []byte {
-	margs := m.Called()
-	return margs.Get(0).([]byte)
-}
+func TestEditCapturesShouldNotMutateTheOriginalCaptures(t *testing.T) {
+	mockReqParser := new(httphelper.MockHTTPRequestParser)
+	mockLogger := new(logger.MockLogger)
 
-func (m *MockHTTPRequest) Do() (*http.Response, error) {
-	margs := m.Called()
-	return margs.Get(0).(*http.Response), margs.Error(1)
-}
+	options := &executable.ExecutableOptions{
+		RequestParser: mockReqParser,
+		Logger:        mockLogger,
+	}
 
-func (m *MockHTTPRequest) String() string {
-	margs := m.Called()
-	return margs.String(0)
+	ex := executable.New("title", "req", options)
+	ex.AddCapture(capture.New("key", "value"))
+
+	captures := ex.Captures()
+	captures[0].Name = "key1"
+	captures[0].Selector = "value1"
+
+	result := ex.Captures()
+
+	assert.NotEqual(t, result[0].Name, captures[0].Name)
+	assert.NotEqual(t, result[0].Selector, captures[0].Selector)
 }
 
 func TestParsingCaptureFromResponse(t *testing.T) {
-	recorder := httptest.NewRecorder()
-	recorder.Body.WriteString(`{"form":{"key1":"val1","key2":"val2"}}`)
-	recorder.Code = 200
-	recorder.Header().Add("Content-Length", "15")
-	recorder.Header().Add("Content-Type", "application/json")
-	recorder.Flush()
+	reqRaw := "GET http://localhost/path HTTP/1.1"
+	respRaw := `HTTP/1.1 200 OK
+Content-Length: 38
+Content-Type: application/json
 
-	resp := recorder.Result()
+{"form":{"key1":"val1","key2":"val2"}}`
 
-	reqMock := new(MockHTTPRequest)
-	reqMock.On("Do").Return(resp, nil)
+	mockHTTPResponse, _ := (&httphelper.HTTPResponseParser{}).Parse(respRaw)
 
-	ex := &executable.Executable{
-		Title:   "test",
-		Request: reqMock,
-		Captures: []*capture.Capture{
-			{
-				Name:     "var1",
-				Selector: "Body.form.key1",
-			},
-			{
-				Name:     "var2",
-				Selector: "Body.form.key2",
-			},
-		},
+	mockHTTPRequest := new(httphelper.MockHTTPRequest)
+	mockHTTPRequest.On("Do").Return(mockHTTPResponse, nil)
+
+	mockReqParser := new(httphelper.MockHTTPRequestParser)
+	mockReqParser.On("Parse", reqRaw).Return(mockHTTPRequest, nil)
+
+	expectedCapturedVariables := variable.New()
+	expectedCapturedVariables.Set("var1", value.New("val1"))
+	expectedCapturedVariables.Set("var2", value.New("val2"))
+
+	mockLogger := new(logger.MockLogger)
+
+	options := &executable.ExecutableOptions{
+		RequestParser: mockReqParser,
+		Logger:        mockLogger,
 	}
 
-	expectedVariables := variable.New()
-	expectedVariables.Set("var1", &response.DataValue{
-		Value:       "val1",
-		TypeName:    "string",
-		IsUndefined: false,
-	})
-	expectedVariables.Set("var2", &response.DataValue{
-		Value:       "val2",
-		TypeName:    "string",
-		IsUndefined: false,
-	})
+	ex := executable.New("test", reqRaw, options)
+	ex.AddCapture(capture.New("var1", "Body.form.key1"))
+	ex.AddCapture(capture.New("var2", "Body.form.key2"))
 
-	log := logger.NewNilLogger(true)
-
-	result, err := ex.Execute(variable.New(), log)
+	initialVars := variable.New()
+	result, err := ex.Execute(initialVars)
 
 	assert.NoError(t, err)
-	assert.Equal(t, expectedVariables, result.Variables)
+	assert.Equal(t, expectedCapturedVariables, result.Variables)
 }

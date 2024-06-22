@@ -2,13 +2,14 @@ package main
 
 import (
 	"cotton/internal/config"
+	"cotton/internal/executable"
+	"cotton/internal/httphelper"
 	"cotton/internal/logger"
 	"cotton/internal/reader"
 	"cotton/internal/testcase"
+	"cotton/internal/variable"
 	"fmt"
 	"os"
-
-	"github.com/chonla/httpreqparser"
 )
 
 func main() {
@@ -16,9 +17,28 @@ func main() {
 	config := &config.Config{
 		RootDir: curdir,
 	}
+
+	debug := true
+	log := logger.NewTerminalLogger(debug)
 	reader := reader.New(os.ReadFile)
-	reqParser := httpreqparser.New()
-	parser := testcase.NewParser(config, reader, reqParser)
+	reqParser := &httphelper.HTTPRequestParser{}
+
+	exOptions := &executable.ParserOptions{
+		Configurator:  config,
+		FileReader:    reader,
+		RequestParser: reqParser,
+		Logger:        log,
+	}
+	exParser := executable.NewParser(exOptions)
+
+	tcOptions := &testcase.ParserOptions{
+		Configurator:     config,
+		FileReader:       reader,
+		RequestParser:    reqParser,
+		Logger:           log,
+		ExecutableParser: exParser,
+	}
+	parser := testcase.NewParser(tcOptions)
 
 	tc, err := parser.FromMarkdownFile("<rootDir>/etc/examples/opensource.org/get_copyleft.md")
 	if err != nil {
@@ -26,10 +46,9 @@ func main() {
 		os.Exit(1)
 	}
 
-	debug := true
+	initialVars := variable.New()
 
-	log := logger.NewTerminalLogger(debug)
-	result := tc.Execute(log)
+	result := tc.Execute(initialVars)
 	log.PrintTestResult(result.Passed)
 	log.PrintAssertionResults(result.Assertions)
 }

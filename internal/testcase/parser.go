@@ -5,34 +5,35 @@ import (
 	"cotton/internal/capture"
 	"cotton/internal/config"
 	"cotton/internal/executable"
+	"cotton/internal/httphelper"
 	"cotton/internal/line"
+	"cotton/internal/logger"
 	"cotton/internal/reader"
-	"cotton/internal/request"
-	"net/http"
+	"errors"
 	"strings"
-
-	"github.com/chonla/httpreqparser"
 )
 
-type Parser struct {
-	config           *config.Config
-	fileReader       reader.Reader
-	executableParser *executable.Parser
-	requestParser    httpreqparser.Parser
+type ParserOptions struct {
+	Configurator     *config.Config
+	FileReader       reader.Reader
+	RequestParser    httphelper.RequestParser
+	ExecutableParser executable.Parser
+	Logger           logger.Logger
 }
 
-func NewParser(config *config.Config, fileReader reader.Reader, requestParser httpreqparser.Parser) *Parser {
+type Parser struct {
+	options *ParserOptions
+}
+
+func NewParser(options *ParserOptions) *Parser {
 	return &Parser{
-		config:           config,
-		fileReader:       fileReader,
-		executableParser: executable.NewParser(config, fileReader, requestParser),
-		requestParser:    requestParser,
+		options: options,
 	}
 }
 
 func (p *Parser) FromMarkdownFile(mdFileName string) (*TestCase, error) {
-	mdFullPath := p.config.ResolvePath(mdFileName)
-	lines, err := p.fileReader.Read(mdFullPath)
+	mdFullPath := p.options.Configurator.ResolvePath(mdFileName)
+	lines, err := p.options.FileReader.Read(mdFullPath)
 	if err != nil {
 		return nil, err
 	}
@@ -42,15 +43,19 @@ func (p *Parser) FromMarkdownFile(mdFileName string) (*TestCase, error) {
 func (p *Parser) FromMarkdownLines(mdLines []line.Line) (*TestCase, error) {
 	title := ""
 	description := []string{}
-	var sutReq *http.Request
 	var req []string
 
 	justTitle := false
 	collectingCodeBlockBackTick := false
 	collectingCodeBlockTilde := false
 	titleCollected := false
+	reqRaw := ""
+	captures := []*capture.Capture{}
+	reqFound := false
+	assertions := []*assertion.Assertion{}
+	setups := []*executable.Executable{}
+	teardowns := []*executable.Executable{}
 
-	tc := &TestCase{}
 	for _, mdLine := range mdLines {
 		if cap, ok := mdLine.Capture(`^ {0,3}#\s+(.*)`, 1); ok && !justTitle && !titleCollected {
 			title = cap
@@ -59,13 +64,13 @@ func (p *Parser) FromMarkdownLines(mdLines []line.Line) (*TestCase, error) {
 			continue
 		}
 
-		if mdLine.LookLike("^```http$") && sutReq == nil {
+		if mdLine.LookLike("^```http$") && !reqFound {
 			justTitle = false
 			collectingCodeBlockBackTick = true
 			continue
 		}
 
-		if mdLine.LookLike("^~~~http$") && sutReq == nil {
+		if mdLine.LookLike("^~~~http$") && !reqFound {
 			justTitle = false
 			collectingCodeBlockTilde = true
 			continue
@@ -86,11 +91,8 @@ func (p *Parser) FromMarkdownLines(mdLines []line.Line) (*TestCase, error) {
 				collectingCodeBlockBackTick = false
 
 				if len(req) > 0 {
-					requestString := line.Line(strings.Join(req, "\n")).Value()
-					httpRequest, err := p.requestParser.Parse(requestString)
-					if err == nil {
-						sutReq = httpRequest
-					}
+					reqRaw = line.Line(strings.Join(req, "\n")).Value()
+					reqFound = true
 					req = nil
 				}
 			} else {
@@ -105,11 +107,8 @@ func (p *Parser) FromMarkdownLines(mdLines []line.Line) (*TestCase, error) {
 					collectingCodeBlockTilde = false
 
 					if len(req) > 0 {
-						requestString := line.Line(strings.Join(req, "\n")).Value()
-						httpRequest, err := p.requestParser.Parse(requestString)
-						if err == nil {
-							sutReq = httpRequest
-						}
+						reqRaw = line.Line(strings.Join(req, "\n")).Value()
+						reqFound = true
 						req = nil
 					}
 				} else {
@@ -120,38 +119,26 @@ func (p *Parser) FromMarkdownLines(mdLines []line.Line) (*TestCase, error) {
 				}
 			} else {
 				if cap, ok := capture.Try(mdLine); ok {
-					if tc.Captures == nil {
-						tc.Captures = []*capture.Capture{}
-					}
-					tc.Captures = append(tc.Captures, cap)
+					captures = append(captures, cap)
 				} else {
 					if as, ok := assertion.Try(mdLine); ok {
-						if tc.Assertions == nil {
-							tc.Assertions = []*assertion.Assertion{}
-						}
-						tc.Assertions = append(tc.Assertions, as)
+						assertions = append(assertions, as)
 					} else {
 						if captures, ok := mdLine.CaptureAll(`^\s*\*\s\[([^\]]+)\]\(([^\)]+)\)`); ok {
-							if sutReq == nil {
-								ex, err := p.executableParser.FromMarkdownFile(captures[2])
+							if !reqFound {
+								ex, err := p.options.ExecutableParser.FromMarkdownFile(captures[2])
 								if err != nil {
 									return nil, err
 								}
-								ex.Title = captures[1]
-								if tc.Setups == nil {
-									tc.Setups = []*executable.Executable{}
-								}
-								tc.Setups = append(tc.Setups, ex)
+								ex.SetTitle(captures[1])
+								setups = append(setups, ex)
 							} else {
-								ex, err := p.executableParser.FromMarkdownFile(captures[2])
+								ex, err := p.options.ExecutableParser.FromMarkdownFile(captures[2])
 								if err != nil {
 									return nil, err
 								}
-								ex.Title = captures[1]
-								if tc.Teardowns == nil {
-									tc.Teardowns = []*executable.Executable{}
-								}
-								tc.Teardowns = append(tc.Teardowns, ex)
+								ex.SetTitle(captures[1])
+								teardowns = append(teardowns, ex)
 							}
 						}
 					}
@@ -160,13 +147,27 @@ func (p *Parser) FromMarkdownLines(mdLines []line.Line) (*TestCase, error) {
 		}
 	}
 
-	tc.Title = title
-	tc.Description = line.Line(strings.Join(description, "\n")).Trim().Value()
-	wrappedReq, err := request.New(sutReq)
-	if err != nil {
-		return nil, err
+	if !reqFound {
+		return nil, errors.New("no callable request")
 	}
-	tc.Request = wrappedReq
+
+	options := &TestCaseOptions{
+		RequestParser: p.options.RequestParser,
+		Logger:        p.options.Logger,
+	}
+	tc := New(title, line.Line(strings.Join(description, "\n")).Trim().Value(), reqRaw, options)
+	for _, cap := range captures {
+		tc.AddCapture(cap)
+	}
+	for _, assertion := range assertions {
+		tc.AddAssertion(assertion)
+	}
+	for _, setup := range setups {
+		tc.AddSetup(setup)
+	}
+	for _, teardown := range teardowns {
+		tc.AddTeardown(teardown)
+	}
 
 	return tc, nil
 }

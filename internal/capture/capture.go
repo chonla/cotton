@@ -11,21 +11,29 @@ type Capture struct {
 
 func Try(mdLine line.Line) (*Capture, bool) {
 	if caps, ok := mdLine.CaptureAll(`\s*\*\s+([^:]+)\s*:\s*` + "`([^`]+)`"); ok {
-		return &Capture{
-			Name:     line.Line(caps[1]).Trim().Value(),
-			Selector: caps[2],
-		}, true
+		return New(line.Line(caps[1]).Trim().Value(), caps[2]), true
 	}
 	if caps, ok := mdLine.CaptureAll(`\s*\*\s+([^:]+)\s*:\s*(.+)`); ok {
-		return &Capture{
-			Name:     line.Line(caps[1]).Trim().Value(),
-			Selector: line.Line(caps[2]).Trim().Value(),
-		}, true
+		return New(line.Line(caps[1]).Trim().Value(), line.Line(caps[2]).Trim().Value()), true
 	}
 	return nil, false
+}
+
+func New(name, selector string) *Capture {
+	return &Capture{
+		Name:     name,
+		Selector: selector,
+	}
 }
 
 func (c *Capture) SimilarTo(anotherCapture *Capture) bool {
 	return c.Name == anotherCapture.Name &&
 		c.Selector == anotherCapture.Selector
+}
+
+func (c *Capture) Clone() *Capture {
+	return &Capture{
+		Name:     c.Name,
+		Selector: c.Selector,
+	}
 }

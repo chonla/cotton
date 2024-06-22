@@ -3,46 +3,94 @@ package executable
 import (
 	"cotton/internal/capture"
 	"cotton/internal/execution"
+	"cotton/internal/httphelper"
 	"cotton/internal/logger"
-	"cotton/internal/request"
-	"cotton/internal/response"
 	"cotton/internal/variable"
 	"errors"
 	"slices"
 )
 
-// For setups and teardowns
-type Executable struct {
-	Title   string
-	Request request.Request
-
-	Captures []*capture.Capture
+type ExecutableOptions struct {
+	Logger        logger.Logger
+	RequestParser httphelper.RequestParser
 }
 
-func (ex *Executable) Execute(initialVars *variable.Variables, log logger.Logger) (*execution.Execution, error) {
-	if log == nil {
-		log = logger.NewNilLogger(false)
+// For setups and teardowns
+type Executable struct {
+	options  *ExecutableOptions
+	title    string
+	reqRaw   string
+	captures []*capture.Capture
+
+	// Request httphelper.HTTPRequest
+}
+
+func New(title, reqRaw string, options *ExecutableOptions) *Executable {
+	return &Executable{
+		options:  options,
+		title:    title,
+		reqRaw:   reqRaw,
+		captures: []*capture.Capture{},
+	}
+}
+
+func (ex *Executable) SetTitle(title string) {
+	ex.title = title
+}
+
+func (ex *Executable) Title() string {
+	return ex.title
+}
+
+func (ex *Executable) RawRequest() string {
+	return ex.reqRaw
+}
+
+func (ex *Executable) Captures() []*capture.Capture {
+	// return clone of captures
+	clones := []*capture.Capture{}
+	for _, cap := range ex.captures {
+		clones = append(clones, cap.Clone())
+	}
+	return clones
+}
+
+func (ex *Executable) AddCapture(capture *capture.Capture) {
+	ex.captures = append(ex.captures, capture.Clone())
+}
+
+func (ex *Executable) Clone() *Executable {
+	capturesClone := []*capture.Capture{}
+	for _, cap := range ex.captures {
+		capturesClone = append(capturesClone, cap.Clone())
 	}
 
-	if ex.Request == nil {
-		return nil, errors.New("no request to be made")
+	return &Executable{
+		options:  ex.options,
+		title:    ex.title,
+		reqRaw:   ex.reqRaw,
+		captures: capturesClone,
+	}
+}
+
+func (ex *Executable) Execute(initialVars *variable.Variables) (*execution.Execution, error) {
+	if ex.reqRaw == "" {
+		return nil, errors.New("no callable request")
 	}
 
-	log.Printfln(" * %s", ex.Title)
-
-	r, err := ex.Request.Do()
+	request, err := ex.options.RequestParser.Parse(ex.reqRaw)
 	if err != nil {
 		return nil, err
 	}
-	defer r.Body.Close()
 
-	resp, err := response.New(r)
+	// ex.options.Logger.Printfln(" * %s", ex.Title)
+	resp, err := request.Do()
 	if err != nil {
 		return nil, err
 	}
 
 	vars := variable.New()
-	for _, cap := range ex.Captures {
+	for _, cap := range ex.captures {
 		value, err := resp.ValueOf(cap.Selector)
 		if err != nil {
 			return nil, err
@@ -56,9 +104,9 @@ func (ex *Executable) Execute(initialVars *variable.Variables, log logger.Logger
 }
 
 func (ex *Executable) SimilarTo(anotherEx *Executable) bool {
-	return ex.Title == anotherEx.Title &&
-		slices.EqualFunc(ex.Captures, anotherEx.Captures, func(c1, c2 *capture.Capture) bool {
+	return ex.title == anotherEx.Title() &&
+		ex.reqRaw == anotherEx.RawRequest() &&
+		slices.EqualFunc(ex.captures, anotherEx.Captures(), func(c1, c2 *capture.Capture) bool {
 			return c1.SimilarTo(c2)
-		}) &&
-		ex.Request.Similar(anotherEx.Request)
+		})
 }

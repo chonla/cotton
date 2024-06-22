@@ -1,7 +1,6 @@
 package logger
 
 import (
-	"cotton/internal/line"
 	"cotton/internal/result"
 
 	"fmt"
@@ -62,20 +61,4 @@ func (c *TerminalLogger) PrintAssertionResult(assertionResult result.AssertionRe
 		_, err = fmt.Printf("  %s\n", errMsg)
 	}
 	return err
-}
-
-func (c *TerminalLogger) Print(args ...any) (int, error) {
-	return fmt.Print(args...)
-}
-
-func (c *TerminalLogger) Println(args ...any) (int, error) {
-	return fmt.Println(args...)
-}
-
-func (c *TerminalLogger) Printf(format string, args ...any) (int, error) {
-	return fmt.Printf(format, args...)
-}
-
-func (c *TerminalLogger) Printfln(format string, args ...any) (int, error) {
-	return fmt.Printf(fmt.Sprintf("%s%s", format, line.DetectLineSeparator()), args...)
 }

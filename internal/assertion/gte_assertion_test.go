@@ -2,7 +2,7 @@ package assertion_test
 
 import (
 	"cotton/internal/assertion"
-	"cotton/internal/response"
+	"cotton/internal/value"
 	"errors"
 	"testing"
 
@@ -11,11 +11,7 @@ import (
 
 func TestGreaterThanOrEqualAssertionWithSameDataTypeAndSuccessGreaterThanCase(t *testing.T) {
 	expected := float64(10)
-	actual := &response.DataValue{
-		Value:       float64(11),
-		TypeName:    "float64",
-		IsUndefined: false,
-	}
+	actual := value.New(float64(11))
 
 	op := assertion.GteAssertion{}
 
@@ -27,11 +23,7 @@ func TestGreaterThanOrEqualAssertionWithSameDataTypeAndSuccessGreaterThanCase(t 
 
 func TestGreaterThanOrEqualAssertionWithSameDataTypeAndSuccessEqualCase(t *testing.T) {
 	expected := float64(10)
-	actual := &response.DataValue{
-		Value:       float64(10),
-		TypeName:    "float64",
-		IsUndefined: false,
-	}
+	actual := value.New(float64(10))
 
 	op := assertion.GteAssertion{}
 
@@ -43,11 +35,7 @@ func TestGreaterThanOrEqualAssertionWithSameDataTypeAndSuccessEqualCase(t *testi
 
 func TestGreaterThanOrEqualAssertionWithSameDataTypeAndFail(t *testing.T) {
 	expected := float64(10)
-	actual := &response.DataValue{
-		Value:       float64(9),
-		TypeName:    "float64",
-		IsUndefined: false,
-	}
+	actual := value.New(float64(9))
 
 	op := assertion.GteAssertion{}
 
@@ -59,11 +47,7 @@ func TestGreaterThanOrEqualAssertionWithSameDataTypeAndFail(t *testing.T) {
 
 func TestGreaterThanOrEqualAssertionWithInvalidActualDataType(t *testing.T) {
 	expected := float64(8)
-	actual := &response.DataValue{
-		Value:       "10",
-		TypeName:    "string",
-		IsUndefined: false,
-	}
+	actual := value.New("10")
 
 	op := assertion.GteAssertion{}
 
@@ -75,11 +59,7 @@ func TestGreaterThanOrEqualAssertionWithInvalidActualDataType(t *testing.T) {
 
 func TestGreaterThanOrEqualAssertionWithInvalidExpectedDataType(t *testing.T) {
 	expected := "8"
-	actual := &response.DataValue{
-		Value:       float64(10),
-		TypeName:    "float64",
-		IsUndefined: false,
-	}
+	actual := value.New(float64(10))
 
 	op := assertion.GteAssertion{}
 
@@ -91,11 +71,7 @@ func TestGreaterThanOrEqualAssertionWithInvalidExpectedDataType(t *testing.T) {
 
 func TestGreaterThanOrEqualAssertionWithInvalidExpectedAndActualDataType(t *testing.T) {
 	expected := "8"
-	actual := &response.DataValue{
-		Value:       "10",
-		TypeName:    "string",
-		IsUndefined: false,
-	}
+	actual := value.New("10")
 
 	op := assertion.GteAssertion{}
 

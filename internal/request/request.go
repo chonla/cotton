@@ -2,15 +2,13 @@ package request
 
 import (
 	"bytes"
-	"errors"
 	"net/http"
-	"net/http/httputil"
 )
 
 type Request interface {
 	Data() []byte
 	Do() (*http.Response, error)
-	Similar(anotherRequest Request) bool
+	SimilarTo(anotherRequest Request) bool
 	String() string
 }
 
@@ -19,22 +17,7 @@ type HTTPRequest struct {
 	plainRequest []byte
 }
 
-func New(req *http.Request) (*HTTPRequest, error) {
-	if req == nil {
-		return nil, errors.New("unexpected nil request")
-	}
-	req.Close = true
-	reqBytes, err := httputil.DumpRequest(req, true)
-	if err != nil {
-		return nil, err
-	}
-	return &HTTPRequest{
-		request:      req,
-		plainRequest: reqBytes,
-	}, nil
-}
-
-func (r *HTTPRequest) Similar(anotherRequest Request) bool {
+func (r *HTTPRequest) SimilarTo(anotherRequest Request) bool {
 	return bytes.Equal(r.plainRequest, anotherRequest.Data())
 }
 

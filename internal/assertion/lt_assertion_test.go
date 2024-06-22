@@ -2,7 +2,7 @@ package assertion_test
 
 import (
 	"cotton/internal/assertion"
-	"cotton/internal/response"
+	"cotton/internal/value"
 	"errors"
 	"testing"
 
@@ -11,11 +11,7 @@ import (
 
 func TestLessThanAssertionWithSameDataTypeAndSuccess(t *testing.T) {
 	expected := float64(10)
-	actual := &response.DataValue{
-		Value:       float64(9),
-		TypeName:    "float64",
-		IsUndefined: false,
-	}
+	actual := value.New(float64(9))
 
 	op := assertion.LtAssertion{}
 
@@ -27,11 +23,7 @@ func TestLessThanAssertionWithSameDataTypeAndSuccess(t *testing.T) {
 
 func TestLessThanAssertionWithSameDataTypeAndFail(t *testing.T) {
 	expected := float64(10)
-	actual := &response.DataValue{
-		Value:       float64(10),
-		TypeName:    "float64",
-		IsUndefined: false,
-	}
+	actual := value.New(float64(10))
 
 	op := assertion.LtAssertion{}
 
@@ -43,11 +35,7 @@ func TestLessThanAssertionWithSameDataTypeAndFail(t *testing.T) {
 
 func TestLessThanAssertionWithInvalidActualDataType(t *testing.T) {
 	expected := float64(8)
-	actual := &response.DataValue{
-		Value:       "10",
-		TypeName:    "string",
-		IsUndefined: false,
-	}
+	actual := value.New("10")
 
 	op := assertion.LtAssertion{}
 
@@ -59,11 +47,7 @@ func TestLessThanAssertionWithInvalidActualDataType(t *testing.T) {
 
 func TestLessThanAssertionWithInvalidExpectedDataType(t *testing.T) {
 	expected := "8"
-	actual := &response.DataValue{
-		Value:       float64(10),
-		TypeName:    "float64",
-		IsUndefined: false,
-	}
+	actual := value.New(float64(10))
 
 	op := assertion.LtAssertion{}
 
@@ -75,11 +59,7 @@ func TestLessThanAssertionWithInvalidExpectedDataType(t *testing.T) {
 
 func TestLessThanAssertionWithInvalidExpectedAndActualDataType(t *testing.T) {
 	expected := "8"
-	actual := &response.DataValue{
-		Value:       "10",
-		TypeName:    "string",
-		IsUndefined: false,
-	}
+	actual := value.New("10")
 
 	op := assertion.LtAssertion{}
 

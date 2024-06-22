@@ -2,7 +2,7 @@ package assertion_test
 
 import (
 	"cotton/internal/assertion"
-	"cotton/internal/response"
+	"cotton/internal/value"
 	"errors"
 	"testing"
 
@@ -10,11 +10,7 @@ import (
 )
 
 func TestDefinedAssertionWithDefinedValue(t *testing.T) {
-	actual := &response.DataValue{
-		Value:       4,
-		TypeName:    "int",
-		IsUndefined: false,
-	}
+	actual := value.New(4)
 
 	op := assertion.DefinedAssertion{}
 
@@ -25,11 +21,7 @@ func TestDefinedAssertionWithDefinedValue(t *testing.T) {
 }
 
 func TestDefinedAssertionWithDefinedValueOnNullValue(t *testing.T) {
-	actual := &response.DataValue{
-		Value:       nil,
-		TypeName:    "",
-		IsUndefined: false,
-	}
+	actual := value.New(nil)
 
 	op := assertion.DefinedAssertion{}
 
@@ -40,11 +32,7 @@ func TestDefinedAssertionWithDefinedValueOnNullValue(t *testing.T) {
 }
 
 func TestDefinedAssertionWithUndefined(t *testing.T) {
-	actual := &response.DataValue{
-		Value:       nil,
-		TypeName:    "",
-		IsUndefined: true,
-	}
+	actual := value.NewUndefined()
 
 	op := assertion.DefinedAssertion{}
 

@@ -2,7 +2,7 @@ package assertion_test
 
 import (
 	"cotton/internal/assertion"
-	"cotton/internal/response"
+	"cotton/internal/value"
 	"errors"
 	"regexp"
 	"testing"
@@ -11,11 +11,7 @@ import (
 )
 
 func TestNotEqualAssertionWithSameValue(t *testing.T) {
-	actual := &response.DataValue{
-		Value:       "10",
-		TypeName:    "string",
-		IsUndefined: false,
-	}
+	actual := value.New("10")
 	expected := "10"
 
 	op := assertion.NeAssertion{}
@@ -27,11 +23,7 @@ func TestNotEqualAssertionWithSameValue(t *testing.T) {
 }
 
 func TestNotEqualAssertionWithDifferentType(t *testing.T) {
-	actual := &response.DataValue{
-		Value:       3,
-		TypeName:    "int",
-		IsUndefined: false,
-	}
+	actual := value.New(3)
 	expected := "3"
 
 	op := assertion.NeAssertion{}
@@ -43,11 +35,7 @@ func TestNotEqualAssertionWithDifferentType(t *testing.T) {
 }
 
 func TestNotEqualAssertionWithDifferentValue(t *testing.T) {
-	actual := &response.DataValue{
-		Value:       "3",
-		TypeName:    "string",
-		IsUndefined: false,
-	}
+	actual := value.New("3")
 	expected := "10"
 
 	op := assertion.NeAssertion{}
@@ -59,11 +47,7 @@ func TestNotEqualAssertionWithDifferentValue(t *testing.T) {
 }
 
 func TestNeAssertionWithRegexUnmatchValue(t *testing.T) {
-	actual := &response.DataValue{
-		Value:       "108271X",
-		TypeName:    "string",
-		IsUndefined: false,
-	}
+	actual := value.New("108271X")
 	expected, _ := regexp.Compile("^11")
 
 	op := assertion.NeAssertion{}
@@ -75,11 +59,7 @@ func TestNeAssertionWithRegexUnmatchValue(t *testing.T) {
 }
 
 func TestNeAssertionWithRegexMatchValue(t *testing.T) {
-	actual := &response.DataValue{
-		Value:       "108271X",
-		TypeName:    "string",
-		IsUndefined: false,
-	}
+	actual := value.New("108271X")
 	expected, _ := regexp.Compile("^10")
 
 	op := assertion.NeAssertion{}
@@ -91,11 +71,7 @@ func TestNeAssertionWithRegexMatchValue(t *testing.T) {
 }
 
 func TestNeAssertionWithRegexAgainstNonString(t *testing.T) {
-	actual := &response.DataValue{
-		Value:       10827,
-		TypeName:    "int",
-		IsUndefined: false,
-	}
+	actual := value.New(10827)
 	expected, _ := regexp.Compile("^10")
 
 	op := assertion.NeAssertion{}

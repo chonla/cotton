@@ -2,7 +2,7 @@ package assertion
 
 import (
 	"cotton/internal/line"
-	"cotton/internal/response"
+	"cotton/internal/value"
 	"errors"
 	"fmt"
 	"reflect"
@@ -17,12 +17,12 @@ type UndefinedOperator interface {
 }
 
 type UnaryAssertionOperator interface {
-	Assert(actual *response.DataValue) (bool, error)
+	Assert(actual *value.Value) (bool, error)
 	Name() string
 }
 
 type BinaryAssertionOperator interface {
-	Assert(expected interface{}, actual *response.DataValue) (bool, error)
+	Assert(expected interface{}, actual *value.Value) (bool, error)
 	Name() string
 }
 
@@ -32,10 +32,18 @@ type Assertion struct {
 	Operator mo.Either3[UndefinedOperator, UnaryAssertionOperator, BinaryAssertionOperator]
 }
 
+func New(selector string, operator mo.Either3[UndefinedOperator, UnaryAssertionOperator, BinaryAssertionOperator], value interface{}) *Assertion {
+	return &Assertion{
+		Selector: selector,
+		Operator: operator,
+		Value:    value,
+	}
+}
+
 func Try(mdLine line.Line) (*Assertion, bool) {
 	// binary assertion operator
 	if caps, ok := mdLine.CaptureAll("\\s*\\*\\s+`([^`]+)`\\s*(.+)\\s*`([^`]+)`"); ok {
-		op, err := New(line.Line(caps[2]).Trim().Value())
+		op, err := NewOp(line.Line(caps[2]).Trim().Value())
 		if err == nil {
 			value, err := parseValue(line.Line(caps[3]).Trim())
 			if err == nil {
@@ -49,7 +57,7 @@ func Try(mdLine line.Line) (*Assertion, bool) {
 	}
 	// binary assertion operator for regex
 	if caps, ok := mdLine.CaptureAll("\\s*\\*\\s+`([^`]+)`\\s*(.+)\\s*/(.+)/"); ok {
-		op, err := NewRegex(line.Line(caps[2]).Trim().Value())
+		op, err := NewRegexOp(line.Line(caps[2]).Trim().Value())
 		if err == nil {
 			value, err := parseRegexValue(line.Line(caps[3]).Trim())
 			if err == nil {
@@ -63,7 +71,7 @@ func Try(mdLine line.Line) (*Assertion, bool) {
 	}
 	// unary assertion operator
 	if caps, ok := mdLine.CaptureAll("\\s*\\*\\s+`([^`]+)`\\s*(.+)"); ok {
-		op, err := New(line.Line(caps[2]).Trim().Value())
+		op, err := NewOp(line.Line(caps[2]).Trim().Value())
 		if err == nil {
 			return &Assertion{
 				Selector: line.Line(caps[1]).Trim().Value(),
@@ -110,7 +118,7 @@ func parseValue(mdLine line.Line) (interface{}, error) {
 	return nil, errors.New("unexpected value")
 }
 
-func NewRegex(op string) (mo.Either3[UndefinedOperator, UnaryAssertionOperator, BinaryAssertionOperator], error) {
+func NewRegexOp(op string) (mo.Either3[UndefinedOperator, UnaryAssertionOperator, BinaryAssertionOperator], error) {
 	operatorMap := map[string]func() mo.Either3[UndefinedOperator, UnaryAssertionOperator, BinaryAssertionOperator]{
 		"==": func() mo.Either3[UndefinedOperator, UnaryAssertionOperator, BinaryAssertionOperator] {
 			return mo.NewEither3Arg3[UndefinedOperator, UnaryAssertionOperator, BinaryAssertionOperator](&EqAssertion{})
@@ -125,7 +133,7 @@ func NewRegex(op string) (mo.Either3[UndefinedOperator, UnaryAssertionOperator, 
 	return mo.NewEither3Arg1[UndefinedOperator, UnaryAssertionOperator, BinaryAssertionOperator](nil), errors.New("unrecognized assertion")
 }
 
-func New(op string) (mo.Either3[UndefinedOperator, UnaryAssertionOperator, BinaryAssertionOperator], error) {
+func NewOp(op string) (mo.Either3[UndefinedOperator, UnaryAssertionOperator, BinaryAssertionOperator], error) {
 	operatorMap := map[string]func() mo.Either3[UndefinedOperator, UnaryAssertionOperator, BinaryAssertionOperator]{
 		"==": func() mo.Either3[UndefinedOperator, UnaryAssertionOperator, BinaryAssertionOperator] {
 			return mo.NewEither3Arg3[UndefinedOperator, UnaryAssertionOperator, BinaryAssertionOperator](&EqAssertion{})
@@ -184,6 +192,14 @@ func (a *Assertion) SimilarTo(anotherAssertion *Assertion) bool {
 	}
 
 	return false
+}
+
+func (a *Assertion) Clone() *Assertion {
+	return &Assertion{
+		Selector: a.Selector,
+		Operator: a.Operator,
+		Value:    a.Value,
+	}
 }
 
 func (a *Assertion) String() string {
