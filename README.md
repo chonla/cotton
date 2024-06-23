@@ -40,7 +40,7 @@ See the files in `etc/examples` directory.
 * ~~Regular expression assertion operands~~
   * ~~== (Match)~~
   * ~~!= (Not match)~~
-* Captures integration
+* ~~Captures integration~~
 * ~~Debug mode~~
 * CLI
 * Cookbook
