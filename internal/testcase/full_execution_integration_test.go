@@ -30,7 +30,7 @@ func TestGetDataFromHttpBin(t *testing.T) {
 		Configurator:  config,
 		FileReader:    reader.New(os.ReadFile),
 		RequestParser: &httphelper.HTTPRequestParser{},
-		Logger:        logger.NewNilLogger(false),
+		Logger:        logger.NewNilLogger(logger.Compact),
 	}
 	executableParser := executable.NewParser(executableParserOptions)
 
@@ -38,18 +38,18 @@ func TestGetDataFromHttpBin(t *testing.T) {
 		Configurator:     config,
 		FileReader:       reader.New(os.ReadFile),
 		RequestParser:    &httphelper.HTTPRequestParser{},
-		Logger:           logger.NewNilLogger(false),
+		Logger:           logger.NewNilLogger(logger.Compact),
 		ExecutableParser: executableParser,
 	}
 
 	executableOptions := &executable.ExecutableOptions{
 		RequestParser: &httphelper.HTTPRequestParser{},
-		Logger:        logger.NewNilLogger(false),
+		Logger:        logger.NewNilLogger(logger.Compact),
 	}
 
 	testcaseOptions := &testcase.TestCaseOptions{
 		RequestParser: &httphelper.HTTPRequestParser{},
-		Logger:        logger.NewNilLogger(false),
+		Logger:        logger.NewNilLogger(logger.Compact),
 	}
 
 	parser := testcase.NewParser(parserOptions)
@@ -114,7 +114,7 @@ func TestGetDataFromHttpBinWithThreeTildedCodeBlock(t *testing.T) {
 		Configurator:  config,
 		FileReader:    reader.New(os.ReadFile),
 		RequestParser: &httphelper.HTTPRequestParser{},
-		Logger:        logger.NewNilLogger(false),
+		Logger:        logger.NewNilLogger(logger.Compact),
 	}
 	executableParser := executable.NewParser(executableParserOptions)
 
@@ -122,18 +122,18 @@ func TestGetDataFromHttpBinWithThreeTildedCodeBlock(t *testing.T) {
 		Configurator:     config,
 		FileReader:       reader.New(os.ReadFile),
 		RequestParser:    &httphelper.HTTPRequestParser{},
-		Logger:           logger.NewNilLogger(false),
+		Logger:           logger.NewNilLogger(logger.Compact),
 		ExecutableParser: executableParser,
 	}
 
 	executableOptions := &executable.ExecutableOptions{
 		RequestParser: &httphelper.HTTPRequestParser{},
-		Logger:        logger.NewNilLogger(false),
+		Logger:        logger.NewNilLogger(logger.Compact),
 	}
 
 	testcaseOptions := &testcase.TestCaseOptions{
 		RequestParser: &httphelper.HTTPRequestParser{},
-		Logger:        logger.NewNilLogger(false),
+		Logger:        logger.NewNilLogger(logger.Compact),
 	}
 
 	parser := testcase.NewParser(parserOptions)

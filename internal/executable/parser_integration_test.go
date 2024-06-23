@@ -26,11 +26,11 @@ func TestParsingCompleteExecutableMarkdownFile(t *testing.T) {
 		Configurator:  config,
 		FileReader:    reader.New(os.ReadFile),
 		RequestParser: &httphelper.HTTPRequestParser{},
-		Logger:        logger.NewNilLogger(false),
+		Logger:        logger.NewNilLogger(logger.Compact),
 	}
 	executableOptions := &executable.ExecutableOptions{
 		RequestParser: &httphelper.HTTPRequestParser{},
-		Logger:        logger.NewNilLogger(false),
+		Logger:        logger.NewNilLogger(logger.Compact),
 	}
 
 	parser := executable.NewParser(parserOptions)

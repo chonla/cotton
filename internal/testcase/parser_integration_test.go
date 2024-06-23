@@ -28,7 +28,7 @@ func TestParsingCompleteTestcaseMarkdownFile(t *testing.T) {
 		Configurator:  config,
 		FileReader:    reader.New(os.ReadFile),
 		RequestParser: &httphelper.HTTPRequestParser{},
-		Logger:        logger.NewNilLogger(false),
+		Logger:        logger.NewNilLogger(logger.Compact),
 	}
 	executableParser := executable.NewParser(executableParserOptions)
 
@@ -36,20 +36,20 @@ func TestParsingCompleteTestcaseMarkdownFile(t *testing.T) {
 		Configurator:     config,
 		FileReader:       reader.New(os.ReadFile),
 		RequestParser:    &httphelper.HTTPRequestParser{},
-		Logger:           logger.NewNilLogger(false),
+		Logger:           logger.NewNilLogger(logger.Compact),
 		ExecutableParser: executableParser,
 	}
 	parser := testcase.NewParser(parserOptions)
 
 	testcaseOptions := &testcase.TestCaseOptions{
 		RequestParser: &httphelper.HTTPRequestParser{},
-		Logger:        logger.NewNilLogger(false),
+		Logger:        logger.NewNilLogger(logger.Compact),
 	}
 	result, err := parser.FromMarkdownFile("<rootDir>/etc/examples/testcase.md")
 
 	executableOptions := &executable.ExecutableOptions{
 		RequestParser: &httphelper.HTTPRequestParser{},
-		Logger:        logger.NewNilLogger(false),
+		Logger:        logger.NewNilLogger(logger.Compact),
 	}
 	expectedSetup := executable.New("Link before the test will be executed before executing test", `GET /get-info HTTP/1.1
 Host: localhost`, executableOptions)
