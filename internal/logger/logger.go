@@ -18,4 +18,5 @@ type Logger interface {
 	PrintBlockTitle(header string) error // printing Setups or Teardowns or Assertions or Captures or whatever
 	PrintAssertionResults(assertionResults []result.AssertionResult) error
 	PrintAssertionResult(assertionResult result.AssertionResult) error
+	PrintRequest(req string) error
 }

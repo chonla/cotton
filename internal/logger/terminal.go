@@ -58,7 +58,7 @@ func (c *TerminalLogger) PrintTestResult(passed bool) error {
 	} else {
 		val = color.New(color.FgRed).Add(color.Bold).Sprint("FAILED")
 	}
-	_, err := fmt.Printf("* Test result: %s", val)
+	_, err := fmt.Printf("* Test result: %s\n", val)
 	return err
 }
 
@@ -103,5 +103,15 @@ func (c *TerminalLogger) PrintAssertionResult(assertionResult result.AssertionRe
 		errMsg := color.New(color.FgRed).Add(color.Bold).Sprint(assertionResult.Error)
 		_, err = fmt.Printf("  %s\n", errMsg)
 	}
+	return err
+}
+
+func (c *TerminalLogger) PrintRequest(req string) error {
+	if c.level != Debug {
+		return nil
+	}
+
+	val := color.New(color.FgWhite).Sprint(req)
+	_, err := fmt.Printf("\n%s\n\n", val)
 	return err
 }

@@ -18,7 +18,7 @@ func main() {
 		RootDir: curdir,
 	}
 
-	level := logger.Verbose
+	level := logger.Debug
 	log := logger.NewTerminalLogger(level)
 	reader := reader.New(os.ReadFile)
 	reqParser := &httphelper.HTTPRequestParser{}

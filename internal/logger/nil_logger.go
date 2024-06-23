@@ -39,3 +39,7 @@ func (c *NilLogger) PrintAssertionResults(assertions []result.AssertionResult) e
 func (c *NilLogger) PrintAssertionResult(assertion result.AssertionResult) error {
 	return nil
 }
+
+func (c *NilLogger) PrintRequest(req string) error {
+	return nil
+}

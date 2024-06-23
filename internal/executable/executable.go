@@ -88,7 +88,7 @@ func (ex *Executable) Execute(initialVars *variable.Variables) (*execution.Execu
 	}
 
 	ex.options.Logger.PrintExecutableTitle(ex.title)
-	// ex.options.Logger.Printfln(" * %s", ex.Title)
+	ex.options.Logger.PrintRequest(compiledRequest)
 	resp, err := request.Do()
 	if err != nil {
 		return nil, err

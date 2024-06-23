@@ -44,3 +44,8 @@ func (m *MockLogger) PrintAssertionResult(assertion result.AssertionResult) erro
 	args := m.Called(assertion)
 	return args.Error(0)
 }
+
+func (m *MockLogger) PrintRequest(req string) error {
+	args := m.Called(req)
+	return args.Error(0)
+}

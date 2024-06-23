@@ -147,6 +147,7 @@ func (t *TestCase) Execute(initialVars *variable.Variables) *result.TestResult {
 	}
 
 	t.options.Logger.PrintBlockTitle("Execute test")
+	t.options.Logger.PrintRequest(compiledRequest)
 	resp, err := request.Do()
 	if err != nil {
 		testResult.Error = err
