@@ -7,6 +7,7 @@ import (
 	"cotton/internal/httphelper"
 	"cotton/internal/logger"
 	"cotton/internal/result"
+	"cotton/internal/template"
 	"cotton/internal/variable"
 	"errors"
 	"fmt"
@@ -122,8 +123,7 @@ func (t *TestCase) Execute(initialVars *variable.Variables) *result.TestResult {
 
 	t.options.Logger.PrintTestCaseTitle(t.title)
 
-	sessionVars := variable.New()
-
+	sessionVars := initialVars.Clone()
 	for _, setup := range t.setups {
 		execution, err := setup.Execute(sessionVars)
 		if err != nil {
@@ -133,7 +133,10 @@ func (t *TestCase) Execute(initialVars *variable.Variables) *result.TestResult {
 		sessionVars = sessionVars.MergeWith(execution.Variables)
 	}
 
-	request, err := t.options.RequestParser.Parse(t.reqRaw)
+	reqTemplate := template.New(t.reqRaw)
+	compiledRequest := reqTemplate.Apply(sessionVars)
+
+	request, err := t.options.RequestParser.Parse(compiledRequest)
 	if err != nil {
 		testResult.Error = err
 		return testResult

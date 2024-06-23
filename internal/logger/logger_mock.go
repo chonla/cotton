@@ -15,6 +15,11 @@ func (m *MockLogger) PrintTestCaseTitle(title string) error {
 	return args.Error(0)
 }
 
+func (m *MockLogger) PrintExecutableTitle(title string) error {
+	args := m.Called(title)
+	return args.Error(0)
+}
+
 func (m *MockLogger) PrintTestResult(passed bool) error {
 	args := m.Called(passed)
 	return args.Error(0)

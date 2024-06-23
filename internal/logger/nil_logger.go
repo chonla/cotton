@@ -16,6 +16,10 @@ func (c *NilLogger) PrintTestCaseTitle(title string) error {
 	return nil
 }
 
+func (c *NilLogger) PrintExecutableTitle(title string) error {
+	return nil
+}
+
 func (c *NilLogger) PrintTestResult(passed bool) error {
 	return nil
 }

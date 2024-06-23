@@ -62,6 +62,14 @@ func (v *Variables) MergeWith(anotherVars *Variables) *Variables {
 	return newVars
 }
 
+func (v *Variables) Clone() *Variables {
+	newVars := New()
+	for k, v := range v.values {
+		newVars.Set(k, v)
+	}
+	return newVars
+}
+
 func (v *Variables) ToStringMap() map[string]interface{} {
 	m := map[string]interface{}{}
 

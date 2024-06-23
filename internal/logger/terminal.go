@@ -23,6 +23,11 @@ func (c *TerminalLogger) PrintTestCaseTitle(title string) error {
 	return err
 }
 
+func (c *TerminalLogger) PrintExecutableTitle(title string) error {
+	_, err := fmt.Printf("* %s", title)
+	return err
+}
+
 func (c *TerminalLogger) PrintTestResult(passed bool) error {
 	var val string
 	if passed {

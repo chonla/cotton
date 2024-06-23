@@ -76,15 +76,30 @@ func (p *Parser) FromMarkdownLines(mdLines []line.Line) (*TestCase, error) {
 			continue
 		}
 
-		if justTitle {
-			if ok := mdLine.LookLike(`^ {0,3}#{1,6}\s+(.*)`); ok {
-				justTitle = false
-				continue
-			}
+		// if justTitle {
+		// 	if ok := mdLine.LookLike(`^ {0,3}#{1,6}\s+(.*)`); ok {
+		// 		justTitle = false
+		// 		continue
+		// 	}
 
-			description = append(description, mdLine.Value())
-			continue
-		}
+		// 	if ok := mdLine.LookLike(`^~~~`); ok {
+		// 		justTitle = false
+		// 		continue
+		// 	}
+
+		// 	if ok := mdLine.LookLike("^```"); ok {
+		// 		justTitle = false
+		// 		continue
+		// 	}
+
+		// 	if ok := mdLine.LookLike(`^\s*\*\s.+`); ok {
+		// 		justTitle = false
+		// 		continue
+		// 	}
+
+		// 	description = append(description, mdLine.Value())
+		// 	continue
+		// }
 
 		if collectingCodeBlockBackTick {
 			if ok := mdLine.LookLike("^```$"); ok {
@@ -119,12 +134,15 @@ func (p *Parser) FromMarkdownLines(mdLines []line.Line) (*TestCase, error) {
 				}
 			} else {
 				if cap, ok := capture.Try(mdLine); ok {
+					justTitle = false
 					captures = append(captures, cap)
 				} else {
 					if as, ok := assertion.Try(mdLine); ok {
+						justTitle = false
 						assertions = append(assertions, as)
 					} else {
 						if captures, ok := mdLine.CaptureAll(`^\s*\*\s\[([^\]]+)\]\(([^\)]+)\)`); ok {
+							justTitle = false
 							if !reqFound {
 								ex, err := p.options.ExecutableParser.FromMarkdownFile(captures[2])
 								if err != nil {
@@ -139,6 +157,15 @@ func (p *Parser) FromMarkdownLines(mdLines []line.Line) (*TestCase, error) {
 								}
 								ex.SetTitle(captures[1])
 								teardowns = append(teardowns, ex)
+							}
+						} else {
+							if ok := mdLine.LookLike(`^ {0,3}#{1,6}\s+(.*)`); ok {
+								justTitle = false
+								// continue
+							} else {
+								if justTitle {
+									description = append(description, mdLine.Value())
+								}
 							}
 						}
 					}

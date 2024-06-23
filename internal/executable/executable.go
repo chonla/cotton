@@ -5,6 +5,7 @@ import (
 	"cotton/internal/execution"
 	"cotton/internal/httphelper"
 	"cotton/internal/logger"
+	"cotton/internal/template"
 	"cotton/internal/variable"
 	"errors"
 	"slices"
@@ -78,11 +79,15 @@ func (ex *Executable) Execute(initialVars *variable.Variables) (*execution.Execu
 		return nil, errors.New("no callable request")
 	}
 
-	request, err := ex.options.RequestParser.Parse(ex.reqRaw)
+	reqTemplate := template.New(ex.reqRaw)
+	compiledRequest := reqTemplate.Apply(initialVars)
+
+	request, err := ex.options.RequestParser.Parse(compiledRequest)
 	if err != nil {
 		return nil, err
 	}
 
+	ex.options.Logger.PrintExecutableTitle(ex.title)
 	// ex.options.Logger.Printfln(" * %s", ex.Title)
 	resp, err := request.Do()
 	if err != nil {

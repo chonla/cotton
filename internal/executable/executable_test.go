@@ -10,6 +10,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 func TestNewReturnEmptyExecutable(t *testing.T) {
@@ -90,6 +91,7 @@ Content-Type: application/json
 	expectedCapturedVariables.Set("var2", value.New("val2"))
 
 	mockLogger := new(logger.MockLogger)
+	mockLogger.On("PrintExecutableTitle", mock.Anything).Return(nil)
 
 	options := &executable.ExecutableOptions{
 		RequestParser: mockReqParser,

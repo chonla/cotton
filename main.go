@@ -40,7 +40,7 @@ func main() {
 	}
 	parser := testcase.NewParser(tcOptions)
 
-	tc, err := parser.FromMarkdownFile("<rootDir>/etc/examples/opensource.org/get_copyleft.md")
+	tc, err := parser.FromMarkdownFile("<rootDir>/etc/examples/mixed/test.md")
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
