@@ -9,26 +9,64 @@ import (
 )
 
 type TerminalLogger struct {
-	debug bool
+	level LogLevel
 }
 
-func NewTerminalLogger(debug bool) Logger {
+func NewTerminalLogger(level LogLevel) Logger {
 	return &TerminalLogger{
-		debug: debug,
+		level: level,
 	}
 }
 
 func (c *TerminalLogger) PrintTestCaseTitle(title string) error {
-	_, err := fmt.Printf("%s ... ", title)
+	var err error
+	if c.level == Compact {
+		_, err = fmt.Printf("%s ... ", title)
+	} else {
+		_, err = fmt.Printf("%s\n", title)
+	}
+
 	return err
 }
 
 func (c *TerminalLogger) PrintExecutableTitle(title string) error {
-	_, err := fmt.Printf("* %s", title)
+	if c.level == Compact {
+		return nil
+	}
+
+	_, err := fmt.Printf("  - %s\n", title)
+	return err
+}
+
+func (c *TerminalLogger) PrintBlockTitle(title string) error {
+	if c.level == Compact {
+		return nil
+	}
+
+	_, err := fmt.Printf("* %s\n", title)
 	return err
 }
 
 func (c *TerminalLogger) PrintTestResult(passed bool) error {
+	if c.level == Compact {
+		return nil
+	}
+
+	var val string
+	if passed {
+		val = color.New(color.FgGreen).Add(color.Bold).Sprint("PASSED")
+	} else {
+		val = color.New(color.FgRed).Add(color.Bold).Sprint("FAILED")
+	}
+	_, err := fmt.Printf("* Test result: %s", val)
+	return err
+}
+
+func (c *TerminalLogger) PrintInlineTestResult(passed bool) error {
+	if c.level != Compact {
+		return nil
+	}
+
 	var val string
 	if passed {
 		val = color.New(color.FgGreen).Add(color.Bold).Sprint("PASSED")
@@ -40,7 +78,7 @@ func (c *TerminalLogger) PrintTestResult(passed bool) error {
 }
 
 func (c *TerminalLogger) PrintAssertionResults(assertionResults []result.AssertionResult) error {
-	if !c.debug {
+	if c.level == Compact {
 		return nil
 	}
 
@@ -60,7 +98,7 @@ func (c *TerminalLogger) PrintAssertionResult(assertionResult result.AssertionRe
 	} else {
 		val = color.New(color.FgRed).Add(color.Bold).Sprint("FAILED")
 	}
-	_, err := fmt.Printf("* %s ... %s\n", assertionResult.Title, val)
+	_, err := fmt.Printf("  - %s ... %s\n", assertionResult.Title, val)
 	if err == nil && !assertionResult.Passed {
 		errMsg := color.New(color.FgRed).Add(color.Bold).Sprint(assertionResult.Error)
 		_, err = fmt.Printf("  %s\n", errMsg)

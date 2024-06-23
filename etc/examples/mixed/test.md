@@ -11,3 +11,5 @@ license={{license}}
 ```
 
 * `Body.form.license`==`"GPL-3.0"`
+
+* [Get "world" translation](<rootDir>/etc/examples/mixed/after.md)

@@ -18,8 +18,8 @@ func main() {
 		RootDir: curdir,
 	}
 
-	debug := true
-	log := logger.NewTerminalLogger(debug)
+	level := logger.Verbose
+	log := logger.NewTerminalLogger(level)
 	reader := reader.New(os.ReadFile)
 	reqParser := &httphelper.HTTPRequestParser{}
 
@@ -49,6 +49,8 @@ func main() {
 	initialVars := variable.New()
 
 	result := tc.Execute(initialVars)
-	log.PrintTestResult(result.Passed)
+	log.PrintInlineTestResult(result.Passed)
+	log.PrintBlockTitle("Assertions")
 	log.PrintAssertionResults(result.Assertions)
+	log.PrintTestResult(result.Passed)
 }

@@ -3,12 +3,12 @@ package logger
 import "cotton/internal/result"
 
 type NilLogger struct {
-	debug bool
+	level LogLevel
 }
 
-func NewNilLogger(debug bool) Logger {
+func NewNilLogger(level LogLevel) Logger {
 	return &NilLogger{
-		debug: debug,
+		level: level,
 	}
 }
 
@@ -20,7 +20,15 @@ func (c *NilLogger) PrintExecutableTitle(title string) error {
 	return nil
 }
 
+func (c *NilLogger) PrintBlockTitle(title string) error {
+	return nil
+}
+
 func (c *NilLogger) PrintTestResult(passed bool) error {
+	return nil
+}
+
+func (c *NilLogger) PrintInlineTestResult(passed bool) error {
 	return nil
 }
 

@@ -124,13 +124,17 @@ func (t *TestCase) Execute(initialVars *variable.Variables) *result.TestResult {
 	t.options.Logger.PrintTestCaseTitle(t.title)
 
 	sessionVars := initialVars.Clone()
-	for _, setup := range t.setups {
-		execution, err := setup.Execute(sessionVars)
-		if err != nil {
-			testResult.Error = err
-			return testResult
+
+	if len(t.setups) > 0 {
+		t.options.Logger.PrintBlockTitle("Setups")
+		for _, setup := range t.setups {
+			execution, err := setup.Execute(sessionVars)
+			if err != nil {
+				testResult.Error = err
+				return testResult
+			}
+			sessionVars = sessionVars.MergeWith(execution.Variables)
 		}
-		sessionVars = sessionVars.MergeWith(execution.Variables)
 	}
 
 	reqTemplate := template.New(t.reqRaw)
@@ -142,6 +146,7 @@ func (t *TestCase) Execute(initialVars *variable.Variables) *result.TestResult {
 		return testResult
 	}
 
+	t.options.Logger.PrintBlockTitle("Execute test")
 	resp, err := request.Do()
 	if err != nil {
 		testResult.Error = err
@@ -189,13 +194,16 @@ func (t *TestCase) Execute(initialVars *variable.Variables) *result.TestResult {
 		}
 	}
 
-	for _, teardown := range t.teardowns {
-		execution, err := teardown.Execute(sessionVars)
-		if err != nil {
-			testResult.Error = err
-			return testResult
+	if len(t.teardowns) > 0 {
+		t.options.Logger.PrintBlockTitle("Teardowns")
+		for _, teardown := range t.teardowns {
+			execution, err := teardown.Execute(sessionVars)
+			if err != nil {
+				testResult.Error = err
+				return testResult
+			}
+			sessionVars = sessionVars.MergeWith(execution.Variables)
 		}
-		sessionVars = sessionVars.MergeWith(execution.Variables)
 	}
 
 	testResult.Passed = true
