@@ -1,15 +1,20 @@
 package variable
 
-import "errors"
+import (
+	"errors"
+	"fmt"
+)
 
 type Variables struct {
-	names  []string
-	values map[string]interface{}
+	names        []string
+	values       map[string]interface{}
+	stringValues map[string]string
 }
 
 func New() *Variables {
 	return &Variables{
-		values: map[string]interface{}{},
+		values:       map[string]interface{}{},
+		stringValues: map[string]string{},
 	}
 }
 
@@ -35,6 +40,7 @@ func (v *Variables) Set(name string, value interface{}) {
 	}
 
 	v.values[name] = value
+	v.stringValues[name] = fmt.Sprintf("%v", value)
 }
 
 func (v *Variables) Names() []string {
@@ -54,4 +60,13 @@ func (v *Variables) MergeWith(anotherVars *Variables) *Variables {
 		}
 	}
 	return newVars
+}
+
+func (v *Variables) ToStringMap() map[string]interface{} {
+	m := map[string]interface{}{}
+
+	for k, v := range v.stringValues {
+		m[k] = v
+	}
+	return m
 }
