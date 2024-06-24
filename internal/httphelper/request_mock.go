@@ -6,8 +6,8 @@ type MockHTTPRequest struct {
 	mock.Mock
 }
 
-func (m *MockHTTPRequest) Do() (*HTTPResponse, error) {
-	args := m.Called()
+func (m *MockHTTPRequest) Do(insecure bool) (*HTTPResponse, error) {
+	args := m.Called(insecure)
 	return args.Get(0).(*HTTPResponse), args.Error(1)
 }
 

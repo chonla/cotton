@@ -12,8 +12,9 @@ import (
 )
 
 type ExecutableOptions struct {
-	Logger        logger.Logger
-	RequestParser httphelper.RequestParser
+	Logger          logger.Logger
+	RequestParser   httphelper.RequestParser
+	InsecureRequest bool
 }
 
 // For setups and teardowns
@@ -22,8 +23,6 @@ type Executable struct {
 	title    string
 	reqRaw   string
 	captures []*capture.Capture
-
-	// Request httphelper.HTTPRequest
 }
 
 func New(title, reqRaw string, options *ExecutableOptions) *Executable {
@@ -89,7 +88,7 @@ func (ex *Executable) Execute(initialVars *variable.Variables) (*execution.Execu
 
 	ex.options.Logger.PrintExecutableTitle(ex.title)
 	ex.options.Logger.PrintRequest(compiledRequest)
-	resp, err := request.Do()
+	resp, err := request.Do(ex.options.InsecureRequest)
 	if err != nil {
 		return nil, err
 	}

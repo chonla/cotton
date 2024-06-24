@@ -23,4 +23,5 @@ type Logger interface {
 	PrintRequest(req string) error
 	PrintError(err error) error
 	PrintTestsuiteResult(testsuiteResult *result.TestsuiteResult) error
+	PrintDebugMessage(message string) error
 }

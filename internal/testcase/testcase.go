@@ -15,8 +15,9 @@ import (
 )
 
 type TestcaseOptions struct {
-	Logger        logger.Logger
-	RequestParser httphelper.RequestParser
+	Logger          logger.Logger
+	RequestParser   httphelper.RequestParser
+	InsecureRequest bool
 }
 
 // Test cases
@@ -147,7 +148,7 @@ func (t *Testcase) Execute(initialVars *variable.Variables) *result.TestResult {
 	t.options.Logger.PrintTestcaseTitle(t.title)
 
 	t.options.Logger.PrintRequest(compiledRequest)
-	resp, err := request.Do()
+	resp, err := request.Do(t.options.InsecureRequest)
 	if err != nil {
 		testResult.Error = err
 		return testResult

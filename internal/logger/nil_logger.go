@@ -59,3 +59,7 @@ func (c *NilLogger) PrintTestsuiteResult(testsuiteResult *result.TestsuiteResult
 func (c *NilLogger) PrintSectionTitle(sectionTitle string) error {
 	return nil
 }
+
+func (c *NilLogger) PrintDebugMessage(message string) error {
+	return nil
+}

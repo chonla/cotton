@@ -6,6 +6,7 @@ import (
 	"cotton/internal/variable"
 	"errors"
 	"fmt"
+	"strings"
 )
 
 type Testsuite struct {
@@ -21,6 +22,9 @@ func NewTestsuite(path string, options *ParserOptions) (*Testsuite, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	options.Logger.PrintDebugMessage(fmt.Sprintf("Test path: %s", actualPath))
+	options.Logger.PrintDebugMessage(fmt.Sprintf("\nFile(s) scanned:\n- %s", strings.Join(files, "\n- ")))
 
 	testcases := []*Testcase{}
 

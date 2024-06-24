@@ -106,6 +106,10 @@ func (c *TerminalLogger) PrintAssertionResults(assertionResults []*result.Assert
 }
 
 func (c *TerminalLogger) PrintAssertionResult(assertionResult *result.AssertionResult) error {
+	if c.level == Compact {
+		return nil
+	}
+
 	var val string
 	if assertionResult.Passed {
 		val = color.New(color.FgGreen).Sprint("passed")
@@ -173,4 +177,12 @@ func (c *TerminalLogger) buildFieldValue(label string, value interface{}) string
 	labelData := color.New(color.FgWhite).Sprintf("%s: ", label)
 	valueData := color.New(color.FgHiWhite).Sprintf("%v", value)
 	return fmt.Sprintf("%s%s", labelData, valueData)
+}
+
+func (c *TerminalLogger) PrintDebugMessage(message string) error {
+	if c.level != Debug {
+		return nil
+	}
+
+	return c.PrintSectionedMessage("debug", message)
 }

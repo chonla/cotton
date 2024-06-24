@@ -69,3 +69,8 @@ func (m *MockLogger) PrintSectionTitle(sectionTitle string) error {
 	args := m.Called(sectionTitle)
 	return args.Error(0)
 }
+
+func (m *MockLogger) PrintDebugMessage(message string) error {
+	args := m.Called(message)
+	return args.Error(0)
+}

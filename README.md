@@ -47,3 +47,4 @@ See the files in `etc/examples` directory.
 * ~~Colorized logging~~
 * HTML reports
 * Upload request
+* ~~Insecure mode~~

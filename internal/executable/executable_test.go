@@ -81,7 +81,7 @@ Content-Type: application/json
 	mockHTTPResponse, _ := (&httphelper.HTTPResponseParser{}).Parse(respRaw)
 
 	mockHTTPRequest := new(httphelper.MockHTTPRequest)
-	mockHTTPRequest.On("Do").Return(mockHTTPResponse, nil)
+	mockHTTPRequest.On("Do", mock.AnythingOfType("bool")).Return(mockHTTPResponse, nil)
 
 	mockReqParser := new(httphelper.MockHTTPRequestParser)
 	mockReqParser.On("Parse", reqRaw).Return(mockHTTPRequest, nil)

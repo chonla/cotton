@@ -1,12 +1,13 @@
 package httphelper
 
 import (
+	"crypto/tls"
 	"errors"
 	"net/http"
 )
 
 type Request interface {
-	Do() (*HTTPResponse, error)
+	Do(insecure bool) (*HTTPResponse, error)
 	String() string
 	Specs() map[string]interface{}
 }
@@ -22,12 +23,18 @@ type HTTPRequest struct {
 	body            string
 }
 
-func (r *HTTPRequest) Do() (*HTTPResponse, error) {
+func (r *HTTPRequest) Do(insecure bool) (*HTTPResponse, error) {
 	if r.req == nil {
 		return nil, errors.New("empty request")
 	}
 
-	resp, err := http.DefaultClient.Do(r.req)
+	client := &http.Client{
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: insecure},
+		},
+	}
+
+	resp, err := client.Do(r.req)
 	if err != nil {
 		return nil, err
 	}
