@@ -48,3 +48,4 @@ See the files in `etc/examples` directory.
 * HTML reports
 * Upload request
 * ~~Insecure mode~~
+* Track time taken
