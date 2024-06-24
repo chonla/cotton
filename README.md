@@ -42,7 +42,7 @@ See the files in `etc/examples` directory.
   * ~~!= (Not match)~~
 * ~~Captures integration~~
 * ~~Debug mode~~
-* CLI
+* ~~CLI~~
 * Cookbook
 * ~~Colorized logging~~
 * HTML reports
