@@ -49,3 +49,4 @@ See the files in `etc/examples` directory.
 * Upload request
 * ~~Insecure mode~~
 * Track time taken
+* ~~Stop tests execution when failed~~
