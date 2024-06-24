@@ -43,7 +43,7 @@ See the files in `etc/examples` directory.
 * ~~Captures integration~~
 * ~~Debug mode~~
 * ~~CLI~~
-* Cookbook
+* Playbook
 * ~~Colorized logging~~
 * HTML reports
 * Upload request
