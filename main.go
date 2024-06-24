@@ -23,12 +23,12 @@ func main() {
 	var stopWhenFailed bool
 
 	flag.Usage = usage
-	flag.BoolVar(&debug, "d", false, "debug mode")
 	flag.BoolVar(&compact, "c", false, "compact mode")
-	flag.BoolVar(&ver, "v", false, "display cotton version")
-	flag.BoolVar(&help, "h", false, "display this help")
+	flag.BoolVar(&debug, "d", false, "debug mode")
 	flag.BoolVar(&insecure, "i", false, "disable certificate verification")
 	flag.BoolVar(&stopWhenFailed, "s", false, "stop when test failed")
+	flag.BoolVar(&ver, "v", false, "display cotton version")
+	flag.BoolVar(&help, "h", false, "display this help")
 	flag.Parse()
 
 	rootDir, _ := os.Getwd()
@@ -51,6 +51,11 @@ func main() {
 
 	if ver {
 		fmt.Printf("cotton %s\n", Version)
+		os.Exit(0)
+	}
+
+	if help {
+		usage()
 		os.Exit(0)
 	}
 
