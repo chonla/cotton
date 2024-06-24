@@ -20,6 +20,7 @@ func main() {
 	var help bool
 	var ver bool
 	var insecure bool
+	var stopWhenFailed bool
 
 	flag.Usage = usage
 	flag.BoolVar(&debug, "d", false, "debug mode")
@@ -27,6 +28,7 @@ func main() {
 	flag.BoolVar(&ver, "v", false, "display cotton version")
 	flag.BoolVar(&help, "h", false, "display this help")
 	flag.BoolVar(&insecure, "i", false, "disable certificate verification")
+	flag.BoolVar(&stopWhenFailed, "s", false, "stop when test failed")
 	flag.Parse()
 
 	rootDir, _ := os.Getwd()
@@ -72,7 +74,13 @@ func main() {
 		ExecutableParser: exParser,
 	}
 
-	ts, err := testcase.NewTestsuite(testDir, tcOptions)
+	options := &testcase.TestsuiteOptions{
+		TestcaseParserOption: tcOptions,
+		StopWhenFailed:       stopWhenFailed,
+		Logger:               log,
+	}
+
+	ts, err := testcase.NewTestsuite(testDir, options)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)

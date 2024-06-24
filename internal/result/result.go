@@ -16,6 +16,9 @@ type AssertionResult struct {
 }
 
 type TestsuiteResult struct {
-	TestCount   int
-	PassedCount int
+	TestCount       int
+	PassedCount     int
+	ExecutionsCount int
+	FailedCount     int
+	SkippedCount    int
 }

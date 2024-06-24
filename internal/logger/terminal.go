@@ -85,8 +85,8 @@ func (c *TerminalLogger) PrintInlineTestResult(passed bool) error {
 	} else {
 		val = color.New(color.FgRed).Add(color.Bold).Sprint("FAILED")
 	}
-	openBracket := color.New(color.FgGreen).Sprint("[")
-	closeBracket := color.New(color.FgGreen).Sprint("]")
+	openBracket := color.New(color.FgWhite).Sprint("[")
+	closeBracket := color.New(color.FgWhite).Sprint("]")
 	_, err := fmt.Printf(" %s%s%s\n", openBracket, val, closeBracket)
 	return err
 }
@@ -153,23 +153,27 @@ func (c *TerminalLogger) PrintTestsuiteResult(testsuiteResult *result.TestsuiteR
 	if err != nil {
 		return err
 	}
-	_, err = fmt.Printf("%s\n", c.buildFieldValue("Testcases executed", testsuiteResult.TestCount))
+	_, err = fmt.Printf("%s\n", c.buildFieldValue("Testcases executed", fmt.Sprintf("%d/%d", testsuiteResult.ExecutionsCount, testsuiteResult.TestCount)))
 	if err != nil {
 		return err
 	}
 	passedPercentage := 0.0
 	failedPercentage := 0.0
-	failedCount := 0
+	skippedPerecentage := 0.0
 	if testsuiteResult.TestCount > 0 {
 		passedPercentage = float64(testsuiteResult.PassedCount) * 100.0 / float64(testsuiteResult.TestCount)
-		failedCount = testsuiteResult.TestCount - testsuiteResult.PassedCount
-		failedPercentage = float64(failedCount) * 100.0 / float64(testsuiteResult.TestCount)
+		failedPercentage = float64(testsuiteResult.FailedCount) * 100.0 / float64(testsuiteResult.TestCount)
+		skippedPerecentage = float64(testsuiteResult.SkippedCount) * 100.0 / float64(testsuiteResult.TestCount)
 	}
 	_, err = fmt.Printf("%s\n", c.buildFieldValue("Passed", fmt.Sprintf("%d (%0.2f%%)", testsuiteResult.PassedCount, passedPercentage)))
 	if err != nil {
 		return err
 	}
-	_, err = fmt.Printf("%s\n", c.buildFieldValue("Failed", fmt.Sprintf("%d (%0.2f%%)", failedCount, failedPercentage)))
+	_, err = fmt.Printf("%s\n", c.buildFieldValue("Failed", fmt.Sprintf("%d (%0.2f%%)", testsuiteResult.FailedCount, failedPercentage)))
+	if err != nil {
+		return err
+	}
+	_, err = fmt.Printf("%s\n", c.buildFieldValue("Skipped", fmt.Sprintf("%d (%0.2f%%)", testsuiteResult.SkippedCount, skippedPerecentage)))
 	return err
 }
 

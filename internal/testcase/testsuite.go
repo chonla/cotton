@@ -2,6 +2,7 @@ package testcase
 
 import (
 	"cotton/internal/directory"
+	"cotton/internal/logger"
 	"cotton/internal/result"
 	"cotton/internal/variable"
 	"errors"
@@ -9,14 +10,20 @@ import (
 	"strings"
 )
 
+type TestsuiteOptions struct {
+	StopWhenFailed       bool
+	Logger               logger.Logger
+	TestcaseParserOption *ParserOptions
+}
+
 type Testsuite struct {
 	testcases []*Testcase
 
-	options *ParserOptions
+	options *TestsuiteOptions
 }
 
-func NewTestsuite(path string, options *ParserOptions) (*Testsuite, error) {
-	actualPath := options.Configurator.ResolvePath(path)
+func NewTestsuite(path string, options *TestsuiteOptions) (*Testsuite, error) {
+	actualPath := options.TestcaseParserOption.Configurator.ResolvePath(path)
 	dir := directory.New()
 	files, err := dir.ListFiles(actualPath, "md")
 	if err != nil {
@@ -28,7 +35,7 @@ func NewTestsuite(path string, options *ParserOptions) (*Testsuite, error) {
 
 	testcases := []*Testcase{}
 
-	parser := NewParser(options)
+	parser := NewParser(options.TestcaseParserOption)
 	for _, file := range files {
 		tc, err := parser.FromMarkdownFile(file)
 		if err == nil && len(tc.assertions) > 0 {
@@ -50,23 +57,32 @@ func (ts *Testsuite) Execute() (*result.TestsuiteResult, error) {
 	initialVars := variable.New()
 
 	testsuiteResult := &result.TestsuiteResult{
-		PassedCount: 0,
-		TestCount:   len(ts.testcases),
+		PassedCount:     0,
+		ExecutionsCount: 0,
+		FailedCount:     0,
+		SkippedCount:    0,
+		TestCount:       len(ts.testcases),
 	}
 
 	for index, tc := range ts.testcases {
-		// ts.options.Logger.PrintTestcaseSequence(index+1, testsuiteResult.TestCount)
 		section := fmt.Sprintf("testcase %d/%d", index+1, testsuiteResult.TestCount)
 		ts.options.Logger.PrintSectionedMessage(section, tc.title)
 
 		result := tc.Execute(initialVars)
 		if result.Passed {
 			testsuiteResult.PassedCount += 1
+		} else {
+			testsuiteResult.FailedCount += 1
 		}
+		testsuiteResult.ExecutionsCount += 1
 		ts.options.Logger.PrintInlineTestResult(result.Passed)
 		ts.options.Logger.PrintSectionTitle("result")
 		ts.options.Logger.PrintTestResult(result.Passed)
+		if !result.Passed && ts.options.StopWhenFailed {
+			break
+		}
 	}
+	testsuiteResult.SkippedCount = testsuiteResult.TestCount - testsuiteResult.ExecutionsCount
 	ts.options.Logger.PrintTestsuiteResult(testsuiteResult)
 
 	return testsuiteResult, nil
