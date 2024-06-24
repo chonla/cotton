@@ -7,7 +7,6 @@ import (
 	"cotton/internal/logger"
 	"cotton/internal/reader"
 	"cotton/internal/testcase"
-	"cotton/internal/variable"
 	"fmt"
 	"os"
 )
@@ -38,19 +37,16 @@ func main() {
 		Logger:           log,
 		ExecutableParser: exParser,
 	}
-	parser := testcase.NewParser(tcOptions)
 
-	tc, err := parser.FromMarkdownFile("<rootDir>/etc/examples/mixed/test.md")
+	ts, err := testcase.NewTestsuite("<rootDir>/etc/examples", tcOptions)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
 
-	initialVars := variable.New()
-
-	result := tc.Execute(initialVars)
-	log.PrintInlineTestResult(result.Passed)
-	log.PrintBlockTitle("Assertions")
-	log.PrintAssertionResults(result.Assertions)
-	log.PrintTestResult(result.Passed)
+	_, err = ts.Execute()
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
 }

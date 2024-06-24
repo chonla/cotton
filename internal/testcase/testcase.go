@@ -112,7 +112,7 @@ func (t *Testcase) Execute(initialVars *variable.Variables) *result.TestResult {
 	testResult := &result.TestResult{
 		Title:      t.title,
 		Passed:     false,
-		Assertions: []result.AssertionResult{},
+		Assertions: []*result.AssertionResult{},
 		Error:      nil,
 	}
 
@@ -121,13 +121,10 @@ func (t *Testcase) Execute(initialVars *variable.Variables) *result.TestResult {
 		return testResult
 	}
 
-	t.options.Logger.PrintTestcaseTitle(t.title)
-
 	sessionVars := initialVars.Clone()
-
 	if len(t.setups) > 0 {
-		t.options.Logger.PrintBlockTitle("Setups")
 		for _, setup := range t.setups {
+			t.options.Logger.PrintSectionTitle("setup")
 			execution, err := setup.Execute(sessionVars)
 			if err != nil {
 				testResult.Error = err
@@ -146,7 +143,9 @@ func (t *Testcase) Execute(initialVars *variable.Variables) *result.TestResult {
 		return testResult
 	}
 
-	t.options.Logger.PrintBlockTitle("Execute test")
+	t.options.Logger.PrintSectionTitle("test")
+	t.options.Logger.PrintTestcaseTitle(t.title)
+
 	t.options.Logger.PrintRequest(compiledRequest)
 	resp, err := request.Do()
 	if err != nil {
@@ -182,22 +181,25 @@ func (t *Testcase) Execute(initialVars *variable.Variables) *result.TestResult {
 				passed, err = assertion.Operator.MustArg3().Assert(expected, actual)
 			}
 		}
-		testResult.Assertions = append(testResult.Assertions, result.AssertionResult{
+		assertionResult := &result.AssertionResult{
 			Title:    assertion.String(),
 			Passed:   passed,
 			Actual:   fmt.Sprintf("%v", actual),
 			Expected: fmt.Sprintf("%v", expected),
 			Error:    err,
-		})
+		}
+		testResult.Assertions = append(testResult.Assertions, assertionResult)
 		if err != nil {
 			testResult.Error = err
 			return testResult
 		}
+		t.options.Logger.PrintSectionTitle("assert")
+		t.options.Logger.PrintAssertionResult(assertionResult)
 	}
 
 	if len(t.teardowns) > 0 {
-		t.options.Logger.PrintBlockTitle("Teardowns")
 		for _, teardown := range t.teardowns {
+			t.options.Logger.PrintSectionTitle("teardown")
 			execution, err := teardown.Execute(sessionVars)
 			if err != nil {
 				testResult.Error = err

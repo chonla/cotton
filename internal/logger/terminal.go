@@ -21,10 +21,21 @@ func NewTerminalLogger(level LogLevel) Logger {
 func (c *TerminalLogger) PrintTestcaseTitle(title string) error {
 	var err error
 	if c.level == Compact {
-		_, err = fmt.Printf("%s ... ", title)
+		_, err = fmt.Printf("%s", title)
 	} else {
 		_, err = fmt.Printf("%s\n", title)
 	}
+
+	return err
+}
+
+func (c *TerminalLogger) PrintSectionTitle(sectionTitle string) error {
+	if c.level == Compact {
+		return nil
+	}
+
+	val := color.New(color.FgWhite).Sprintf("[%s] ", sectionTitle)
+	_, err := fmt.Print(val)
 
 	return err
 }
@@ -34,17 +45,18 @@ func (c *TerminalLogger) PrintExecutableTitle(title string) error {
 		return nil
 	}
 
-	_, err := fmt.Printf("  - %s\n", title)
+	_, err := fmt.Println(title)
 	return err
 }
 
-func (c *TerminalLogger) PrintBlockTitle(title string) error {
+func (c *TerminalLogger) PrintSectionedMessage(section, message string) error {
 	if c.level == Compact {
 		return nil
 	}
 
-	_, err := fmt.Printf("* %s\n", title)
-	return err
+	c.PrintSectionTitle(section)
+	_, e := fmt.Println(message)
+	return e
 }
 
 func (c *TerminalLogger) PrintTestResult(passed bool) error {
@@ -58,7 +70,7 @@ func (c *TerminalLogger) PrintTestResult(passed bool) error {
 	} else {
 		val = color.New(color.FgRed).Add(color.Bold).Sprint("FAILED")
 	}
-	_, err := fmt.Printf("* Test result: %s\n", val)
+	_, err := fmt.Println(val)
 	return err
 }
 
@@ -73,11 +85,13 @@ func (c *TerminalLogger) PrintInlineTestResult(passed bool) error {
 	} else {
 		val = color.New(color.FgRed).Add(color.Bold).Sprint("FAILED")
 	}
-	_, err := fmt.Println(val)
+	openBracket := color.New(color.FgGreen).Sprint("[")
+	closeBracket := color.New(color.FgGreen).Sprint("]")
+	_, err := fmt.Printf(" %s%s%s\n", openBracket, val, closeBracket)
 	return err
 }
 
-func (c *TerminalLogger) PrintAssertionResults(assertionResults []result.AssertionResult) error {
+func (c *TerminalLogger) PrintAssertionResults(assertionResults []*result.AssertionResult) error {
 	if c.level == Compact {
 		return nil
 	}
@@ -91,14 +105,14 @@ func (c *TerminalLogger) PrintAssertionResults(assertionResults []result.Asserti
 	return nil
 }
 
-func (c *TerminalLogger) PrintAssertionResult(assertionResult result.AssertionResult) error {
+func (c *TerminalLogger) PrintAssertionResult(assertionResult *result.AssertionResult) error {
 	var val string
 	if assertionResult.Passed {
-		val = color.New(color.FgGreen).Add(color.Bold).Sprint("PASSED")
+		val = color.New(color.FgGreen).Sprint("passed")
 	} else {
-		val = color.New(color.FgRed).Add(color.Bold).Sprint("FAILED")
+		val = color.New(color.FgRed).Sprint("failed")
 	}
-	_, err := fmt.Printf("  - %s ... %s\n", assertionResult.Title, val)
+	_, err := fmt.Printf("%s...%s\n", assertionResult.Title, val)
 	if err == nil && !assertionResult.Passed {
 		errMsg := color.New(color.FgRed).Add(color.Bold).Sprint(assertionResult.Error)
 		_, err = fmt.Printf("  %s\n", errMsg)
@@ -111,7 +125,52 @@ func (c *TerminalLogger) PrintRequest(req string) error {
 		return nil
 	}
 
-	val := color.New(color.FgWhite).Sprint(req)
-	_, err := fmt.Printf("\n%s\n\n", val)
+	c.PrintSectionTitle("request")
+	fmt.Println("")
+	val := color.New(color.FgBlue).Sprint(req)
+	_, err := fmt.Println(val)
 	return err
+}
+
+func (c *TerminalLogger) PrintError(err error) error {
+	val := color.New(color.FgRed).Sprint(err)
+	_, err = fmt.Println(val)
+	return err
+}
+
+func (c *TerminalLogger) PrintTestcaseSequence(index, total int) error {
+	val := color.New(color.FgWhite).Sprintf("[testcase %d/%d] ", index, total)
+	_, err := fmt.Print(val)
+	return err
+}
+
+func (c *TerminalLogger) PrintTestsuiteResult(testsuiteResult *result.TestsuiteResult) error {
+	_, err := fmt.Println(color.New(color.FgWhite).Sprintf("-------------------------"))
+	if err != nil {
+		return err
+	}
+	_, err = fmt.Printf("%s\n", c.buildFieldValue("Testcases executed", testsuiteResult.TestCount))
+	if err != nil {
+		return err
+	}
+	passedPercentage := 0.0
+	failedPercentage := 0.0
+	failedCount := 0
+	if testsuiteResult.TestCount > 0 {
+		passedPercentage = float64(testsuiteResult.PassedCount) * 100.0 / float64(testsuiteResult.TestCount)
+		failedCount = testsuiteResult.TestCount - testsuiteResult.PassedCount
+		failedPercentage = float64(failedCount) * 100.0 / float64(testsuiteResult.TestCount)
+	}
+	_, err = fmt.Printf("%s\n", c.buildFieldValue("Passed", fmt.Sprintf("%d (%0.2f%%)", testsuiteResult.PassedCount, passedPercentage)))
+	if err != nil {
+		return err
+	}
+	_, err = fmt.Printf("%s\n", c.buildFieldValue("Failed", fmt.Sprintf("%d (%0.2f%%)", failedCount, failedPercentage)))
+	return err
+}
+
+func (c *TerminalLogger) buildFieldValue(label string, value interface{}) string {
+	labelData := color.New(color.FgWhite).Sprintf("%s: ", label)
+	valueData := color.New(color.FgHiWhite).Sprintf("%v", value)
+	return fmt.Sprintf("%s%s", labelData, valueData)
 }

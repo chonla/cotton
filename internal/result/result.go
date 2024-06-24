@@ -3,7 +3,7 @@ package result
 type TestResult struct {
 	Title      string
 	Passed     bool
-	Assertions []AssertionResult
+	Assertions []*AssertionResult
 	Error      error
 }
 
@@ -13,4 +13,9 @@ type AssertionResult struct {
 	Expected string
 	Actual   string
 	Error    error
+}
+
+type TestsuiteResult struct {
+	TestCount   int
+	PassedCount int
 }

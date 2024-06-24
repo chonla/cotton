@@ -75,7 +75,7 @@ secret=updatedValue`, executableOptions)
 	expectedTestcase.AddAssertion(assertion.New("Body.args.key1", eqOp, "value1"))
 	expectedTestcase.AddAssertion(assertion.New("Body.args.key2", eqOp, "value2"))
 
-	expectedAssertionResults := []result.AssertionResult{
+	expectedAssertionResults := []*result.AssertionResult{
 		{
 			Title:    "Body.args.key1 == value1",
 			Passed:   true,
@@ -159,7 +159,7 @@ secret=updatedValue`, executableOptions)
 	expectedTestcase.AddAssertion(assertion.New("Body.args.key1", eqOp, "value1"))
 	expectedTestcase.AddAssertion(assertion.New("Body.args.key2", eqOp, "value2"))
 
-	expectedAssertionResults := []result.AssertionResult{
+	expectedAssertionResults := []*result.AssertionResult{
 		{
 			Title:    "Body.args.key1 == value1",
 			Passed:   true,

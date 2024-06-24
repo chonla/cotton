@@ -20,13 +20,13 @@ func (m *MockLogger) PrintExecutableTitle(title string) error {
 	return args.Error(0)
 }
 
-func (m *MockLogger) PrintBlockTitle(title string) error {
-	args := m.Called(title)
+func (m *MockLogger) PrintTestResult(passed bool) error {
+	args := m.Called(passed)
 	return args.Error(0)
 }
 
-func (m *MockLogger) PrintTestResult(passed bool) error {
-	args := m.Called(passed)
+func (m *MockLogger) PrintSectionedMessage(section, message string) error {
+	args := m.Called(section, message)
 	return args.Error(0)
 }
 
@@ -35,17 +35,37 @@ func (m *MockLogger) PrintInlineTestResult(passed bool) error {
 	return args.Error(0)
 }
 
-func (m *MockLogger) PrintAssertionResults(assertions []result.AssertionResult) error {
+func (m *MockLogger) PrintAssertionResults(assertions []*result.AssertionResult) error {
 	args := m.Called(assertions)
 	return args.Error(0)
 }
 
-func (m *MockLogger) PrintAssertionResult(assertion result.AssertionResult) error {
+func (m *MockLogger) PrintAssertionResult(assertion *result.AssertionResult) error {
 	args := m.Called(assertion)
 	return args.Error(0)
 }
 
 func (m *MockLogger) PrintRequest(req string) error {
 	args := m.Called(req)
+	return args.Error(0)
+}
+
+func (m *MockLogger) PrintError(err error) error {
+	args := m.Called(err)
+	return args.Error(0)
+}
+
+func (m *MockLogger) PrintTestcaseSequence(index, total int) error {
+	args := m.Called(index, total)
+	return args.Error(0)
+}
+
+func (m *MockLogger) PrintTestsuiteResult(testsuiteResult *result.TestsuiteResult) error {
+	args := m.Called(testsuiteResult)
+	return args.Error(0)
+}
+
+func (m *MockLogger) PrintSectionTitle(sectionTitle string) error {
+	args := m.Called(sectionTitle)
 	return args.Error(0)
 }
