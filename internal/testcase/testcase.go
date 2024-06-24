@@ -14,14 +14,14 @@ import (
 	"slices"
 )
 
-type TestCaseOptions struct {
+type TestcaseOptions struct {
 	Logger        logger.Logger
 	RequestParser httphelper.RequestParser
 }
 
 // Test cases
-type TestCase struct {
-	options     *TestCaseOptions
+type Testcase struct {
+	options     *TestcaseOptions
 	title       string
 	description string
 	reqRaw      string
@@ -31,8 +31,8 @@ type TestCase struct {
 	assertions  []*assertion.Assertion
 }
 
-func New(title, description, reqRaw string, options *TestCaseOptions) *TestCase {
-	return &TestCase{
+func NewTestcase(title, description, reqRaw string, options *TestcaseOptions) *Testcase {
+	return &Testcase{
 		options:     options,
 		title:       title,
 		description: description,
@@ -44,19 +44,19 @@ func New(title, description, reqRaw string, options *TestCaseOptions) *TestCase 
 	}
 }
 
-func (t *TestCase) Title() string {
+func (t *Testcase) Title() string {
 	return t.title
 }
 
-func (t *TestCase) Description() string {
+func (t *Testcase) Description() string {
 	return t.description
 }
 
-func (t *TestCase) RawRequest() string {
+func (t *Testcase) RawRequest() string {
 	return t.reqRaw
 }
 
-func (t *TestCase) Captures() []*capture.Capture {
+func (t *Testcase) Captures() []*capture.Capture {
 	// return clone of captures
 	clones := []*capture.Capture{}
 	for _, cap := range t.captures {
@@ -65,11 +65,11 @@ func (t *TestCase) Captures() []*capture.Capture {
 	return clones
 }
 
-func (t *TestCase) AddCapture(cap *capture.Capture) {
+func (t *Testcase) AddCapture(cap *capture.Capture) {
 	t.captures = append(t.captures, cap.Clone())
 }
 
-func (t *TestCase) Assertions() []*assertion.Assertion {
+func (t *Testcase) Assertions() []*assertion.Assertion {
 	// return clone of assertions
 	clones := []*assertion.Assertion{}
 	for _, assert := range t.assertions {
@@ -78,11 +78,11 @@ func (t *TestCase) Assertions() []*assertion.Assertion {
 	return clones
 }
 
-func (t *TestCase) AddAssertion(assert *assertion.Assertion) {
+func (t *Testcase) AddAssertion(assert *assertion.Assertion) {
 	t.assertions = append(t.assertions, assert.Clone())
 }
 
-func (t *TestCase) Setups() []*executable.Executable {
+func (t *Testcase) Setups() []*executable.Executable {
 	// return clone of executables
 	clones := []*executable.Executable{}
 	for _, setup := range t.setups {
@@ -91,11 +91,11 @@ func (t *TestCase) Setups() []*executable.Executable {
 	return clones
 }
 
-func (t *TestCase) AddSetup(setup *executable.Executable) {
+func (t *Testcase) AddSetup(setup *executable.Executable) {
 	t.setups = append(t.setups, setup.Clone())
 }
 
-func (t *TestCase) Teardowns() []*executable.Executable {
+func (t *Testcase) Teardowns() []*executable.Executable {
 	// return clone of executables
 	clones := []*executable.Executable{}
 	for _, teardown := range t.teardowns {
@@ -104,11 +104,11 @@ func (t *TestCase) Teardowns() []*executable.Executable {
 	return clones
 }
 
-func (t *TestCase) AddTeardown(teardown *executable.Executable) {
+func (t *Testcase) AddTeardown(teardown *executable.Executable) {
 	t.teardowns = append(t.teardowns, teardown.Clone())
 }
 
-func (t *TestCase) Execute(initialVars *variable.Variables) *result.TestResult {
+func (t *Testcase) Execute(initialVars *variable.Variables) *result.TestResult {
 	testResult := &result.TestResult{
 		Title:      t.title,
 		Passed:     false,
@@ -121,7 +121,7 @@ func (t *TestCase) Execute(initialVars *variable.Variables) *result.TestResult {
 		return testResult
 	}
 
-	t.options.Logger.PrintTestCaseTitle(t.title)
+	t.options.Logger.PrintTestcaseTitle(t.title)
 
 	sessionVars := initialVars.Clone()
 
@@ -212,20 +212,20 @@ func (t *TestCase) Execute(initialVars *variable.Variables) *result.TestResult {
 	return testResult
 }
 
-func (t *TestCase) SimilarTo(anotherTestCase *TestCase) bool {
-	return t.title == anotherTestCase.title &&
-		t.description == anotherTestCase.description &&
-		t.reqRaw == anotherTestCase.reqRaw &&
-		slices.EqualFunc(t.captures, anotherTestCase.captures, func(c1, c2 *capture.Capture) bool {
+func (t *Testcase) SimilarTo(anotherTestcase *Testcase) bool {
+	return t.title == anotherTestcase.title &&
+		t.description == anotherTestcase.description &&
+		t.reqRaw == anotherTestcase.reqRaw &&
+		slices.EqualFunc(t.captures, anotherTestcase.captures, func(c1, c2 *capture.Capture) bool {
 			return c1.SimilarTo(c2)
 		}) &&
-		slices.EqualFunc(t.setups, anotherTestCase.setups, func(s1, s2 *executable.Executable) bool {
+		slices.EqualFunc(t.setups, anotherTestcase.setups, func(s1, s2 *executable.Executable) bool {
 			return s1.SimilarTo(s2)
 		}) &&
-		slices.EqualFunc(t.teardowns, anotherTestCase.teardowns, func(s1, s2 *executable.Executable) bool {
+		slices.EqualFunc(t.teardowns, anotherTestcase.teardowns, func(s1, s2 *executable.Executable) bool {
 			return s1.SimilarTo(s2)
 		}) &&
-		slices.EqualFunc(t.assertions, anotherTestCase.assertions, func(a1, a2 *assertion.Assertion) bool {
+		slices.EqualFunc(t.assertions, anotherTestcase.assertions, func(a1, a2 *assertion.Assertion) bool {
 			return a1.SimilarTo(a2)
 		})
 }

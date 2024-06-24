@@ -47,7 +47,7 @@ func TestGetDataFromHttpBin(t *testing.T) {
 		Logger:        logger.NewNilLogger(logger.Compact),
 	}
 
-	testcaseOptions := &testcase.TestCaseOptions{
+	testcaseOptions := &testcase.TestcaseOptions{
 		RequestParser: &httphelper.HTTPRequestParser{},
 		Logger:        logger.NewNilLogger(logger.Compact),
 	}
@@ -69,7 +69,7 @@ Content-Length: 19
 secret=updatedValue`, executableOptions)
 
 	eqOp, _ := assertion.NewOp("==")
-	expectedTestcase := testcase.New("Test GET on httpbin.org", "Test getting data from httpbin.org using multiple http requests.", "GET https://httpbin.org/get?key1=value1&key2=value2 HTTP/1.1", testcaseOptions)
+	expectedTestcase := testcase.NewTestcase("Test GET on httpbin.org", "Test getting data from httpbin.org using multiple http requests.", "GET https://httpbin.org/get?key1=value1&key2=value2 HTTP/1.1", testcaseOptions)
 	expectedTestcase.AddSetup(expectedSetup)
 	expectedTestcase.AddTeardown(expectedTeardown)
 	expectedTestcase.AddAssertion(assertion.New("Body.args.key1", eqOp, "value1"))
@@ -131,7 +131,7 @@ func TestGetDataFromHttpBinWithThreeTildedCodeBlock(t *testing.T) {
 		Logger:        logger.NewNilLogger(logger.Compact),
 	}
 
-	testcaseOptions := &testcase.TestCaseOptions{
+	testcaseOptions := &testcase.TestcaseOptions{
 		RequestParser: &httphelper.HTTPRequestParser{},
 		Logger:        logger.NewNilLogger(logger.Compact),
 	}
@@ -153,7 +153,7 @@ Content-Length: 19
 secret=updatedValue`, executableOptions)
 
 	eqOp, _ := assertion.NewOp("==")
-	expectedTestcase := testcase.New("Test GET on httpbin.org with three-tilded code block", "Test getting data from httpbin.org using multiple http requests.", "GET https://httpbin.org/get?key1=value1&key2=value2 HTTP/1.1", testcaseOptions)
+	expectedTestcase := testcase.NewTestcase("Test GET on httpbin.org with three-tilded code block", "Test getting data from httpbin.org using multiple http requests.", "GET https://httpbin.org/get?key1=value1&key2=value2 HTTP/1.1", testcaseOptions)
 	expectedTestcase.AddSetup(expectedSetup)
 	expectedTestcase.AddTeardown(expectedTeardown)
 	expectedTestcase.AddAssertion(assertion.New("Body.args.key1", eqOp, "value1"))

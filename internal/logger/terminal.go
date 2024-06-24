@@ -18,7 +18,7 @@ func NewTerminalLogger(level LogLevel) Logger {
 	}
 }
 
-func (c *TerminalLogger) PrintTestCaseTitle(title string) error {
+func (c *TerminalLogger) PrintTestcaseTitle(title string) error {
 	var err error
 	if c.level == Compact {
 		_, err = fmt.Printf("%s ... ", title)

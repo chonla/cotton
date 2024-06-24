@@ -10,7 +10,7 @@ type MockLogger struct {
 	mock.Mock
 }
 
-func (m *MockLogger) PrintTestCaseTitle(title string) error {
+func (m *MockLogger) PrintTestcaseTitle(title string) error {
 	args := m.Called(title)
 	return args.Error(0)
 }

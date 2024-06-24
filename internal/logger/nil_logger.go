@@ -12,7 +12,7 @@ func NewNilLogger(level LogLevel) Logger {
 	}
 }
 
-func (c *NilLogger) PrintTestCaseTitle(title string) error {
+func (c *NilLogger) PrintTestcaseTitle(title string) error {
 	return nil
 }
 

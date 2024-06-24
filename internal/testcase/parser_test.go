@@ -50,7 +50,7 @@ func TestH1AtVeryFirstLine(t *testing.T) {
 		ExecutableParser: mockExecutableParser,
 	}
 
-	testcaseOptions := &testcase.TestCaseOptions{
+	testcaseOptions := &testcase.TestcaseOptions{
 		Logger:        mockLogger,
 		RequestParser: mockHTTPRequestParser,
 	}
@@ -59,13 +59,13 @@ Host: url
 
 post
 body`
-	expectedTestCase := testcase.New("Title", "", expectedRawRequest, testcaseOptions)
+	expectedTestcase := testcase.NewTestcase("Title", "", expectedRawRequest, testcaseOptions)
 
 	parser := testcase.NewParser(options)
 	result, err := parser.FromMarkdownFile("mock_file")
 
 	assert.Nil(t, err)
-	assert.Equal(t, expectedTestCase, result)
+	assert.Equal(t, expectedTestcase, result)
 	mockFileReader.AssertExpectations(t)
 }
 
@@ -105,7 +105,7 @@ func TestH1AtSomeOtherLines(t *testing.T) {
 		ExecutableParser: mockExecutableParser,
 	}
 
-	testcaseOptions := &testcase.TestCaseOptions{
+	testcaseOptions := &testcase.TestcaseOptions{
 		Logger:        mockLogger,
 		RequestParser: mockHTTPRequestParser,
 	}
@@ -114,13 +114,13 @@ Host: url
 
 post
 body`
-	expectedTestCase := testcase.New("Title", "", expectedRawRequest, testcaseOptions)
+	expectedTestcase := testcase.NewTestcase("Title", "", expectedRawRequest, testcaseOptions)
 
 	parser := testcase.NewParser(options)
 	result, err := parser.FromMarkdownFile("mock_file")
 
 	assert.NoError(t, err)
-	assert.Equal(t, expectedTestCase, result)
+	assert.Equal(t, expectedTestcase, result)
 	mockFileReader.AssertExpectations(t)
 	mockHTTPRequestParser.AssertExpectations(t)
 }
@@ -161,7 +161,7 @@ func TestMultipleH1sWillGrabTheFirstH1AsTitle(t *testing.T) {
 		ExecutableParser: mockExecutableParser,
 	}
 
-	testcaseOptions := &testcase.TestCaseOptions{
+	testcaseOptions := &testcase.TestcaseOptions{
 		Logger:        mockLogger,
 		RequestParser: mockHTTPRequestParser,
 	}
@@ -170,13 +170,13 @@ Host: url
 
 post
 body`
-	expectedTestCase := testcase.New("Title", "", expectedRawRequest, testcaseOptions)
+	expectedTestcase := testcase.NewTestcase("Title", "", expectedRawRequest, testcaseOptions)
 
 	parser := testcase.NewParser(options)
 	result, err := parser.FromMarkdownFile("mock_file")
 
 	assert.NoError(t, err)
-	assert.Equal(t, expectedTestCase, result)
+	assert.Equal(t, expectedTestcase, result)
 	mockFileReader.AssertExpectations(t)
 	mockHTTPRequestParser.AssertExpectations(t)
 }
@@ -218,7 +218,7 @@ func TestDescription(t *testing.T) {
 		ExecutableParser: mockExecutableParser,
 	}
 
-	testcaseOptions := &testcase.TestCaseOptions{
+	testcaseOptions := &testcase.TestcaseOptions{
 		Logger:        mockLogger,
 		RequestParser: mockHTTPRequestParser,
 	}
@@ -227,13 +227,13 @@ Host: url
 
 post
 body`
-	expectedTestCase := testcase.New("Title", "Wonderful\nworld", expectedRawRequest, testcaseOptions)
+	expectedTestcase := testcase.NewTestcase("Title", "Wonderful\nworld", expectedRawRequest, testcaseOptions)
 
 	parser := testcase.NewParser(options)
 	result, err := parser.FromMarkdownFile("mock_file")
 
 	assert.NoError(t, err)
-	assert.Equal(t, expectedTestCase, result)
+	assert.Equal(t, expectedTestcase, result)
 	mockFileReader.AssertExpectations(t)
 	mockHTTPRequestParser.AssertExpectations(t)
 }
@@ -279,7 +279,7 @@ func TestDescriptionAtOtherH1(t *testing.T) {
 		ExecutableParser: mockExecutableParser,
 	}
 
-	testcaseOptions := &testcase.TestCaseOptions{
+	testcaseOptions := &testcase.TestcaseOptions{
 		Logger:        mockLogger,
 		RequestParser: mockHTTPRequestParser,
 	}
@@ -288,13 +288,13 @@ Host: url
 
 post
 body`
-	expectedTestCase := testcase.New("Title", "Wonderful", expectedRawRequest, testcaseOptions)
+	expectedTestcase := testcase.NewTestcase("Title", "Wonderful", expectedRawRequest, testcaseOptions)
 
 	parser := testcase.NewParser(options)
 	result, err := parser.FromMarkdownFile("mock_file")
 
 	assert.NoError(t, err)
-	assert.Equal(t, expectedTestCase, result)
+	assert.Equal(t, expectedTestcase, result)
 	mockFileReader.AssertExpectations(t)
 	mockHTTPRequestParser.AssertExpectations(t)
 }
@@ -331,7 +331,7 @@ func TestGetHTTPRequestWithoutTitle(t *testing.T) {
 		ExecutableParser: mockExecutableParser,
 	}
 
-	testcaseOptions := &testcase.TestCaseOptions{
+	testcaseOptions := &testcase.TestcaseOptions{
 		Logger:        mockLogger,
 		RequestParser: mockHTTPRequestParser,
 	}
@@ -340,13 +340,13 @@ Host: url
 
 post
 body`
-	expectedTestCase := testcase.New("", "", expectedRawRequest, testcaseOptions)
+	expectedTestcase := testcase.NewTestcase("", "", expectedRawRequest, testcaseOptions)
 
 	parser := testcase.NewParser(options)
 	result, err := parser.FromMarkdownFile("mock_file")
 
 	assert.NoError(t, err)
-	assert.Equal(t, expectedTestCase, result)
+	assert.Equal(t, expectedTestcase, result)
 	mockFileReader.AssertExpectations(t)
 	mockHTTPRequestParser.AssertExpectations(t)
 }
@@ -383,7 +383,7 @@ func TestGetHTTPRequestFromThreeTildedCodeBlock(t *testing.T) {
 		ExecutableParser: mockExecutableParser,
 	}
 
-	testcaseOptions := &testcase.TestCaseOptions{
+	testcaseOptions := &testcase.TestcaseOptions{
 		Logger:        mockLogger,
 		RequestParser: mockHTTPRequestParser,
 	}
@@ -392,13 +392,13 @@ Host: url
 
 post
 body`
-	expectedTestCase := testcase.New("", "", expectedRawRequest, testcaseOptions)
+	expectedTestcase := testcase.NewTestcase("", "", expectedRawRequest, testcaseOptions)
 
 	parser := testcase.NewParser(options)
 	result, err := parser.FromMarkdownFile("mock_file")
 
 	assert.NoError(t, err)
-	assert.Equal(t, expectedTestCase, result)
+	assert.Equal(t, expectedTestcase, result)
 	mockFileReader.AssertExpectations(t)
 	mockHTTPRequestParser.AssertExpectations(t)
 }
@@ -484,7 +484,7 @@ func TestGetHTTPRequestInOtherHTTPCodeBlock(t *testing.T) {
 		ExecutableParser: mockExecutableParser,
 	}
 
-	testcaseOptions := &testcase.TestCaseOptions{
+	testcaseOptions := &testcase.TestcaseOptions{
 		Logger:        mockLogger,
 		RequestParser: mockHTTPRequestParser,
 	}
@@ -493,13 +493,13 @@ Host: url
 
 post
 body`
-	expectedTestCase := testcase.New("", "", expectedRawRequest, testcaseOptions)
+	expectedTestcase := testcase.NewTestcase("", "", expectedRawRequest, testcaseOptions)
 
 	parser := testcase.NewParser(options)
 	result, err := parser.FromMarkdownFile("mock_file")
 
 	assert.NoError(t, err)
-	assert.Equal(t, expectedTestCase, result)
+	assert.Equal(t, expectedTestcase, result)
 	mockFileReader.AssertExpectations(t)
 	mockHTTPRequestParser.AssertExpectations(t)
 }
@@ -552,7 +552,7 @@ func TestGetHTTPRequestInMixedHTTPCodeBlock(t *testing.T) {
 		ExecutableParser: mockExecutableParser,
 	}
 
-	testcaseOptions := &testcase.TestCaseOptions{
+	testcaseOptions := &testcase.TestcaseOptions{
 		Logger:        mockLogger,
 		RequestParser: mockHTTPRequestParser,
 	}
@@ -561,13 +561,13 @@ Host: url
 
 post
 body`
-	expectedTestCase := testcase.New("", "", expectedRawRequest, testcaseOptions)
+	expectedTestcase := testcase.NewTestcase("", "", expectedRawRequest, testcaseOptions)
 
 	parser := testcase.NewParser(options)
 	result, err := parser.FromMarkdownFile("mock_file")
 
 	assert.NoError(t, err)
-	assert.Equal(t, expectedTestCase, result)
+	assert.Equal(t, expectedTestcase, result)
 	mockFileReader.AssertExpectations(t)
 	mockHTTPRequestParser.AssertExpectations(t)
 }
@@ -611,7 +611,7 @@ func TestGetHTTPRequestInOnlyFirstHTTPCodeBlock(t *testing.T) {
 		ExecutableParser: mockExecutableParser,
 	}
 
-	testcaseOptions := &testcase.TestCaseOptions{
+	testcaseOptions := &testcase.TestcaseOptions{
 		Logger:        mockLogger,
 		RequestParser: mockHTTPRequestParser,
 	}
@@ -620,13 +620,13 @@ Host: url
 
 post
 body`
-	expectedTestCase := testcase.New("", "", expectedRawRequest, testcaseOptions)
+	expectedTestcase := testcase.NewTestcase("", "", expectedRawRequest, testcaseOptions)
 
 	parser := testcase.NewParser(options)
 	result, err := parser.FromMarkdownFile("mock_file")
 
 	assert.NoError(t, err)
-	assert.Equal(t, expectedTestCase, result)
+	assert.Equal(t, expectedTestcase, result)
 	mockFileReader.AssertExpectations(t)
 	mockHTTPRequestParser.AssertExpectations(t)
 }
@@ -679,7 +679,7 @@ func TestGetExecutablesBeforeTest(t *testing.T) {
 		ExecutableParser: mockExecutableParser,
 	}
 
-	testcaseOptions := &testcase.TestCaseOptions{
+	testcaseOptions := &testcase.TestcaseOptions{
 		Logger:        mockLogger,
 		RequestParser: mockHTTPRequestParser,
 	}
@@ -688,15 +688,15 @@ Host: url
 
 post
 body`
-	expectedTestCase := testcase.New("", "", expectedRawRequest, testcaseOptions)
-	expectedTestCase.AddSetup(mockSetup1)
-	expectedTestCase.AddSetup(mockSetup2)
+	expectedTestcase := testcase.NewTestcase("", "", expectedRawRequest, testcaseOptions)
+	expectedTestcase.AddSetup(mockSetup1)
+	expectedTestcase.AddSetup(mockSetup2)
 
 	parser := testcase.NewParser(options)
 	result, err := parser.FromMarkdownFile("mock_file")
 
 	assert.NoError(t, err)
-	assert.Equal(t, expectedTestCase, result)
+	assert.Equal(t, expectedTestcase, result)
 }
 
 func TestGetExecutablesAfterTest(t *testing.T) {
@@ -747,7 +747,7 @@ func TestGetExecutablesAfterTest(t *testing.T) {
 		ExecutableParser: mockExecutableParser,
 	}
 
-	testcaseOptions := &testcase.TestCaseOptions{
+	testcaseOptions := &testcase.TestcaseOptions{
 		Logger:        mockLogger,
 		RequestParser: mockHTTPRequestParser,
 	}
@@ -756,15 +756,15 @@ Host: url
 
 post
 body`
-	expectedTestCase := testcase.New("", "", expectedRawRequest, testcaseOptions)
-	expectedTestCase.AddTeardown(mockTeardown1)
-	expectedTestCase.AddTeardown(mockTeardown2)
+	expectedTestcase := testcase.NewTestcase("", "", expectedRawRequest, testcaseOptions)
+	expectedTestcase.AddTeardown(mockTeardown1)
+	expectedTestcase.AddTeardown(mockTeardown2)
 
 	parser := testcase.NewParser(options)
 	result, err := parser.FromMarkdownFile("mock_file")
 
 	assert.NoError(t, err)
-	assert.Equal(t, expectedTestCase, result)
+	assert.Equal(t, expectedTestcase, result)
 }
 
 func TestGetCapturesInTestcase(t *testing.T) {
@@ -801,7 +801,7 @@ func TestGetCapturesInTestcase(t *testing.T) {
 		ExecutableParser: mockExecutableParser,
 	}
 
-	testcaseOptions := &testcase.TestCaseOptions{
+	testcaseOptions := &testcase.TestcaseOptions{
 		Logger:        mockLogger,
 		RequestParser: mockHTTPRequestParser,
 	}
@@ -810,14 +810,14 @@ Host: url
 
 post
 body`
-	expectedTestCase := testcase.New("", "", expectedRawRequest, testcaseOptions)
-	expectedTestCase.AddCapture(capture.New("varname", "$.result"))
+	expectedTestcase := testcase.NewTestcase("", "", expectedRawRequest, testcaseOptions)
+	expectedTestcase.AddCapture(capture.New("varname", "$.result"))
 
 	parser := testcase.NewParser(options)
 	result, err := parser.FromMarkdownFile("mock_file")
 
 	assert.NoError(t, err)
-	assert.Equal(t, expectedTestCase, result)
+	assert.Equal(t, expectedTestcase, result)
 
 }
 
@@ -856,7 +856,7 @@ func TestGetAssertion(t *testing.T) {
 		ExecutableParser: mockExecutableParser,
 	}
 
-	testcaseOptions := &testcase.TestCaseOptions{
+	testcaseOptions := &testcase.TestcaseOptions{
 		Logger:        mockLogger,
 		RequestParser: mockHTTPRequestParser,
 	}
@@ -866,13 +866,13 @@ Host: url
 post
 body`
 	eqOp, _ := assertion.NewOp("==")
-	expectedTestCase := testcase.New("", "", expectedRawRequest, testcaseOptions)
-	expectedTestCase.AddAssertion(assertion.New("$.var", eqOp, float64(3)))
-	expectedTestCase.AddAssertion(assertion.New("$.var2", eqOp, "good.vibe"))
+	expectedTestcase := testcase.NewTestcase("", "", expectedRawRequest, testcaseOptions)
+	expectedTestcase.AddAssertion(assertion.New("$.var", eqOp, float64(3)))
+	expectedTestcase.AddAssertion(assertion.New("$.var2", eqOp, "good.vibe"))
 
 	parser := testcase.NewParser(options)
 	result, err := parser.FromMarkdownFile("mock_file")
 
 	assert.NoError(t, err)
-	assert.Equal(t, expectedTestCase, result)
+	assert.Equal(t, expectedTestcase, result)
 }

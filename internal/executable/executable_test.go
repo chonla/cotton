@@ -92,6 +92,7 @@ Content-Type: application/json
 
 	mockLogger := new(logger.MockLogger)
 	mockLogger.On("PrintExecutableTitle", mock.Anything).Return(nil)
+	mockLogger.On("PrintRequest", mock.Anything).Return(nil)
 
 	options := &executable.ExecutableOptions{
 		RequestParser: mockReqParser,

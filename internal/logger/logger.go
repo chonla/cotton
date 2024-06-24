@@ -11,7 +11,7 @@ const (
 )
 
 type Logger interface {
-	PrintTestCaseTitle(title string) error
+	PrintTestcaseTitle(title string) error
 	PrintExecutableTitle(title string) error
 	PrintTestResult(passed bool) error
 	PrintInlineTestResult(passed bool) error

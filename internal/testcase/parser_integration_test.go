@@ -41,7 +41,7 @@ func TestParsingCompleteTestcaseMarkdownFile(t *testing.T) {
 	}
 	parser := testcase.NewParser(parserOptions)
 
-	testcaseOptions := &testcase.TestCaseOptions{
+	testcaseOptions := &testcase.TestcaseOptions{
 		RequestParser: &httphelper.HTTPRequestParser{},
 		Logger:        logger.NewNilLogger(logger.Compact),
 	}
@@ -60,7 +60,7 @@ Host: localhost`, executableOptions)
 Host: localhost`, executableOptions)
 	expectedTeardown.AddCapture(capture.New("time", "$.millisec"))
 
-	expectedTestcase := testcase.New("This is title of test case written with ATX Heading 1", "The test case is described by providing paragraphs right after the test case title.\n\nThe description of test case can be single or multiple lines.\n\nCotton will consider only the first ATX Heading 1 as the test title.", `POST /some-path HTTP/1.1
+	expectedTestcase := testcase.NewTestcase("This is title of test case written with ATX Heading 1", "The test case is described by providing paragraphs right after the test case title.\n\nThe description of test case can be single or multiple lines.\n\nCotton will consider only the first ATX Heading 1 as the test title.", `POST /some-path HTTP/1.1
 Host: localhost
 
 {

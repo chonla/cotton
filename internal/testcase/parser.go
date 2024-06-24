@@ -31,7 +31,7 @@ func NewParser(options *ParserOptions) *Parser {
 	}
 }
 
-func (p *Parser) FromMarkdownFile(mdFileName string) (*TestCase, error) {
+func (p *Parser) FromMarkdownFile(mdFileName string) (*Testcase, error) {
 	mdFullPath := p.options.Configurator.ResolvePath(mdFileName)
 	lines, err := p.options.FileReader.Read(mdFullPath)
 	if err != nil {
@@ -40,7 +40,7 @@ func (p *Parser) FromMarkdownFile(mdFileName string) (*TestCase, error) {
 	return p.FromMarkdownLines(lines)
 }
 
-func (p *Parser) FromMarkdownLines(mdLines []line.Line) (*TestCase, error) {
+func (p *Parser) FromMarkdownLines(mdLines []line.Line) (*Testcase, error) {
 	title := ""
 	description := []string{}
 	var req []string
@@ -178,11 +178,11 @@ func (p *Parser) FromMarkdownLines(mdLines []line.Line) (*TestCase, error) {
 		return nil, errors.New("no callable request")
 	}
 
-	options := &TestCaseOptions{
+	options := &TestcaseOptions{
 		RequestParser: p.options.RequestParser,
 		Logger:        p.options.Logger,
 	}
-	tc := New(title, line.Line(strings.Join(description, "\n")).Trim().Value(), reqRaw, options)
+	tc := NewTestcase(title, line.Line(strings.Join(description, "\n")).Trim().Value(), reqRaw, options)
 	for _, cap := range captures {
 		tc.AddCapture(cap)
 	}
