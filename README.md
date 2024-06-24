@@ -46,3 +46,4 @@ See the files in `etc/examples` directory.
 * Cookbook
 * ~~Colorized logging~~
 * HTML reports
+* Upload request

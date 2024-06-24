@@ -38,7 +38,7 @@ func main() {
 		ExecutableParser: exParser,
 	}
 
-	ts, err := testcase.NewTestsuite("<rootDir>/etc/examples", tcOptions)
+	ts, err := testcase.NewTestsuite("<rootDir>/etc/examples/mixed", tcOptions)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
