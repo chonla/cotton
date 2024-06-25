@@ -14,6 +14,7 @@ key1=value1&key2=value2
 ```
 
 * `Body.form` is defined
+* `Body.form.key1`==`"value1"`
 ~~~
 
 ## A descriptive testcase
@@ -34,5 +35,6 @@ key1=value1&key2=value2
 ```
 
 * `Body.form` is defined
+* `Body.form.key1`==`"value1"`
 ~~~
 
