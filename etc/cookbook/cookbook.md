@@ -103,3 +103,74 @@ key1=value1&key2=value2
 * `Body.form` is defined
 * `Body.form.key1`==`"value1"`
 ~~~
+
+## Capturing result
+
+The result of any request can be captured into variables. The variables can be referred in the following requests once they are captured.
+
+From the following markdown:
+
+~~~markdown
+# Sending post to httpbin.org
+
+This request is an example of calling setting ups and sending a request to httpbin.org.
+
+* [Authenticate client](./common/auth.md)
+* [Get session reference id](./common/get_ref_id.md)
+
+```http
+POST https://httpbin.org/post HTTP/1.1
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 25
+
+key1=value1&key2=value2
+```
+
+* `Body.form` is defined
+* `Body.form.key1`==`"value1"`
+~~~
+
+Given a url `http://sso.someurl.org/ref` returns the following JSON when received a POST request:
+
+```json
+{"ref_id":"1726-ed7a7"}
+```
+
+The markdown `get_ref_id.md` will look like this.
+
+~~~markdown
+```http
+POST http://sso.someurl.org/ref HTTP/1.1
+Content-Type: application/json
+Content-Length: 20
+
+{"client-id":"1234"}
+```
+
+* `refid`:`Body.ref_id`
+~~~
+
+where `` `refid` ``:`` `Body.ref_id` `` is capturing syntax. The `refid` is variable name and `Body.ref_id` is selector from result.
+
+The modified testcase will look like this.
+
+~~~markdown
+# Sending post to httpbin.org
+
+This request is an example of calling setting ups and sending a request to httpbin.org.
+
+* [Authenticate client](./common/auth.md)
+* [Get session reference id](./common/get_ref_id.md)
+
+```http
+POST https://httpbin.org/post HTTP/1.1
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 25
+
+key1=value1&key2=value2&refid={{refid}}
+```
+
+* `Body.form` is defined
+* `Body.form.key1`==`"value1"`
+* `Body.form.refid`==`"1234"`
+~~~
