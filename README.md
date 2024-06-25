@@ -50,6 +50,7 @@ See the files in `etc/examples` directory.
 * ~~Insecure mode~~
 * Track time taken
 * ~~Stop tests execution when failed~~
+* Variables
 
 ## License
 
