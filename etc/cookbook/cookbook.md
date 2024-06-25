@@ -172,5 +172,5 @@ key1=value1&key2=value2&refid={{refid}}
 
 * `Body.form` is defined
 * `Body.form.key1`==`"value1"`
-* `Body.form.refid`==`"1234"`
+* `Body.form.refid`==`"1726-ed7a7"`
 ~~~
