@@ -47,6 +47,8 @@ func (p *ExecutableParser) FromMarkdownLines(mdLines []line.Line) (*Executable, 
 
 	collectingCodeBlockBackTick := false
 	collectingCodeBlockTilde := false
+	discardingCodeBlockBacktick := false
+	discardingCodeBlockTilde := false
 
 	exReqFound := false
 	exTitle := "Untitled"
@@ -54,50 +56,75 @@ func (p *ExecutableParser) FromMarkdownLines(mdLines []line.Line) (*Executable, 
 	exCaptures := []*capture.Capture{}
 
 	for _, mdLine := range mdLines {
-		if mdLine.LookLike("^```http$") && !exReqFound {
-			collectingCodeBlockBackTick = true
-			continue
-		}
-
-		if mdLine.LookLike("^~~~http$") && !exReqFound {
-			collectingCodeBlockTilde = true
-			continue
-		}
-
-		if collectingCodeBlockBackTick {
+		if discardingCodeBlockBacktick {
+			// discard everything after opening unsupport ```
 			if ok := mdLine.LookLike("^```$"); ok {
-				collectingCodeBlockBackTick = false
-
-				if len(req) > 0 {
-					exReqRaw = line.Line(strings.Join(req, "\n")).Value()
-					exReqFound = true
-					req = nil
-				}
-			} else {
-				if req == nil {
-					req = []string{}
-				}
-				req = append(req, mdLine.Value())
+				discardingCodeBlockBacktick = false
 			}
 		} else {
-			if collectingCodeBlockTilde {
+			if discardingCodeBlockTilde {
+				// discard everything after opening unsupport ~~~
 				if ok := mdLine.LookLike("^~~~$"); ok {
-					collectingCodeBlockTilde = false
-
-					if len(req) > 0 {
-						exReqRaw = line.Line(strings.Join(req, "\n")).Value()
-						exReqFound = true
-						req = nil
-					}
-				} else {
-					if req == nil {
-						req = []string{}
-					}
-					req = append(req, mdLine.Value())
+					discardingCodeBlockTilde = false
 				}
 			} else {
-				if cap, ok := capture.Try(mdLine); ok {
-					exCaptures = append(exCaptures, cap)
+				if collectingCodeBlockBackTick {
+					if ok := mdLine.LookLike("^```$"); ok {
+						collectingCodeBlockBackTick = false
+						discardingCodeBlockBacktick = false
+
+						if len(req) > 0 {
+							exReqRaw = line.Line(strings.Join(req, "\n")).Value()
+							exReqFound = true
+							req = nil
+						}
+					} else {
+						if req == nil {
+							req = []string{}
+						}
+						req = append(req, mdLine.Value())
+					}
+				} else {
+					if collectingCodeBlockTilde {
+						if ok := mdLine.LookLike("^~~~$"); ok {
+							collectingCodeBlockTilde = false
+
+							if len(req) > 0 {
+								exReqRaw = line.Line(strings.Join(req, "\n")).Value()
+								exReqFound = true
+								req = nil
+							}
+						} else {
+							if req == nil {
+								req = []string{}
+							}
+							req = append(req, mdLine.Value())
+						}
+					} else {
+						if cap, ok := capture.Try(mdLine); ok {
+							exCaptures = append(exCaptures, cap)
+						} else {
+							if mdLine.LookLike("^```http$") && !exReqFound {
+								collectingCodeBlockBackTick = true
+								continue
+							}
+
+							if mdLine.LookLike("^~~~http$") && !exReqFound {
+								collectingCodeBlockTilde = true
+								continue
+							}
+
+							if ok := mdLine.LookLike("^```"); ok {
+								discardingCodeBlockBacktick = true
+								continue
+							}
+
+							if ok := mdLine.LookLike("^~~~"); ok {
+								discardingCodeBlockTilde = true
+								continue
+							}
+						}
+					}
 				}
 			}
 		}

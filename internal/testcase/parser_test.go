@@ -351,6 +351,130 @@ body`
 	mockHTTPRequestParser.AssertExpectations(t)
 }
 
+func TestNotGetHTTPRequestWithinOtherCodeblock(t *testing.T) {
+	config := &config.Config{
+		RootDir: "",
+	}
+
+	lines := []line.Line{
+		"~~~markdown",
+		"```http",
+		"POST /some-other-path HTTP/1.0",
+		"Host: url",
+		"",
+		"post",
+		"body",
+		"```",
+		"~~~",
+		"",
+		"```http",
+		"POST /some-path HTTP/1.0",
+		"Host: url",
+		"",
+		"post",
+		"body",
+		"```",
+	}
+
+	mockFileReader := new(reader.MockFileReader)
+	mockFileReader.On("Read", "mock_file").Return(lines, nil)
+
+	mockHTTPRequestParser := new(httphelper.MockHTTPRequestParser)
+
+	mockLogger := new(logger.MockLogger)
+
+	mockExecutableParser := new(executable.MockExecutableParser)
+
+	options := &testcase.ParserOptions{
+		Configurator:     config,
+		FileReader:       mockFileReader,
+		RequestParser:    mockHTTPRequestParser,
+		Logger:           mockLogger,
+		ExecutableParser: mockExecutableParser,
+	}
+
+	testcaseOptions := &testcase.TestcaseOptions{
+		Logger:        mockLogger,
+		RequestParser: mockHTTPRequestParser,
+	}
+	expectedRawRequest := `POST /some-path HTTP/1.0
+Host: url
+
+post
+body`
+	expectedTestcase := testcase.NewTestcase("", "", expectedRawRequest, testcaseOptions)
+
+	parser := testcase.NewParser(options)
+	result, err := parser.FromMarkdownFile("mock_file")
+
+	assert.NoError(t, err)
+	assert.Equal(t, expectedTestcase, result)
+	mockFileReader.AssertExpectations(t)
+	mockHTTPRequestParser.AssertExpectations(t)
+}
+
+func TestNotGetHTTPRequestWithinOtherCodeblockFlip(t *testing.T) {
+	config := &config.Config{
+		RootDir: "",
+	}
+
+	lines := []line.Line{
+		"```markdown",
+		"~~~http",
+		"POST /some-other-path HTTP/1.0",
+		"Host: url",
+		"",
+		"post",
+		"body",
+		"~~~",
+		"```",
+		"",
+		"```http",
+		"POST /some-path HTTP/1.0",
+		"Host: url",
+		"",
+		"post",
+		"body",
+		"```",
+	}
+
+	mockFileReader := new(reader.MockFileReader)
+	mockFileReader.On("Read", "mock_file").Return(lines, nil)
+
+	mockHTTPRequestParser := new(httphelper.MockHTTPRequestParser)
+
+	mockLogger := new(logger.MockLogger)
+
+	mockExecutableParser := new(executable.MockExecutableParser)
+
+	options := &testcase.ParserOptions{
+		Configurator:     config,
+		FileReader:       mockFileReader,
+		RequestParser:    mockHTTPRequestParser,
+		Logger:           mockLogger,
+		ExecutableParser: mockExecutableParser,
+	}
+
+	testcaseOptions := &testcase.TestcaseOptions{
+		Logger:        mockLogger,
+		RequestParser: mockHTTPRequestParser,
+	}
+	expectedRawRequest := `POST /some-path HTTP/1.0
+Host: url
+
+post
+body`
+	expectedTestcase := testcase.NewTestcase("", "", expectedRawRequest, testcaseOptions)
+
+	parser := testcase.NewParser(options)
+	result, err := parser.FromMarkdownFile("mock_file")
+
+	assert.NoError(t, err)
+	assert.Equal(t, expectedTestcase, result)
+	mockFileReader.AssertExpectations(t)
+	mockHTTPRequestParser.AssertExpectations(t)
+}
+
 func TestGetHTTPRequestFromThreeTildedCodeBlock(t *testing.T) {
 	config := &config.Config{
 		RootDir: "",

@@ -48,6 +48,8 @@ func (p *Parser) FromMarkdownLines(mdLines []line.Line) (*Testcase, error) {
 	justTitle := false
 	collectingCodeBlockBackTick := false
 	collectingCodeBlockTilde := false
+	discardingCodeBlockBacktick := false
+	discardingCodeBlockTilde := false
 	titleCollected := false
 	reqRaw := ""
 	captures := []*capture.Capture{}
@@ -57,114 +59,114 @@ func (p *Parser) FromMarkdownLines(mdLines []line.Line) (*Testcase, error) {
 	teardowns := []*executable.Executable{}
 
 	for _, mdLine := range mdLines {
-		if cap, ok := mdLine.Capture(`^ {0,3}#\s+(.*)`, 1); ok && !justTitle && !titleCollected {
-			title = cap
-			justTitle = true
-			titleCollected = true
-			continue
-		}
-
-		if mdLine.LookLike("^```http$") && !reqFound {
-			justTitle = false
-			collectingCodeBlockBackTick = true
-			continue
-		}
-
-		if mdLine.LookLike("^~~~http$") && !reqFound {
-			justTitle = false
-			collectingCodeBlockTilde = true
-			continue
-		}
-
-		// if justTitle {
-		// 	if ok := mdLine.LookLike(`^ {0,3}#{1,6}\s+(.*)`); ok {
-		// 		justTitle = false
-		// 		continue
-		// 	}
-
-		// 	if ok := mdLine.LookLike(`^~~~`); ok {
-		// 		justTitle = false
-		// 		continue
-		// 	}
-
-		// 	if ok := mdLine.LookLike("^```"); ok {
-		// 		justTitle = false
-		// 		continue
-		// 	}
-
-		// 	if ok := mdLine.LookLike(`^\s*\*\s.+`); ok {
-		// 		justTitle = false
-		// 		continue
-		// 	}
-
-		// 	description = append(description, mdLine.Value())
-		// 	continue
-		// }
-
-		if collectingCodeBlockBackTick {
+		if discardingCodeBlockBacktick {
+			// discard everything after opening unsupport ```
 			if ok := mdLine.LookLike("^```$"); ok {
-				collectingCodeBlockBackTick = false
-
-				if len(req) > 0 {
-					reqRaw = line.Line(strings.Join(req, "\n")).Value()
-					reqFound = true
-					req = nil
-				}
-			} else {
-				if req == nil {
-					req = []string{}
-				}
-				req = append(req, mdLine.Value())
+				discardingCodeBlockBacktick = false
 			}
 		} else {
-			if collectingCodeBlockTilde {
+			if discardingCodeBlockTilde {
+				// discard everything after opening unsupport ~~~
 				if ok := mdLine.LookLike("^~~~$"); ok {
-					collectingCodeBlockTilde = false
-
-					if len(req) > 0 {
-						reqRaw = line.Line(strings.Join(req, "\n")).Value()
-						reqFound = true
-						req = nil
-					}
-				} else {
-					if req == nil {
-						req = []string{}
-					}
-					req = append(req, mdLine.Value())
+					discardingCodeBlockTilde = false
 				}
 			} else {
-				if cap, ok := capture.Try(mdLine); ok {
-					justTitle = false
-					captures = append(captures, cap)
-				} else {
-					if as, ok := assertion.Try(mdLine); ok {
-						justTitle = false
-						assertions = append(assertions, as)
+
+				if cap, ok := mdLine.Capture(`^ {0,3}#\s+(.*)`, 1); ok && !justTitle && !titleCollected {
+					title = cap
+					justTitle = true
+					titleCollected = true
+					continue
+				}
+
+				if collectingCodeBlockBackTick {
+					if ok := mdLine.LookLike("^```$"); ok {
+						collectingCodeBlockBackTick = false
+
+						if len(req) > 0 {
+							reqRaw = line.Line(strings.Join(req, "\n")).Value()
+							reqFound = true
+							req = nil
+						}
 					} else {
-						if captures, ok := mdLine.CaptureAll(`^\s*\*\s\[([^\]]+)\]\(([^\)]+)\)`); ok {
-							justTitle = false
-							if !reqFound {
-								ex, err := p.options.ExecutableParser.FromMarkdownFile(captures[2])
-								if err != nil {
-									return nil, err
-								}
-								ex.SetTitle(captures[1])
-								setups = append(setups, ex)
-							} else {
-								ex, err := p.options.ExecutableParser.FromMarkdownFile(captures[2])
-								if err != nil {
-									return nil, err
-								}
-								ex.SetTitle(captures[1])
-								teardowns = append(teardowns, ex)
+						if req == nil {
+							req = []string{}
+						}
+						req = append(req, mdLine.Value())
+					}
+				} else {
+					if collectingCodeBlockTilde {
+						if ok := mdLine.LookLike("^~~~$"); ok {
+							collectingCodeBlockTilde = false
+
+							if len(req) > 0 {
+								reqRaw = line.Line(strings.Join(req, "\n")).Value()
+								reqFound = true
+								req = nil
 							}
 						} else {
-							if ok := mdLine.LookLike(`^ {0,3}#{1,6}\s+(.*)`); ok {
+							if req == nil {
+								req = []string{}
+							}
+							req = append(req, mdLine.Value())
+						}
+					} else {
+						if cap, ok := capture.Try(mdLine); ok {
+							justTitle = false
+							captures = append(captures, cap)
+						} else {
+							if as, ok := assertion.Try(mdLine); ok {
 								justTitle = false
-								// continue
+								assertions = append(assertions, as)
 							} else {
-								if justTitle {
-									description = append(description, mdLine.Value())
+								if captures, ok := mdLine.CaptureAll(`^\s*\*\s\[([^\]]+)\]\(([^\)]+)\)`); ok {
+									justTitle = false
+									if !reqFound {
+										ex, err := p.options.ExecutableParser.FromMarkdownFile(captures[2])
+										if err != nil {
+											return nil, err
+										}
+										ex.SetTitle(captures[1])
+										setups = append(setups, ex)
+									} else {
+										ex, err := p.options.ExecutableParser.FromMarkdownFile(captures[2])
+										if err != nil {
+											return nil, err
+										}
+										ex.SetTitle(captures[1])
+										teardowns = append(teardowns, ex)
+									}
+								} else {
+									if ok := mdLine.LookLike(`^ {0,3}#{1,6}\s+(.*)`); ok {
+										justTitle = false
+										// continue
+									} else {
+										if mdLine.LookLike("^```http$") && !reqFound {
+											justTitle = false
+											collectingCodeBlockBackTick = true
+											continue
+										}
+
+										if mdLine.LookLike("^~~~http$") && !reqFound {
+											justTitle = false
+											collectingCodeBlockTilde = true
+											continue
+										}
+
+										if ok := mdLine.LookLike("^```"); ok {
+											discardingCodeBlockBacktick = true
+											continue
+										}
+
+										if ok := mdLine.LookLike("^~~~"); ok {
+											discardingCodeBlockTilde = true
+											continue
+										}
+
+										if justTitle {
+											description = append(description, mdLine.Value())
+										}
+									}
 								}
 							}
 						}

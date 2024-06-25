@@ -46,6 +46,9 @@ func NewTestcase(title, description, reqRaw string, options *TestcaseOptions) *T
 }
 
 func (t *Testcase) Title() string {
+	if t.title == "" {
+		return "Untitled"
+	}
 	return t.title
 }
 
@@ -145,7 +148,7 @@ func (t *Testcase) Execute(initialVars *variable.Variables) *result.TestResult {
 	}
 
 	t.options.Logger.PrintSectionTitle("test")
-	t.options.Logger.PrintTestcaseTitle(t.title)
+	t.options.Logger.PrintTestcaseTitle(t.Title())
 
 	t.options.Logger.PrintRequest(compiledRequest)
 	resp, err := request.Do(t.options.InsecureRequest)

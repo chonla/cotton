@@ -66,7 +66,7 @@ func (ts *Testsuite) Execute() (*result.TestsuiteResult, error) {
 
 	for index, tc := range ts.testcases {
 		section := fmt.Sprintf("testcase %d/%d", index+1, testsuiteResult.TestCount)
-		ts.options.Logger.PrintSectionedMessage(section, tc.title)
+		ts.options.Logger.PrintSectionedMessage(section, tc.Title())
 
 		result := tc.Execute(initialVars)
 		if result.Passed {

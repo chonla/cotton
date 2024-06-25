@@ -39,6 +39,9 @@ func (ex *Executable) SetTitle(title string) {
 }
 
 func (ex *Executable) Title() string {
+	if ex.title == "" {
+		return "Untitled"
+	}
 	return ex.title
 }
 
@@ -86,7 +89,7 @@ func (ex *Executable) Execute(initialVars *variable.Variables) (*execution.Execu
 		return nil, err
 	}
 
-	ex.options.Logger.PrintExecutableTitle(ex.title)
+	ex.options.Logger.PrintExecutableTitle(ex.Title())
 	ex.options.Logger.PrintRequest(compiledRequest)
 	resp, err := request.Do(ex.options.InsecureRequest)
 	if err != nil {
@@ -108,8 +111,8 @@ func (ex *Executable) Execute(initialVars *variable.Variables) (*execution.Execu
 }
 
 func (ex *Executable) SimilarTo(anotherEx *Executable) bool {
-	return ex.title == anotherEx.Title() &&
-		ex.reqRaw == anotherEx.RawRequest() &&
+	return ex.title == anotherEx.title &&
+		ex.reqRaw == anotherEx.reqRaw &&
 		slices.EqualFunc(ex.captures, anotherEx.Captures(), func(c1, c2 *capture.Capture) bool {
 			return c1.SimilarTo(c2)
 		})

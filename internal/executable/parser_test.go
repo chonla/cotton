@@ -165,6 +165,122 @@ body`
 	mockFileReader.AssertExpectations(t)
 }
 
+func TestNotGetHTTPRequestInHTTPCodeBlockInOtherCodeBlock(t *testing.T) {
+	config := &config.Config{
+		RootDir: "",
+	}
+
+	lines := []line.Line{
+		"~~~markdown",
+		"```http",
+		"POST /some-other-path HTTP/1.0",
+		"Host: url",
+		"",
+		"post",
+		"body",
+		"```",
+		"~~~",
+		"",
+		"```http",
+		"POST /some-path HTTP/1.0",
+		"Host: url",
+		"",
+		"post",
+		"body",
+		"```",
+	}
+
+	mockFileReader := new(reader.MockFileReader)
+	mockFileReader.On("Read", "mock_file").Return(lines, nil)
+
+	mockHTTPRequestParser := new(httphelper.MockHTTPRequestParser)
+
+	mockLogger := new(logger.MockLogger)
+
+	expectedExecutableOptions := &executable.ExecutableOptions{
+		Logger:        mockLogger,
+		RequestParser: mockHTTPRequestParser,
+	}
+	expectedRawRequest := `POST /some-path HTTP/1.0
+Host: url
+
+post
+body`
+	expectedExecutable := executable.New("Untitled", expectedRawRequest, expectedExecutableOptions)
+
+	options := &executable.ParserOptions{
+		Configurator:  config,
+		FileReader:    mockFileReader,
+		RequestParser: mockHTTPRequestParser,
+		Logger:        mockLogger,
+	}
+
+	parser := executable.NewParser(options)
+	result, err := parser.FromMarkdownFile("mock_file")
+
+	assert.NoError(t, err)
+	assert.Equal(t, expectedExecutable, result)
+	mockFileReader.AssertExpectations(t)
+}
+
+func TestNotGetHTTPRequestInHTTPCodeBlockInOtherCodeBlockFlip(t *testing.T) {
+	config := &config.Config{
+		RootDir: "",
+	}
+
+	lines := []line.Line{
+		"```markdown",
+		"~~~http",
+		"POST /some-other-path HTTP/1.0",
+		"Host: url",
+		"",
+		"post",
+		"body",
+		"~~~",
+		"```",
+		"",
+		"```http",
+		"POST /some-path HTTP/1.0",
+		"Host: url",
+		"",
+		"post",
+		"body",
+		"```",
+	}
+
+	mockFileReader := new(reader.MockFileReader)
+	mockFileReader.On("Read", "mock_file").Return(lines, nil)
+
+	mockHTTPRequestParser := new(httphelper.MockHTTPRequestParser)
+
+	mockLogger := new(logger.MockLogger)
+
+	expectedExecutableOptions := &executable.ExecutableOptions{
+		Logger:        mockLogger,
+		RequestParser: mockHTTPRequestParser,
+	}
+	expectedRawRequest := `POST /some-path HTTP/1.0
+Host: url
+
+post
+body`
+	expectedExecutable := executable.New("Untitled", expectedRawRequest, expectedExecutableOptions)
+
+	options := &executable.ParserOptions{
+		Configurator:  config,
+		FileReader:    mockFileReader,
+		RequestParser: mockHTTPRequestParser,
+		Logger:        mockLogger,
+	}
+
+	parser := executable.NewParser(options)
+	result, err := parser.FromMarkdownFile("mock_file")
+
+	assert.NoError(t, err)
+	assert.Equal(t, expectedExecutable, result)
+	mockFileReader.AssertExpectations(t)
+}
+
 func TestDiscardHTTPRequestInNonHTTPCodeBlockWillCauseANilExecutable(t *testing.T) {
 	config := &config.Config{
 		RootDir: "",
