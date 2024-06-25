@@ -1,4 +1,4 @@
-# Cotton API book
+# Cotton API reference
 
 ## Minimum testcase
 
