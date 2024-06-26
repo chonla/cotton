@@ -13,6 +13,7 @@ type Variables struct {
 
 func New() *Variables {
 	return &Variables{
+		names:        []string{},
 		values:       map[string]interface{}{},
 		stringValues: map[string]string{},
 	}
