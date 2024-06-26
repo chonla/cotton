@@ -1,6 +1,9 @@
 package logger
 
-import "cotton/internal/result"
+import (
+	"cotton/internal/result"
+	"cotton/internal/stopwatch"
+)
 
 type LogLevel int
 
@@ -17,7 +20,9 @@ type Logger interface {
 	PrintSectionTitle(sectionTitle string) error
 	PrintExecutableTitle(title string) error
 	PrintTestResult(passed bool) error
+	PrintTimeEllapsed(ellapsedTime *stopwatch.EllapsedTime) error
 	PrintInlineTestResult(passed bool) error
+	PrintInlineTimeEllapsed(ellapsedTime *stopwatch.EllapsedTime) error
 	PrintAssertionResults(assertionResults []*result.AssertionResult) error
 	PrintAssertionResult(assertionResult *result.AssertionResult) error
 	PrintRequest(req string) error

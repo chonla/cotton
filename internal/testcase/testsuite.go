@@ -1,9 +1,11 @@
 package testcase
 
 import (
+	"cotton/internal/clock"
 	"cotton/internal/directory"
 	"cotton/internal/logger"
 	"cotton/internal/result"
+	"cotton/internal/stopwatch"
 	"cotton/internal/variable"
 	"errors"
 	"fmt"
@@ -14,6 +16,7 @@ type TestsuiteOptions struct {
 	StopWhenFailed       bool
 	Logger               logger.Logger
 	TestcaseParserOption *ParserOptions
+	ClockWrapper         clock.ClockWrapper
 }
 
 type Testsuite struct {
@@ -62,7 +65,11 @@ func (ts *Testsuite) Execute() (*result.TestsuiteResult, error) {
 		FailedCount:     0,
 		SkippedCount:    0,
 		TestCount:       len(ts.testcases),
+		EllapsedTime:    nil,
 	}
+
+	watch := stopwatch.New(ts.options.ClockWrapper)
+	watch.Start()
 
 	for index, tc := range ts.testcases {
 		section := fmt.Sprintf("testcase %d/%d", index+1, testsuiteResult.TestCount)
@@ -76,13 +83,17 @@ func (ts *Testsuite) Execute() (*result.TestsuiteResult, error) {
 		}
 		testsuiteResult.ExecutionsCount += 1
 		ts.options.Logger.PrintInlineTestResult(result.Passed)
+		ts.options.Logger.PrintInlineTimeEllapsed(result.EllapsedTime)
 		ts.options.Logger.PrintSectionTitle("result")
 		ts.options.Logger.PrintTestResult(result.Passed)
+		ts.options.Logger.PrintSectionTitle("ellapsed")
+		ts.options.Logger.PrintTimeEllapsed(result.EllapsedTime)
 		if !result.Passed && ts.options.StopWhenFailed {
 			break
 		}
 	}
 	testsuiteResult.SkippedCount = testsuiteResult.TestCount - testsuiteResult.ExecutionsCount
+	testsuiteResult.EllapsedTime = watch.Stop()
 	ts.options.Logger.PrintTestsuiteResult(testsuiteResult)
 
 	return testsuiteResult, nil

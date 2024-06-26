@@ -2,6 +2,7 @@ package logger
 
 import (
 	"cotton/internal/result"
+	"cotton/internal/stopwatch"
 
 	"github.com/stretchr/testify/mock"
 )
@@ -22,6 +23,16 @@ func (m *MockLogger) PrintExecutableTitle(title string) error {
 
 func (m *MockLogger) PrintTestResult(passed bool) error {
 	args := m.Called(passed)
+	return args.Error(0)
+}
+
+func (m *MockLogger) PrintTimeEllapsed(ellapsedTime *stopwatch.EllapsedTime) error {
+	args := m.Called(ellapsedTime)
+	return args.Error(0)
+}
+
+func (m *MockLogger) PrintInlineTimeEllapsed(ellapsedTime *stopwatch.EllapsedTime) error {
+	args := m.Called(ellapsedTime)
 	return args.Error(0)
 }
 

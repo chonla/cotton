@@ -6,16 +6,19 @@ package testcase_test
 import (
 	"cotton/internal/assertion"
 	"cotton/internal/capture"
+	"cotton/internal/clock"
 	"cotton/internal/config"
 	"cotton/internal/executable"
 	"cotton/internal/httphelper"
 	"cotton/internal/logger"
 	"cotton/internal/reader"
 	"cotton/internal/result"
+	"cotton/internal/stopwatch"
 	"cotton/internal/testcase"
 	"cotton/internal/variable"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -25,6 +28,11 @@ func TestGetDataFromHttpBin(t *testing.T) {
 	config := &config.Config{
 		RootDir: curdir + "/../..",
 	}
+
+	mockTime, _ := time.Parse(time.RFC3339, "2024-06-26T15:27:05+07:00")
+
+	mockClock := new(clock.MockClock)
+	mockClock.On("Now").Return(mockTime)
 
 	executableParserOptions := &executable.ParserOptions{
 		Configurator:  config,
@@ -40,6 +48,7 @@ func TestGetDataFromHttpBin(t *testing.T) {
 		RequestParser:    &httphelper.HTTPRequestParser{},
 		Logger:           logger.NewNilLogger(logger.Compact),
 		ExecutableParser: executableParser,
+		ClockWrapper:     mockClock,
 	}
 
 	executableOptions := &executable.ExecutableOptions{
@@ -50,6 +59,7 @@ func TestGetDataFromHttpBin(t *testing.T) {
 	testcaseOptions := &testcase.TestcaseOptions{
 		RequestParser: &httphelper.HTTPRequestParser{},
 		Logger:        logger.NewNilLogger(logger.Compact),
+		ClockWrapper:  mockClock,
 	}
 
 	parser := testcase.NewParser(parserOptions)
@@ -91,9 +101,10 @@ secret=updatedValue`, executableOptions)
 	}
 
 	expectedTestResult := &result.TestResult{
-		Title:      "Test GET on httpbin.org",
-		Passed:     true,
-		Assertions: expectedAssertionResults,
+		Title:        "Test GET on httpbin.org",
+		Passed:       true,
+		Assertions:   expectedAssertionResults,
+		EllapsedTime: stopwatch.NewEllapsedTime(0),
 	}
 
 	initialVars := variable.New()
@@ -110,6 +121,11 @@ func TestGetDataFromHttpBinWithThreeTildedCodeBlock(t *testing.T) {
 		RootDir: curdir + "/../..",
 	}
 
+	mockTime, _ := time.Parse(time.RFC3339, "2024-06-26T15:27:05+07:00")
+
+	mockClock := new(clock.MockClock)
+	mockClock.On("Now").Return(mockTime)
+
 	executableParserOptions := &executable.ParserOptions{
 		Configurator:  config,
 		FileReader:    reader.New(os.ReadFile),
@@ -124,6 +140,7 @@ func TestGetDataFromHttpBinWithThreeTildedCodeBlock(t *testing.T) {
 		RequestParser:    &httphelper.HTTPRequestParser{},
 		Logger:           logger.NewNilLogger(logger.Compact),
 		ExecutableParser: executableParser,
+		ClockWrapper:     mockClock,
 	}
 
 	executableOptions := &executable.ExecutableOptions{
@@ -134,6 +151,7 @@ func TestGetDataFromHttpBinWithThreeTildedCodeBlock(t *testing.T) {
 	testcaseOptions := &testcase.TestcaseOptions{
 		RequestParser: &httphelper.HTTPRequestParser{},
 		Logger:        logger.NewNilLogger(logger.Compact),
+		ClockWrapper:  mockClock,
 	}
 
 	parser := testcase.NewParser(parserOptions)
@@ -175,9 +193,10 @@ secret=updatedValue`, executableOptions)
 	}
 
 	expectedTestResult := &result.TestResult{
-		Title:      "Test GET on httpbin.org with three-tilded code block",
-		Passed:     true,
-		Assertions: expectedAssertionResults,
+		Title:        "Test GET on httpbin.org with three-tilded code block",
+		Passed:       true,
+		Assertions:   expectedAssertionResults,
+		EllapsedTime: stopwatch.NewEllapsedTime(0),
 	}
 
 	initialVars := variable.New()

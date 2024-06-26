@@ -1,10 +1,13 @@
 package result
 
+import "cotton/internal/stopwatch"
+
 type TestResult struct {
-	Title      string
-	Passed     bool
-	Assertions []*AssertionResult
-	Error      error
+	Title        string
+	Passed       bool
+	Assertions   []*AssertionResult
+	Error        error
+	EllapsedTime *stopwatch.EllapsedTime
 }
 
 type AssertionResult struct {
@@ -21,4 +24,5 @@ type TestsuiteResult struct {
 	ExecutionsCount int
 	FailedCount     int
 	SkippedCount    int
+	EllapsedTime    *stopwatch.EllapsedTime
 }

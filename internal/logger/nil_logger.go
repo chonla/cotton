@@ -1,6 +1,9 @@
 package logger
 
-import "cotton/internal/result"
+import (
+	"cotton/internal/result"
+	"cotton/internal/stopwatch"
+)
 
 type NilLogger struct {
 	level LogLevel
@@ -25,6 +28,14 @@ func (c *NilLogger) PrintTestResult(passed bool) error {
 }
 
 func (c *NilLogger) PrintSectionedMessage(section, message string) error {
+	return nil
+}
+
+func (c *NilLogger) PrintTimeEllapsed(ellapsedTime *stopwatch.EllapsedTime) error {
+	return nil
+}
+
+func (c *NilLogger) PrintInlineTimeEllapsed(ellapsedTime *stopwatch.EllapsedTime) error {
 	return nil
 }
 

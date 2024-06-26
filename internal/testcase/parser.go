@@ -3,6 +3,7 @@ package testcase
 import (
 	"cotton/internal/assertion"
 	"cotton/internal/capture"
+	"cotton/internal/clock"
 	"cotton/internal/config"
 	"cotton/internal/executable"
 	"cotton/internal/httphelper"
@@ -19,6 +20,7 @@ type ParserOptions struct {
 	RequestParser    httphelper.RequestParser
 	ExecutableParser executable.Parser
 	Logger           logger.Logger
+	ClockWrapper     clock.ClockWrapper
 }
 
 type Parser struct {
@@ -183,6 +185,7 @@ func (p *Parser) FromMarkdownLines(mdLines []line.Line) (*Testcase, error) {
 	options := &TestcaseOptions{
 		RequestParser: p.options.RequestParser,
 		Logger:        p.options.Logger,
+		ClockWrapper:  p.options.ClockWrapper,
 	}
 	tc := NewTestcase(title, line.Line(strings.Join(description, "\n")).Trim().Value(), reqRaw, options)
 	for _, cap := range captures {

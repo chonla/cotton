@@ -3,10 +3,12 @@ package testcase
 import (
 	"cotton/internal/assertion"
 	"cotton/internal/capture"
+	"cotton/internal/clock"
 	"cotton/internal/executable"
 	"cotton/internal/httphelper"
 	"cotton/internal/logger"
 	"cotton/internal/result"
+	"cotton/internal/stopwatch"
 	"cotton/internal/template"
 	"cotton/internal/variable"
 	"errors"
@@ -18,6 +20,7 @@ type TestcaseOptions struct {
 	Logger          logger.Logger
 	RequestParser   httphelper.RequestParser
 	InsecureRequest bool
+	ClockWrapper    clock.ClockWrapper
 }
 
 // Test cases
@@ -30,6 +33,8 @@ type Testcase struct {
 	setups      []*executable.Executable
 	teardowns   []*executable.Executable
 	assertions  []*assertion.Assertion
+	// stopwatch    *stopwatch.Stopwatch
+	// ellapsedTime *stopwatch.EllapsedTime
 }
 
 func NewTestcase(title, description, reqRaw string, options *TestcaseOptions) *Testcase {
@@ -42,6 +47,8 @@ func NewTestcase(title, description, reqRaw string, options *TestcaseOptions) *T
 		setups:      []*executable.Executable{},
 		teardowns:   []*executable.Executable{},
 		assertions:  []*assertion.Assertion{},
+		// stopwatch:    stopwatch.New(options.ClockWrapper),
+		// ellapsedTime: nil,
 	}
 }
 
@@ -114,11 +121,17 @@ func (t *Testcase) AddTeardown(teardown *executable.Executable) {
 
 func (t *Testcase) Execute(initialVars *variable.Variables) *result.TestResult {
 	testResult := &result.TestResult{
-		Title:      t.title,
-		Passed:     false,
-		Assertions: []*result.AssertionResult{},
-		Error:      nil,
+		Title:        t.title,
+		Passed:       false,
+		Assertions:   []*result.AssertionResult{},
+		Error:        nil,
+		EllapsedTime: nil,
 	}
+	watch := stopwatch.New(t.options.ClockWrapper)
+	watch.Start()
+	defer (func() {
+		testResult.EllapsedTime = watch.Stop()
+	})()
 
 	if t.reqRaw == "" {
 		testResult.Error = errors.New("no callable request")

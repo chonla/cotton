@@ -94,9 +94,15 @@ Content-Type: application/json
 	mockLogger.On("PrintExecutableTitle", mock.Anything).Return(nil)
 	mockLogger.On("PrintRequest", mock.Anything).Return(nil)
 
+	// mockTime, _ := time.Parse(time.RFC3339, "2024-06-26T15:27:05+07:00")
+
+	// mockClock := new(clock.MockClock)
+	// mockClock.On("Now").Return(mockTime)
+
 	options := &executable.ExecutableOptions{
 		RequestParser: mockReqParser,
 		Logger:        mockLogger,
+		// ClockWrapper:  mockClock,
 	}
 
 	ex := executable.New("test", reqRaw, options)

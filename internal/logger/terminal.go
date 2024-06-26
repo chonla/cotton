@@ -2,6 +2,7 @@ package logger
 
 import (
 	"cotton/internal/result"
+	"cotton/internal/stopwatch"
 
 	"fmt"
 
@@ -87,7 +88,7 @@ func (c *TerminalLogger) PrintInlineTestResult(passed bool) error {
 	}
 	openBracket := color.New(color.FgWhite).Sprint("[")
 	closeBracket := color.New(color.FgWhite).Sprint("]")
-	_, err := fmt.Printf(" %s%s%s\n", openBracket, val, closeBracket)
+	_, err := fmt.Printf(" %s%s%s ", openBracket, val, closeBracket)
 	return err
 }
 
@@ -174,6 +175,10 @@ func (c *TerminalLogger) PrintTestsuiteResult(testsuiteResult *result.TestsuiteR
 		return err
 	}
 	_, err = fmt.Printf("%s\n", c.buildFieldValue("Skipped", fmt.Sprintf("%d (%0.2f%%)", testsuiteResult.SkippedCount, skippedPerecentage)))
+	if err != nil {
+		return err
+	}
+	_, err = fmt.Printf("%s\n", c.buildFieldValue("Ellapsed", testsuiteResult.EllapsedTime))
 	return err
 }
 
@@ -189,4 +194,24 @@ func (c *TerminalLogger) PrintDebugMessage(message string) error {
 	}
 
 	return c.PrintSectionedMessage("debug", message)
+}
+
+func (c *TerminalLogger) PrintTimeEllapsed(ellapsedTime *stopwatch.EllapsedTime) error {
+	if c.level == Compact {
+		return nil
+	}
+
+	val := color.New(color.FgWhite).Sprint(ellapsedTime)
+	_, err := fmt.Println(val)
+	return err
+}
+
+func (c *TerminalLogger) PrintInlineTimeEllapsed(ellapsedTime *stopwatch.EllapsedTime) error {
+	if c.level != Compact {
+		return nil
+	}
+
+	val := color.New(color.FgWhite).Sprintf("(%s)", ellapsedTime)
+	_, err := fmt.Println(val)
+	return err
 }

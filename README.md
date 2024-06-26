@@ -48,7 +48,7 @@ See the files in `etc/examples` directory.
 * HTML reports
 * Upload request
 * ~~Insecure mode~~
-* Track time taken
+* ~~Track time taken~~
 * ~~Stop tests execution when failed~~
 * Variables
 * Ordered list support for Setups,Teardowns,Assertions,Captures

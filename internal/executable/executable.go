@@ -15,6 +15,7 @@ type ExecutableOptions struct {
 	Logger          logger.Logger
 	RequestParser   httphelper.RequestParser
 	InsecureRequest bool
+	// ClockWrapper    clock.ClockWrapper
 }
 
 // For setups and teardowns
@@ -23,6 +24,8 @@ type Executable struct {
 	title    string
 	reqRaw   string
 	captures []*capture.Capture
+	// stopwatch    *stopwatch.Stopwatch
+	// ellapsedTime *stopwatch.EllapsedTime
 }
 
 func New(title, reqRaw string, options *ExecutableOptions) *Executable {
@@ -31,6 +34,8 @@ func New(title, reqRaw string, options *ExecutableOptions) *Executable {
 		title:    title,
 		reqRaw:   reqRaw,
 		captures: []*capture.Capture{},
+		// ellapsedTime: nil,
+		// stopwatch:    stopwatch.New(options.ClockWrapper),
 	}
 }
 
@@ -77,6 +82,9 @@ func (ex *Executable) Clone() *Executable {
 }
 
 func (ex *Executable) Execute(initialVars *variable.Variables) (*execution.Execution, error) {
+	// ex.stopwatch.Start()
+	// defer func() { ex.ellapsedTime = ex.stopwatch.Stop() }()
+
 	if ex.reqRaw == "" {
 		return nil, errors.New("no callable request")
 	}

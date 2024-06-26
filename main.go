@@ -1,6 +1,7 @@
 package main
 
 import (
+	"cotton/internal/clock"
 	"cotton/internal/config"
 	"cotton/internal/executable"
 	"cotton/internal/httphelper"
@@ -62,12 +63,14 @@ func main() {
 	log := logger.NewTerminalLogger(level)
 	reader := reader.New(os.ReadFile)
 	reqParser := &httphelper.HTTPRequestParser{}
+	clockWrapper := clock.New()
 
 	exOptions := &executable.ParserOptions{
 		Configurator:  config,
 		FileReader:    reader,
 		RequestParser: reqParser,
 		Logger:        log,
+		ClockWrapper:  clockWrapper,
 	}
 	exParser := executable.NewParser(exOptions)
 
@@ -77,12 +80,14 @@ func main() {
 		RequestParser:    reqParser,
 		Logger:           log,
 		ExecutableParser: exParser,
+		ClockWrapper:     clockWrapper,
 	}
 
 	options := &testcase.TestsuiteOptions{
 		TestcaseParserOption: tcOptions,
 		StopWhenFailed:       stopWhenFailed,
 		Logger:               log,
+		ClockWrapper:         clockWrapper,
 	}
 
 	ts, err := testcase.NewTestsuite(testDir, options)

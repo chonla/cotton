@@ -2,6 +2,7 @@ package executable
 
 import (
 	"cotton/internal/capture"
+	"cotton/internal/clock"
 	"cotton/internal/config"
 	"cotton/internal/httphelper"
 	"cotton/internal/line"
@@ -16,6 +17,7 @@ type ParserOptions struct {
 	FileReader    reader.Reader
 	RequestParser httphelper.RequestParser
 	Logger        logger.Logger
+	ClockWrapper  clock.ClockWrapper
 }
 
 type Parser interface {
@@ -137,6 +139,7 @@ func (p *ExecutableParser) FromMarkdownLines(mdLines []line.Line) (*Executable, 
 	options := &ExecutableOptions{
 		RequestParser: p.options.RequestParser,
 		Logger:        p.options.Logger,
+		// ClockWrapper:  p.options.ClockWrapper,
 	}
 	ex := New(exTitle, exReqRaw, options)
 	for _, cap := range exCaptures {
