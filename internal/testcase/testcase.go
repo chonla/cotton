@@ -33,8 +33,6 @@ type Testcase struct {
 	setups      []*executable.Executable
 	teardowns   []*executable.Executable
 	assertions  []*assertion.Assertion
-	// stopwatch    *stopwatch.Stopwatch
-	// ellapsedTime *stopwatch.EllapsedTime
 }
 
 func NewTestcase(title, description, reqRaw string, options *TestcaseOptions) *Testcase {
@@ -47,8 +45,6 @@ func NewTestcase(title, description, reqRaw string, options *TestcaseOptions) *T
 		setups:      []*executable.Executable{},
 		teardowns:   []*executable.Executable{},
 		assertions:  []*assertion.Assertion{},
-		// stopwatch:    stopwatch.New(options.ClockWrapper),
-		// ellapsedTime: nil,
 	}
 }
 

@@ -50,8 +50,11 @@ func (v *Variables) Names() []string {
 
 func (v *Variables) MergeWith(anotherVars *Variables) *Variables {
 	newVars := New()
-	for k, v := range v.values {
-		newVars.Set(k, v)
+	for _, name := range v.names {
+		value, err := v.ValueOf(name)
+		if err == nil {
+			newVars.Set(name, value)
+		}
 	}
 	anotherVarsNames := anotherVars.names
 	for _, name := range anotherVarsNames {
