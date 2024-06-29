@@ -33,6 +33,7 @@ type Testcase struct {
 	setups      []*executable.Executable
 	teardowns   []*executable.Executable
 	assertions  []*assertion.Assertion
+	variables   *variable.Variables
 }
 
 func NewTestcase(title, description, reqRaw string, options *TestcaseOptions) *Testcase {
@@ -45,6 +46,7 @@ func NewTestcase(title, description, reqRaw string, options *TestcaseOptions) *T
 		setups:      []*executable.Executable{},
 		teardowns:   []*executable.Executable{},
 		assertions:  []*assertion.Assertion{},
+		variables:   variable.New(),
 	}
 }
 
@@ -115,7 +117,7 @@ func (t *Testcase) AddTeardown(teardown *executable.Executable) {
 	t.teardowns = append(t.teardowns, teardown.Clone())
 }
 
-func (t *Testcase) Execute(initialVars *variable.Variables) *result.TestResult {
+func (t *Testcase) Execute(passedVars *variable.Variables) *result.TestResult {
 	testResult := &result.TestResult{
 		Title:        t.title,
 		Passed:       false,
@@ -134,6 +136,8 @@ func (t *Testcase) Execute(initialVars *variable.Variables) *result.TestResult {
 		return testResult
 	}
 
+	initialVars := t.variables.MergeWith(passedVars)
+
 	sessionVars := initialVars.Clone()
 	if len(t.setups) > 0 {
 		for _, setup := range t.setups {
@@ -147,6 +151,11 @@ func (t *Testcase) Execute(initialVars *variable.Variables) *result.TestResult {
 		}
 	}
 
+	t.options.Logger.PrintSectionTitle("test")
+	t.options.Logger.PrintTestcaseTitle(t.Title())
+
+	t.options.Logger.PrintVariables(sessionVars)
+
 	reqTemplate := template.New(t.reqRaw)
 	compiledRequest := reqTemplate.Apply(sessionVars)
 
@@ -155,9 +164,6 @@ func (t *Testcase) Execute(initialVars *variable.Variables) *result.TestResult {
 		testResult.Error = err
 		return testResult
 	}
-
-	t.options.Logger.PrintSectionTitle("test")
-	t.options.Logger.PrintTestcaseTitle(t.Title())
 
 	t.options.Logger.PrintRequest(compiledRequest)
 	resp, err := request.Do(t.options.InsecureRequest)
@@ -183,14 +189,17 @@ func (t *Testcase) Execute(initialVars *variable.Variables) *result.TestResult {
 		}
 		expected := assertion.Value
 		if assertion.Operator.IsArg1() {
+			// unexpected assertion
 			testResult.Error = errors.New("unexpected assertion found")
 			return testResult
 		}
 		var passed bool
 		if assertion.Operator.IsArg2() {
+			// unary assertion assertion
 			passed, err = assertion.Operator.MustArg2().Assert(actual)
 		} else {
 			if assertion.Operator.IsArg3() {
+				// binary assertion assertion
 				passed, err = assertion.Operator.MustArg3().Assert(expected, actual)
 			}
 		}
@@ -202,12 +211,12 @@ func (t *Testcase) Execute(initialVars *variable.Variables) *result.TestResult {
 			Error:    err,
 		}
 		testResult.Assertions = append(testResult.Assertions, assertionResult)
+		t.options.Logger.PrintSectionTitle("assert")
+		t.options.Logger.PrintAssertionResult(assertionResult)
 		if err != nil {
 			testResult.Error = err
 			return testResult
 		}
-		t.options.Logger.PrintSectionTitle("assert")
-		t.options.Logger.PrintAssertionResult(assertionResult)
 	}
 
 	if len(t.teardowns) > 0 {

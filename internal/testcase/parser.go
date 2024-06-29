@@ -10,6 +10,7 @@ import (
 	"cotton/internal/line"
 	"cotton/internal/logger"
 	"cotton/internal/reader"
+	"cotton/internal/variable"
 	"errors"
 	"strings"
 )
@@ -59,6 +60,7 @@ func (p *Parser) FromMarkdownLines(mdLines []line.Line) (*Testcase, error) {
 	assertions := []*assertion.Assertion{}
 	setups := []*executable.Executable{}
 	teardowns := []*executable.Executable{}
+	defaultVars := variable.New()
 
 	for _, mdLine := range mdLines {
 		if discardingCodeBlockBacktick {
@@ -117,56 +119,61 @@ func (p *Parser) FromMarkdownLines(mdLines []line.Line) (*Testcase, error) {
 							justTitle = false
 							captures = append(captures, cap)
 						} else {
-							if as, ok := assertion.Try(mdLine); ok {
+							if defaultVar, ok := variable.Try(mdLine); ok {
 								justTitle = false
-								assertions = append(assertions, as)
+								defaultVars.Add(defaultVar)
 							} else {
-								if captures, ok := mdLine.CaptureAll(`^\s*\*\s\[([^\]]+)\]\(([^\)]+)\)`); ok {
+								if as, ok := assertion.Try(mdLine); ok {
 									justTitle = false
-									if !reqFound {
-										ex, err := p.options.ExecutableParser.FromMarkdownFile(captures[2])
-										if err != nil {
-											return nil, err
-										}
-										ex.SetTitle(captures[1])
-										setups = append(setups, ex)
-									} else {
-										ex, err := p.options.ExecutableParser.FromMarkdownFile(captures[2])
-										if err != nil {
-											return nil, err
-										}
-										ex.SetTitle(captures[1])
-										teardowns = append(teardowns, ex)
-									}
+									assertions = append(assertions, as)
 								} else {
-									if ok := mdLine.LookLike(`^ {0,3}#{1,6}\s+(.*)`); ok {
+									if captures, ok := mdLine.CaptureAll(`^\s*\*\s\[([^\]]+)\]\(([^\)]+)\)`); ok {
 										justTitle = false
-										// continue
+										if !reqFound {
+											ex, err := p.options.ExecutableParser.FromMarkdownFile(captures[2])
+											if err != nil {
+												return nil, err
+											}
+											ex.SetTitle(captures[1])
+											setups = append(setups, ex)
+										} else {
+											ex, err := p.options.ExecutableParser.FromMarkdownFile(captures[2])
+											if err != nil {
+												return nil, err
+											}
+											ex.SetTitle(captures[1])
+											teardowns = append(teardowns, ex)
+										}
 									} else {
-										if mdLine.LookLike("^```http$") && !reqFound {
+										if ok := mdLine.LookLike(`^ {0,3}#{1,6}\s+(.*)`); ok {
 											justTitle = false
-											collectingCodeBlockBackTick = true
-											continue
-										}
+											// continue
+										} else {
+											if mdLine.LookLike("^```http$") && !reqFound {
+												justTitle = false
+												collectingCodeBlockBackTick = true
+												continue
+											}
 
-										if mdLine.LookLike("^~~~http$") && !reqFound {
-											justTitle = false
-											collectingCodeBlockTilde = true
-											continue
-										}
+											if mdLine.LookLike("^~~~http$") && !reqFound {
+												justTitle = false
+												collectingCodeBlockTilde = true
+												continue
+											}
 
-										if ok := mdLine.LookLike("^```"); ok {
-											discardingCodeBlockBacktick = true
-											continue
-										}
+											if ok := mdLine.LookLike("^```"); ok {
+												discardingCodeBlockBacktick = true
+												continue
+											}
 
-										if ok := mdLine.LookLike("^~~~"); ok {
-											discardingCodeBlockTilde = true
-											continue
-										}
+											if ok := mdLine.LookLike("^~~~"); ok {
+												discardingCodeBlockTilde = true
+												continue
+											}
 
-										if justTitle {
-											description = append(description, mdLine.Value())
+											if justTitle {
+												description = append(description, mdLine.Value())
+											}
 										}
 									}
 								}
@@ -200,6 +207,7 @@ func (p *Parser) FromMarkdownLines(mdLines []line.Line) (*Testcase, error) {
 	for _, teardown := range teardowns {
 		tc.AddTeardown(teardown)
 	}
+	tc.variables = tc.variables.MergeWith(defaultVars)
 
 	return tc, nil
 }

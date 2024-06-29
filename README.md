@@ -50,7 +50,7 @@ See the files in `etc/examples` directory.
 * ~~Insecure mode~~
 * ~~Track time taken~~
 * ~~Stop tests execution when failed~~
-* Variables
+* ~~Variables~~
 * Ordered list support for Setups,Teardowns,Assertions,Captures
 
 ## License

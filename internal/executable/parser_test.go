@@ -511,7 +511,7 @@ func TestGetCaptures(t *testing.T) {
 		"body",
 		"```",
 		"",
-		"* var:sample",
+		"* var:`sample`",
 		"* var2:`good.vibe`",
 	}
 

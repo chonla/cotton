@@ -79,3 +79,21 @@ func TestReplaceUnmatchString(t *testing.T) {
 
 	assert.Equal(t, "/some/path", newPath)
 }
+
+func TestReflectValue(t *testing.T) {
+	lString, _ := line.Line("\"123\"").ReflectJSValue()
+	lInt, _ := line.Line("123").ReflectJSValue()
+	lFloat, _ := line.Line("123.2").ReflectJSValue()
+	lBoolTrue, _ := line.Line("true").ReflectJSValue()
+	lBoolFalse, _ := line.Line("false").ReflectJSValue()
+	lNull, _ := line.Line("null").ReflectJSValue()
+	_, err := line.Line("udya").ReflectJSValue()
+
+	assert.Equal(t, "123", lString.(string))
+	assert.Equal(t, float64(123), lInt.(float64))
+	assert.Equal(t, float64(123.2), lFloat.(float64))
+	assert.True(t, lBoolTrue.(bool))
+	assert.False(t, lBoolFalse.(bool))
+	assert.Nil(t, lNull)
+	assert.Error(t, err)
+}

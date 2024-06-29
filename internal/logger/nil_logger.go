@@ -3,6 +3,7 @@ package logger
 import (
 	"cotton/internal/result"
 	"cotton/internal/stopwatch"
+	"cotton/internal/variable"
 )
 
 type NilLogger struct {
@@ -72,5 +73,9 @@ func (c *NilLogger) PrintSectionTitle(sectionTitle string) error {
 }
 
 func (c *NilLogger) PrintDebugMessage(message string) error {
+	return nil
+}
+
+func (c *NilLogger) PrintVariables(variables *variable.Variables) error {
 	return nil
 }

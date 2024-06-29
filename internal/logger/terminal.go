@@ -3,6 +3,7 @@ package logger
 import (
 	"cotton/internal/result"
 	"cotton/internal/stopwatch"
+	"cotton/internal/variable"
 
 	"fmt"
 
@@ -214,4 +215,17 @@ func (c *TerminalLogger) PrintInlineTimeEllapsed(ellapsedTime *stopwatch.Ellapse
 	val := color.New(color.FgWhite).Sprintf("(%s)", ellapsedTime)
 	_, err := fmt.Println(val)
 	return err
+}
+
+func (c *TerminalLogger) PrintVariables(variables *variable.Variables) error {
+	if c.level != Debug {
+		return nil
+	}
+
+	names := variables.Names()
+	for _, name := range names {
+		value, _ := variables.ValueOf(name)
+		c.PrintSectionedMessage("variable", fmt.Sprintf("%s=%v", name, value))
+	}
+	return nil
 }

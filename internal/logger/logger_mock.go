@@ -3,6 +3,7 @@ package logger
 import (
 	"cotton/internal/result"
 	"cotton/internal/stopwatch"
+	"cotton/internal/variable"
 
 	"github.com/stretchr/testify/mock"
 )
@@ -83,5 +84,10 @@ func (m *MockLogger) PrintSectionTitle(sectionTitle string) error {
 
 func (m *MockLogger) PrintDebugMessage(message string) error {
 	args := m.Called(message)
+	return args.Error(0)
+}
+
+func (m *MockLogger) PrintVariables(variables *variable.Variables) error {
+	args := m.Called(variables)
 	return args.Error(0)
 }

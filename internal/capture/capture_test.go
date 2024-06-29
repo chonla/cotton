@@ -8,18 +8,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestCaptureFromPlainAssignment(t *testing.T) {
-	mdLine := line.Line("* name:$.data.firstname")
-
-	result, ok := capture.Try(mdLine)
-
-	assert.True(t, ok)
-	assert.Equal(t, &capture.Capture{
-		Name:     "name",
-		Selector: "$.data.firstname",
-	}, result)
-}
-
 func TestCaptureFromInlineAssignment(t *testing.T) {
 	mdLine := line.Line("* name:`$.data.firstname`")
 
@@ -33,7 +21,7 @@ func TestCaptureFromInlineAssignment(t *testing.T) {
 }
 
 func TestCaptureFromMoreIndentsPlainAssignment(t *testing.T) {
-	mdLine := line.Line("*   name:$.data.firstname")
+	mdLine := line.Line("*   name:`$.data.firstname`")
 
 	result, ok := capture.Try(mdLine)
 
@@ -45,7 +33,7 @@ func TestCaptureFromMoreIndentsPlainAssignment(t *testing.T) {
 }
 
 func TestCaptureFromPlainAssignmentWithWhiteSpaces(t *testing.T) {
-	mdLine := line.Line("*   name :  $.data.firstname")
+	mdLine := line.Line("*   name :  `$.data.firstname`")
 
 	result, ok := capture.Try(mdLine)
 

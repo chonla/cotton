@@ -3,6 +3,7 @@ package logger
 import (
 	"cotton/internal/result"
 	"cotton/internal/stopwatch"
+	"cotton/internal/variable"
 )
 
 type LogLevel int
@@ -29,4 +30,5 @@ type Logger interface {
 	PrintError(err error) error
 	PrintTestsuiteResult(testsuiteResult *result.TestsuiteResult) error
 	PrintDebugMessage(message string) error
+	PrintVariables(variables *variable.Variables) error
 }

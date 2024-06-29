@@ -13,9 +13,6 @@ func Try(mdLine line.Line) (*Capture, bool) {
 	if caps, ok := mdLine.CaptureAll(`\s*\*\s+([^:]+)\s*:\s*` + "`([^`]+)`"); ok {
 		return New(line.Line(caps[1]).Trim().Value(), caps[2]), true
 	}
-	if caps, ok := mdLine.CaptureAll(`\s*\*\s+([^:]+)\s*:\s*(.+)`); ok {
-		return New(line.Line(caps[1]).Trim().Value(), line.Line(caps[2]).Trim().Value()), true
-	}
 	return nil, false
 }
 

@@ -15,27 +15,24 @@ type ExecutableOptions struct {
 	Logger          logger.Logger
 	RequestParser   httphelper.RequestParser
 	InsecureRequest bool
-	// ClockWrapper    clock.ClockWrapper
 }
 
 // For setups and teardowns
 type Executable struct {
-	options  *ExecutableOptions
-	title    string
-	reqRaw   string
-	captures []*capture.Capture
-	// stopwatch    *stopwatch.Stopwatch
-	// ellapsedTime *stopwatch.EllapsedTime
+	options   *ExecutableOptions
+	title     string
+	reqRaw    string
+	captures  []*capture.Capture
+	variables *variable.Variables
 }
 
 func New(title, reqRaw string, options *ExecutableOptions) *Executable {
 	return &Executable{
-		options:  options,
-		title:    title,
-		reqRaw:   reqRaw,
-		captures: []*capture.Capture{},
-		// ellapsedTime: nil,
-		// stopwatch:    stopwatch.New(options.ClockWrapper),
+		options:   options,
+		title:     title,
+		reqRaw:    reqRaw,
+		captures:  []*capture.Capture{},
+		variables: variable.New(),
 	}
 }
 
@@ -73,21 +70,26 @@ func (ex *Executable) Clone() *Executable {
 		capturesClone = append(capturesClone, cap.Clone())
 	}
 
+	variablesClone := ex.variables.Clone()
+
 	return &Executable{
-		options:  ex.options,
-		title:    ex.title,
-		reqRaw:   ex.reqRaw,
-		captures: capturesClone,
+		options:   ex.options,
+		title:     ex.title,
+		reqRaw:    ex.reqRaw,
+		captures:  capturesClone,
+		variables: variablesClone,
 	}
 }
 
-func (ex *Executable) Execute(initialVars *variable.Variables) (*execution.Execution, error) {
-	// ex.stopwatch.Start()
-	// defer func() { ex.ellapsedTime = ex.stopwatch.Stop() }()
-
+func (ex *Executable) Execute(passedVars *variable.Variables) (*execution.Execution, error) {
 	if ex.reqRaw == "" {
 		return nil, errors.New("no callable request")
 	}
+
+	initialVars := ex.variables.MergeWith(passedVars)
+
+	ex.options.Logger.PrintExecutableTitle(ex.Title())
+	ex.options.Logger.PrintVariables(initialVars)
 
 	reqTemplate := template.New(ex.reqRaw)
 	compiledRequest := reqTemplate.Apply(initialVars)
@@ -97,7 +99,6 @@ func (ex *Executable) Execute(initialVars *variable.Variables) (*execution.Execu
 		return nil, err
 	}
 
-	ex.options.Logger.PrintExecutableTitle(ex.Title())
 	ex.options.Logger.PrintRequest(compiledRequest)
 	resp, err := request.Do(ex.options.InsecureRequest)
 	if err != nil {

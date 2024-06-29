@@ -8,6 +8,7 @@ import (
 	"cotton/internal/line"
 	"cotton/internal/logger"
 	"cotton/internal/reader"
+	"cotton/internal/variable"
 	"errors"
 	"strings"
 )
@@ -52,10 +53,11 @@ func (p *ExecutableParser) FromMarkdownLines(mdLines []line.Line) (*Executable, 
 	discardingCodeBlockBacktick := false
 	discardingCodeBlockTilde := false
 
-	exReqFound := false
-	exTitle := "Untitled"
-	exReqRaw := ""
-	exCaptures := []*capture.Capture{}
+	reqFound := false
+	title := "Untitled"
+	reqRaw := ""
+	captures := []*capture.Capture{}
+	defaultVars := variable.New()
 
 	for _, mdLine := range mdLines {
 		if discardingCodeBlockBacktick {
@@ -76,8 +78,8 @@ func (p *ExecutableParser) FromMarkdownLines(mdLines []line.Line) (*Executable, 
 						discardingCodeBlockBacktick = false
 
 						if len(req) > 0 {
-							exReqRaw = line.Line(strings.Join(req, "\n")).Value()
-							exReqFound = true
+							reqRaw = line.Line(strings.Join(req, "\n")).Value()
+							reqFound = true
 							req = nil
 						}
 					} else {
@@ -92,8 +94,8 @@ func (p *ExecutableParser) FromMarkdownLines(mdLines []line.Line) (*Executable, 
 							collectingCodeBlockTilde = false
 
 							if len(req) > 0 {
-								exReqRaw = line.Line(strings.Join(req, "\n")).Value()
-								exReqFound = true
+								reqRaw = line.Line(strings.Join(req, "\n")).Value()
+								reqFound = true
 								req = nil
 							}
 						} else {
@@ -104,26 +106,30 @@ func (p *ExecutableParser) FromMarkdownLines(mdLines []line.Line) (*Executable, 
 						}
 					} else {
 						if cap, ok := capture.Try(mdLine); ok {
-							exCaptures = append(exCaptures, cap)
+							captures = append(captures, cap)
 						} else {
-							if mdLine.LookLike("^```http$") && !exReqFound {
-								collectingCodeBlockBackTick = true
-								continue
-							}
+							if defaultVar, ok := variable.Try(mdLine); ok {
+								defaultVars.Add(defaultVar)
+							} else {
+								if mdLine.LookLike("^```http$") && !reqFound {
+									collectingCodeBlockBackTick = true
+									continue
+								}
 
-							if mdLine.LookLike("^~~~http$") && !exReqFound {
-								collectingCodeBlockTilde = true
-								continue
-							}
+								if mdLine.LookLike("^~~~http$") && !reqFound {
+									collectingCodeBlockTilde = true
+									continue
+								}
 
-							if ok := mdLine.LookLike("^```"); ok {
-								discardingCodeBlockBacktick = true
-								continue
-							}
+								if ok := mdLine.LookLike("^```"); ok {
+									discardingCodeBlockBacktick = true
+									continue
+								}
 
-							if ok := mdLine.LookLike("^~~~"); ok {
-								discardingCodeBlockTilde = true
-								continue
+								if ok := mdLine.LookLike("^~~~"); ok {
+									discardingCodeBlockTilde = true
+									continue
+								}
 							}
 						}
 					}
@@ -132,19 +138,19 @@ func (p *ExecutableParser) FromMarkdownLines(mdLines []line.Line) (*Executable, 
 		}
 	}
 
-	if !exReqFound {
+	if !reqFound {
 		return nil, errors.New("no callable request")
 	}
 
 	options := &ExecutableOptions{
 		RequestParser: p.options.RequestParser,
 		Logger:        p.options.Logger,
-		// ClockWrapper:  p.options.ClockWrapper,
 	}
-	ex := New(exTitle, exReqRaw, options)
-	for _, cap := range exCaptures {
+	ex := New(title, reqRaw, options)
+	for _, cap := range captures {
 		ex.AddCapture(cap)
 	}
+	ex.variables = ex.variables.MergeWith(defaultVars)
 
 	return ex, nil
 }
