@@ -3,6 +3,7 @@ package reader_test
 import (
 	"cotton/internal/line"
 	"cotton/internal/reader"
+	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -60,4 +61,19 @@ func TestReadFileOnNonWindows(t *testing.T) {
 
 	assert.Nil(t, err)
 	assert.Equal(t, []line.Line{"a file", "	with", "some lines"}, lines)
+}
+
+func TestReadFileErrorShouldReturnError(t *testing.T) {
+	expectedError := errors.New("unable to read file")
+
+	readerFunction := func(fileName string) ([]byte, error) {
+		return nil, expectedError
+	}
+
+	fileReader := reader.New(readerFunction)
+
+	lines, err := fileReader.Read("somefile")
+
+	assert.Equal(t, expectedError, err)
+	assert.Nil(t, lines)
 }
