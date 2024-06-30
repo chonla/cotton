@@ -2,9 +2,9 @@ package executable
 
 import (
 	"cotton/internal/capture"
-	"cotton/internal/execution"
 	"cotton/internal/httphelper"
 	"cotton/internal/logger"
+	"cotton/internal/result"
 	"cotton/internal/template"
 	"cotton/internal/variable"
 	"errors"
@@ -81,7 +81,7 @@ func (ex *Executable) Clone() *Executable {
 	}
 }
 
-func (ex *Executable) Execute(passedVars *variable.Variables) (*execution.Execution, error) {
+func (ex *Executable) Execute(passedVars *variable.Variables) (*result.ExecutionResult, error) {
 	if ex.reqRaw == "" {
 		return nil, errors.New("no callable request")
 	}
@@ -114,7 +114,7 @@ func (ex *Executable) Execute(passedVars *variable.Variables) (*execution.Execut
 		vars.Set(cap.Name, value)
 	}
 
-	return &execution.Execution{
+	return &result.ExecutionResult{
 		Variables: initialVars.MergeWith(vars),
 	}, nil
 }

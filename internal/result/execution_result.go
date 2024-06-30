@@ -1,7 +1,7 @@
-package execution
+package result
 
 import "cotton/internal/variable"
 
-type Execution struct {
+type ExecutionResult struct {
 	Variables *variable.Variables
 }
