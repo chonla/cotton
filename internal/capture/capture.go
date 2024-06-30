@@ -10,7 +10,10 @@ type Capture struct {
 }
 
 func Try(mdLine line.Line) (*Capture, bool) {
-	if caps, ok := mdLine.CaptureAll(`\s*\*\s+([^:]+)\s*:\s*` + "`([^`]+)`"); ok {
+	if caps, ok := mdLine.CaptureAll(`\s*[\*\-\+]\s+([^:]+)\s*:\s*` + "`([^`]+)`"); ok {
+		return New(line.Line(caps[1]).Trim().Value(), caps[2]), true
+	}
+	if caps, ok := mdLine.CaptureAll(`\s*\d+\.\s+([^:]+)\s*:\s*` + "`([^`]+)`"); ok {
 		return New(line.Line(caps[1]).Trim().Value(), caps[2]), true
 	}
 	return nil, false

@@ -127,7 +127,8 @@ func (p *Parser) FromMarkdownLines(mdLines []line.Line) (*Testcase, error) {
 									justTitle = false
 									assertions = append(assertions, as)
 								} else {
-									if captures, ok := mdLine.CaptureAll(`^\s*\*\s\[([^\]]+)\]\(([^\)]+)\)`); ok {
+									if captures, ok := mdLine.CaptureAll(`^\s*[\*\-\+]\s\[([^\]]+)\]\(([^\)]+)\)`); ok {
+										// unordered list
 										justTitle = false
 										if !reqFound {
 											ex, err := p.options.ExecutableParser.FromMarkdownFile(captures[2])
@@ -145,34 +146,54 @@ func (p *Parser) FromMarkdownLines(mdLines []line.Line) (*Testcase, error) {
 											teardowns = append(teardowns, ex)
 										}
 									} else {
-										if ok := mdLine.LookLike(`^ {0,3}#{1,6}\s+(.*)`); ok {
+										if captures, ok := mdLine.CaptureAll(`^\s*\d+\.\s\[([^\]]+)\]\(([^\)]+)\)`); ok {
+											// ordered list
 											justTitle = false
-											// continue
+											if !reqFound {
+												ex, err := p.options.ExecutableParser.FromMarkdownFile(captures[2])
+												if err != nil {
+													return nil, err
+												}
+												ex.SetTitle(captures[1])
+												setups = append(setups, ex)
+											} else {
+												ex, err := p.options.ExecutableParser.FromMarkdownFile(captures[2])
+												if err != nil {
+													return nil, err
+												}
+												ex.SetTitle(captures[1])
+												teardowns = append(teardowns, ex)
+											}
 										} else {
-											if mdLine.LookLike("^```http$") && !reqFound {
+											if ok := mdLine.LookLike(`^ {0,3}#{1,6}\s+(.*)`); ok {
 												justTitle = false
-												collectingCodeBlockBackTick = true
-												continue
-											}
+												// continue
+											} else {
+												if mdLine.LookLike("^```http$") && !reqFound {
+													justTitle = false
+													collectingCodeBlockBackTick = true
+													continue
+												}
 
-											if mdLine.LookLike("^~~~http$") && !reqFound {
-												justTitle = false
-												collectingCodeBlockTilde = true
-												continue
-											}
+												if mdLine.LookLike("^~~~http$") && !reqFound {
+													justTitle = false
+													collectingCodeBlockTilde = true
+													continue
+												}
 
-											if ok := mdLine.LookLike("^```"); ok {
-												discardingCodeBlockBacktick = true
-												continue
-											}
+												if ok := mdLine.LookLike("^```"); ok {
+													discardingCodeBlockBacktick = true
+													continue
+												}
 
-											if ok := mdLine.LookLike("^~~~"); ok {
-												discardingCodeBlockTilde = true
-												continue
-											}
+												if ok := mdLine.LookLike("^~~~"); ok {
+													discardingCodeBlockTilde = true
+													continue
+												}
 
-											if justTitle {
-												description = append(description, mdLine.Value())
+												if justTitle {
+													description = append(description, mdLine.Value())
+												}
 											}
 										}
 									}

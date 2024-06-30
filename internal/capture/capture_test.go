@@ -20,6 +20,42 @@ func TestCaptureFromInlineAssignment(t *testing.T) {
 	}, result)
 }
 
+func TestCaptureFromInlineAssignmentPlus(t *testing.T) {
+	mdLine := line.Line("+ name:`$.data.firstname`")
+
+	result, ok := capture.Try(mdLine)
+
+	assert.True(t, ok)
+	assert.Equal(t, &capture.Capture{
+		Name:     "name",
+		Selector: "$.data.firstname",
+	}, result)
+}
+
+func TestCaptureFromInlineAssignmentMinus(t *testing.T) {
+	mdLine := line.Line("- name:`$.data.firstname`")
+
+	result, ok := capture.Try(mdLine)
+
+	assert.True(t, ok)
+	assert.Equal(t, &capture.Capture{
+		Name:     "name",
+		Selector: "$.data.firstname",
+	}, result)
+}
+
+func TestCaptureFromInlineAssignmentOrderedList(t *testing.T) {
+	mdLine := line.Line("33. name:`$.data.firstname`")
+
+	result, ok := capture.Try(mdLine)
+
+	assert.True(t, ok)
+	assert.Equal(t, &capture.Capture{
+		Name:     "name",
+		Selector: "$.data.firstname",
+	}, result)
+}
+
 func TestCaptureFromMoreIndentsPlainAssignment(t *testing.T) {
 	mdLine := line.Line("*   name:`$.data.firstname`")
 
@@ -45,7 +81,7 @@ func TestCaptureFromPlainAssignmentWithWhiteSpaces(t *testing.T) {
 }
 
 func TestCaptureFromNonCapture(t *testing.T) {
-	mdLine := line.Line("-   name :  `$.data.firstname`")
+	mdLine := line.Line("=   name :  `$.data.firstname`")
 
 	result, ok := capture.Try(mdLine)
 
