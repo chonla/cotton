@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
+	"regexp"
 
 	"github.com/samber/mo"
 )
@@ -40,7 +41,21 @@ func New(selector string, operator mo.Either3[UndefinedOperator, UnaryAssertionO
 
 func Try(mdLine line.Line) (*Assertion, bool) {
 	// binary assertion operator
-	if caps, ok := mdLine.CaptureAll("\\s*\\*\\s+`([^`]+)`\\s*(.+)\\s*`([^`]+)`"); ok {
+	if caps, ok := mdLine.CaptureAll("\\s*[\\*\\+\\-]\\s+`([^`]+)`\\s*(.+)\\s*`([^`]+)`"); ok {
+		op, err := NewOp(line.Line(caps[2]).Trim().Value())
+		if err == nil {
+			value, err := line.Line(caps[3]).Trim().ReflectJSValue()
+			if err == nil {
+				return &Assertion{
+					Selector: line.Line(caps[1]).Trim().Value(),
+					Value:    value,
+					Operator: op,
+				}, true
+			}
+		}
+	}
+	// binary assertion operator from ordered list
+	if caps, ok := mdLine.CaptureAll("\\s*\\d+\\.\\s+`([^`]+)`\\s*(.+)\\s*`([^`]+)`"); ok {
 		op, err := NewOp(line.Line(caps[2]).Trim().Value())
 		if err == nil {
 			value, err := line.Line(caps[3]).Trim().ReflectJSValue()
@@ -54,7 +69,21 @@ func Try(mdLine line.Line) (*Assertion, bool) {
 		}
 	}
 	// binary assertion operator for regex
-	if caps, ok := mdLine.CaptureAll("\\s*\\*\\s+`([^`]+)`\\s*(.+)\\s*/(.+)/"); ok {
+	if caps, ok := mdLine.CaptureAll("\\s*[\\*\\+\\-]\\s+`([^`]+)`\\s*(.+)\\s*/(.+)/"); ok {
+		op, err := NewRegexOp(line.Line(caps[2]).Trim().Value())
+		if err == nil {
+			value, err := line.Line(caps[3]).Trim().ReflectRegexValue()
+			if err == nil {
+				return &Assertion{
+					Selector: line.Line(caps[1]).Trim().Value(),
+					Value:    value,
+					Operator: op,
+				}, true
+			}
+		}
+	}
+	// binary assertion operator for regex from ordered list
+	if caps, ok := mdLine.CaptureAll("\\s*\\d+\\.\\s+`([^`]+)`\\s*(.+)\\s*/(.+)/"); ok {
 		op, err := NewRegexOp(line.Line(caps[2]).Trim().Value())
 		if err == nil {
 			value, err := line.Line(caps[3]).Trim().ReflectRegexValue()
@@ -68,7 +97,18 @@ func Try(mdLine line.Line) (*Assertion, bool) {
 		}
 	}
 	// unary assertion operator
-	if caps, ok := mdLine.CaptureAll("\\s*\\*\\s+`([^`]+)`\\s*(.+)"); ok {
+	if caps, ok := mdLine.CaptureAll("\\s*[\\*\\+\\-]\\s+`([^`]+)`\\s*(.+)"); ok {
+		op, err := NewOp(line.Line(caps[2]).Trim().Value())
+		if err == nil {
+			return &Assertion{
+				Selector: line.Line(caps[1]).Trim().Value(),
+				Value:    nil,
+				Operator: op,
+			}, true
+		}
+	}
+	// unary assertion operator from ordered list
+	if caps, ok := mdLine.CaptureAll("\\s*\\d+\\.\\s+`([^`]+)`\\s*(.+)"); ok {
 		op, err := NewOp(line.Line(caps[2]).Trim().Value())
 		if err == nil {
 			return &Assertion{
@@ -148,10 +188,21 @@ func (a *Assertion) SimilarTo(anotherAssertion *Assertion) bool {
 	}
 
 	if a.Operator.IsArg3() && anotherAssertion.Operator.IsArg3() {
-		return a.Selector == anotherAssertion.Selector &&
-			reflect.TypeOf(a.Value) == reflect.TypeOf(a.Value) &&
-			a.Value == anotherAssertion.Value &&
-			a.Operator.MustArg3().Name() == anotherAssertion.Operator.MustArg3().Name()
+		var v1 interface{}
+		var v2 interface{}
+		if reflect.TypeOf(a.Value) == reflect.TypeOf(anotherAssertion.Value) {
+			if reflect.TypeOf(a.Value).String() == "*regexp.Regexp" {
+				v1 = a.Value.(*regexp.Regexp).String()
+				v2 = anotherAssertion.Value.(*regexp.Regexp).String()
+			} else {
+				v1 = a.Value
+				v2 = anotherAssertion.Value
+			}
+			return a.Selector == anotherAssertion.Selector &&
+				reflect.TypeOf(a.Value) == reflect.TypeOf(anotherAssertion.Value) &&
+				v1 == v2 &&
+				a.Operator.MustArg3().Name() == anotherAssertion.Operator.MustArg3().Name()
+		}
 	}
 
 	return false
