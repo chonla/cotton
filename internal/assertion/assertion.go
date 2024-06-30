@@ -81,41 +81,6 @@ func Try(mdLine line.Line) (*Assertion, bool) {
 	return nil, false
 }
 
-// func parseRegexValue(mdLine line.Line) (interface{}, error) {
-// 	return regexp.Compile(mdLine.Value())
-// }
-
-// func parseValue(mdLine line.Line) (interface{}, error) {
-// 	if cap, ok := mdLine.Capture(`"(.+)"`, 1); ok {
-// 		return cap, nil
-// 	}
-// 	if mdLine.LookLike(`^\d+$`) {
-// 		// ALL numbers in JSON considered a floating point.
-// 		v, err := strconv.ParseFloat(mdLine.Value(), 64)
-// 		if err != nil {
-// 			return nil, err
-// 		}
-// 		return v, nil
-// 	}
-// 	if mdLine.LookLike(`^\d+\.\d+$`) {
-// 		v, err := strconv.ParseFloat(mdLine.Value(), 64)
-// 		if err != nil {
-// 			return nil, err
-// 		}
-// 		return v, nil
-// 	}
-// 	if mdLine.LookLike("true") {
-// 		return true, nil
-// 	}
-// 	if mdLine.LookLike("false") {
-// 		return false, nil
-// 	}
-// 	if mdLine.LookLike("null") {
-// 		return nil, nil
-// 	}
-// 	return nil, errors.New("unexpected value")
-// }
-
 func NewRegexOp(op string) (mo.Either3[UndefinedOperator, UnaryAssertionOperator, BinaryAssertionOperator], error) {
 	operatorMap := map[string]func() mo.Either3[UndefinedOperator, UnaryAssertionOperator, BinaryAssertionOperator]{
 		"==": func() mo.Either3[UndefinedOperator, UnaryAssertionOperator, BinaryAssertionOperator] {
