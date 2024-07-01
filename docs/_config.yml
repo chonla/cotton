@@ -28,7 +28,8 @@ twitter_username: chonla
 github_username:  chonla
 
 # Build settings
-theme: minima
+# theme: aviator
+remote_theme: sighingnow/jekyll-gitbook
 plugins:
   - jekyll-feed
 
