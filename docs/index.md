@@ -2,12 +2,18 @@
 # Feel free to add content and custom Front Matter to this file.
 # To modify the layout, see https://jekyllrb.com/docs/themes/#overriding-theme-defaults
 
-layout: home
+layout: default
+title: General
+nav_order: 1
+description: "Cotton is a markdown-formatted API specification runner."
+permalink: /
 ---
+
+# Cotton
 
 Cotton is a markdown-formatted API specification runner. It promotes the readability of API specification.
 
-### Key Features
+## Key Features
 
 * **Customizable Documentation**: Cotton offers intuitive syntax. You can make your API document more readable.
 * **Setups and Teardowns**: Cotton allows you to to test setups and teardown.

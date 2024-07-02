@@ -29,9 +29,14 @@ github_username:  chonla
 
 # Build settings
 # theme: aviator
-remote_theme: sighingnow/jekyll-gitbook
+theme: just-the-docs
 plugins:
   - jekyll-feed
+
+search_enabled: true
+search.previews: 3
+search.preview_words_before: 5
+search.preview_words_after: 5
 
 # Exclude from processing.
 # The following items will not be processed, by default.
