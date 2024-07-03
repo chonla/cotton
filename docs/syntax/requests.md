@@ -8,7 +8,7 @@ parent: Syntax
 
 # Requests
 
-Request is a HTTP request in the code block annotated language with `http`.
+A request is a HTTP request in the code block annotated language with `http`.
 
 {% highlight markdown %}
 ```http
