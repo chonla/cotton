@@ -46,11 +46,11 @@ An assertion is a test to verify if value in the response satisfies the requirem
 ```
 {% endhighlight %}
 
-### == (Equality)
+### == (Equal)
 
 `==` is an operator to check if the value is equal to the expected value.
 
-Value types for equality assertion can be number, string, [regular expression](#regular-expression-assertion).
+Value types for this assertion can be a number, string, or [regular expression](#regular-expression-assertion).
 
 **Example**
 
@@ -62,11 +62,11 @@ Value types for equality assertion can be number, string, [regular expression](#
 ```
 {% endhighlight %}
 
-### != (Difference)
+### != (Not Equal)
 
 `!=` is an operator to check if the value is different from the expected value.
 
-Value types for difference assertion can be number, string, [regular expression](#regular-expression-assertion).
+Value types for this assertion can be a number, string, or [regular expression](#regular-expression-assertion).
 
 **Example**
 
@@ -75,6 +75,62 @@ Value types for difference assertion can be number, string, [regular expression]
 * `StatusCode` != `404`
 * `StatusText` != `"NOT FOUND"`
 * `Headers.Content-Type` != `"text/plain"`
+```
+{% endhighlight %}
+
+### > (Greater Than)
+
+`>` is an operator to check if the value is greater than the expected value.
+
+Value types for this assertion must be a number.
+
+**Example**
+
+{% highlight markdown %}
+```markdown
+* `Body.id` > `0`
+```
+{% endhighlight %}
+
+### >= (Greater Than or Equal To)
+
+`>=` is an operator to check if the value is greater than or equal to the expected value.
+
+Value types for this assertion must be a number.
+
+**Example**
+
+{% highlight markdown %}
+```markdown
+* `Body.id` >= `0`
+```
+{% endhighlight %}
+
+### < (Less Than)
+
+`<` is an operator to check if the value is less than the expected value.
+
+Value types for this assertion must be a number.
+
+**Example**
+
+{% highlight markdown %}
+```markdown
+* `Body.id` < `0`
+```
+{% endhighlight %}
+
+### <= (Less Than or Equal To)
+
+`<=` is an operator to check if the value is less than or equal to the expected value.
+
+Value types for this assertion must be a number.
+
+**Example**
+
+{% highlight markdown %}
+```markdown
+* `Body.id` <= `0`
 ```
 {% endhighlight %}
 
