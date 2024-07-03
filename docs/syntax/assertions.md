@@ -14,7 +14,7 @@ The assertion is written as a list item (ordered or unordered list) in the follo
 
 {% highlight markdown %}
 ```markdown
-* `<selector>` <assertion operator> [expected value]
+* `selector` assertion_operator `expected_value`
 ```
 {% endhighlight %}
 
