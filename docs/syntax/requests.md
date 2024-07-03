@@ -10,6 +10,8 @@ parent: Syntax
 
 A request is a HTTP request in the code block annotated language with `http`.
 
+**Example**
+
 {% highlight markdown %}
 ```http
 POST https://somedomain.com/resource HTTP/1.1
