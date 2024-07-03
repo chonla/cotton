@@ -51,3 +51,17 @@ The values in response are addressable by [selector](./selectors.md).
 * `Headers.Content-Type` == `"application/json"`
 ```
 {% endhighlight %}
+
+### != (Difference)
+
+`!=` is an operator to check if the value is different from the expected value.
+
+**Example**
+
+{% highlight markdown %}
+```markdown
+* `StatusCode` != `404`
+* `StatusText` != `"NOT FOUND"`
+* `Headers.Content-Type` != `"text/plain"`
+```
+{% endhighlight %}
