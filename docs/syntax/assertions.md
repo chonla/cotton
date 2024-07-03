@@ -8,11 +8,19 @@ parent: Syntax
 
 # Assertions
 
-An assertion is a test to verify if requirements are satisfied.
+An assertion is a test to verify if value in the response satisfies the requirements. The assertion is written as a list item (ordered or unordered list) in the following syntax:
 
-The values in response are addressable by [selector](./selectors.md).
+{% highlight markdown %}
+```markdown
+* `<selector>` <assertion operator> [expected value]
+```
+{% endhighlight %}
 
-## Assertion operators
+* Selector is a value selector, locating a value in the response. See [Selector](./selectors.md)
+* Assertion operator is an assertion operation, which can be unary operator or binary operator. The binary operator requires an expected value as the operand. See [Assertion Operators](#assertion-operators) below.
+* Expected value is an optional operand, depending on operator.
+
+## Assertion Operators
 
 ### is defined
 
@@ -42,6 +50,8 @@ The values in response are addressable by [selector](./selectors.md).
 
 `==` is an operator to check if the value is equal to the expected value.
 
+Value types for equality assertion can be number, string, [regular expression](#regular-expression-assertion).
+
 **Example**
 
 {% highlight markdown %}
@@ -56,6 +66,8 @@ The values in response are addressable by [selector](./selectors.md).
 
 `!=` is an operator to check if the value is different from the expected value.
 
+Value types for difference assertion can be number, string, [regular expression](#regular-expression-assertion).
+
 **Example**
 
 {% highlight markdown %}
@@ -63,5 +75,17 @@ The values in response are addressable by [selector](./selectors.md).
 * `StatusCode` != `404`
 * `StatusText` != `"NOT FOUND"`
 * `Headers.Content-Type` != `"text/plain"`
+```
+{% endhighlight %}
+
+## Regular Expression Assertion
+
+Regular expression is used in equality and difference assertion. The pattern is enclosed between slashes like in Javascript. The value to be asserted **MUST** be string.
+
+**Example**
+
+{% highlight markdown %}
+```markdown
+* `StatusText` == `/^NOT.*/`
 ```
 {% endhighlight %}
