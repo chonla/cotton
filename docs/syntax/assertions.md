@@ -8,7 +8,9 @@ parent: Syntax
 
 # Assertions
 
-Once a response has been returned from the request, an assertion will be evaluated to verify if value in the response satisfies the requirements. The assertion is written as a list item (ordered or unordered list) in the following syntax:
+Once a response has been returned from the request, an assertion will be evaluated to verify if value in the response satisfies the requirements.
+
+The assertion is written as a list item (ordered or unordered list) in the following syntax:
 
 {% highlight markdown %}
 ```markdown
