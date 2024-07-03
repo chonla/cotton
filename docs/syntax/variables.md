@@ -26,3 +26,7 @@ If the value is string, enclose it with double quote. Otherwise, it will be trea
 * id:3
 * keyword:"value"
 {% endhighlight %}
+
+## Capturing a value into a variable
+
+See [Captures](./captures.md).

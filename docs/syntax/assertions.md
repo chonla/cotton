@@ -16,7 +16,7 @@ The assertion is written as a list item (ordered or unordered list) in the follo
 * `selector` assertion_operator `expected_value`
 {% endhighlight %}
 
-* Selector is a value selector, locating a value in the response. See [Selector](./selectors.md)
+* Selector is a value selector, locating a value in the response. See [Selectors](./selectors.md)
 * Assertion operator is an assertion operation, which can be unary operator or binary operator. The binary operator requires an expected value as the operand. See [Assertion Operators](#assertion-operators) below.
 * Expected value is an optional operand, depending on operator.
 
