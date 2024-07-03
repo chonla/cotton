@@ -116,7 +116,7 @@ Value types for this assertion must be a number.
 
 {% highlight markdown %}
 ```markdown
-* `Body.id` < `0`
+* `Body.id` < `30`
 ```
 {% endhighlight %}
 
@@ -130,7 +130,7 @@ Value types for this assertion must be a number.
 
 {% highlight markdown %}
 ```markdown
-* `Body.id` <= `0`
+* `Body.id` <= `30`
 ```
 {% endhighlight %}
 
