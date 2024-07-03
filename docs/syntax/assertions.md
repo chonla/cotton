@@ -38,7 +38,7 @@ The values in response are addressable by [selector](./selectors.md).
 ```
 {% endhighlight %}
 
-### ==
+### == (Equality)
 
 `==` is an operator to check if the value is equal to the expected value.
 
