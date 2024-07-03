@@ -10,7 +10,7 @@ parent: Syntax
 
 Teardown is a request operation that will be executed after the testcase.
 
-Like [setups](./setups.md), the teardown will be saved into separated markdown file. This allows the teardown operation to be able to be reused in other testcases.
+Like [setups](./setups.md), the teardown must be a separated markdown file. If you have several teardown steps, just separate them one step one file. This allows the teardown operation to be able to be reused in other testcases.
 
 The teardown is written as a link in a list item (ordered or unordered list) in the following syntax:
 

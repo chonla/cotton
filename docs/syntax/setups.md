@@ -10,7 +10,7 @@ parent: Syntax
 
 Setup is a request operation that will be executed before the testcase.
 
-The setup will be saved into separated markdown file. This allows the setup operation to be able to be reused in other testcases.
+The setup must be a separated markdown file. If you have several setup steps, just separate them one step one file. This allows the setup operation to be able to be reused in other testcases.
 
 The setup is written as a link in a list item (ordered or unordered list) in the following syntax:
 
