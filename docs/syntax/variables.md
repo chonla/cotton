@@ -10,6 +10,8 @@ parent: Syntax
 
 A variable is named value which can be reused. There are 2 ways to define a variable, explicitly define a variable with value or capture a value from response into a variable.
 
+The variables which defined in earlier step, no matter in setup or testcase or teardown, it will be reusable in later steps.
+
 ## Defining a variable
 
 A variable definition is written in a list item (ordered or unordered list) in the following syntax:
@@ -27,6 +29,16 @@ If the value is string, enclose it with double quote. Otherwise, it will be trea
 * keyword:"value"
 {% endhighlight %}
 
+Defining a variable which has a duplicate name will replace the previous definition. The `keyword` in the following example yield the value of `"another value"`.
+
+**Example**
+
+{% highlight markdown %}
+* id:3
+* keyword:"value"
+* keyword:"another value"
+{% endhighlight %}
+
 ## Capturing a value into a variable
 
 See [Captures](./captures.md).
@@ -34,6 +46,8 @@ See [Captures](./captures.md).
 ## Using a variable
 
 The variable can be used within the request code block by putting variable name enclosed with `{{` and `}}`.
+
+**Example**
 
 {% highlight markdown %}
 * keyword:"value"
