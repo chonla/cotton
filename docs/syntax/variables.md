@@ -30,3 +30,29 @@ If the value is string, enclose it with double quote. Otherwise, it will be trea
 ## Capturing a value into a variable
 
 See [Captures](./captures.md).
+
+## Using a variable
+
+The variable can be used within the request code block by putting variable name enclosed with `{{` and `}}`.
+
+{% highlight markdown %}
+* keyword:"value"
+
+```http
+POST https://somedomain.com/search HTTP/1.1
+Content-Length: 17
+Content-Type: application/json
+
+{"keyword":"{{keyword}}"}
+```
+{% endhighlight %}
+
+The actual request which sent to server will look like this:
+
+{% highlight http %}
+POST https://somedomain.com/search HTTP/1.1
+Content-Length: 17
+Content-Type: application/json
+
+{"keyword":"value"}
+{% endhighlight %}
