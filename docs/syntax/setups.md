@@ -15,9 +15,7 @@ Each setup must be a separated markdown file. If you have several setup steps, j
 The setup is written as a link in a list item (ordered or unordered list) in the following syntax:
 
 {% highlight markdown %}
-```markdown
 * [setup_title](link_to_setup_file)
-```
 {% endhighlight %}
 
 **Note**: A built-in variable `<rootDir>` can be used in link-to-setup-file to make link more readable.
@@ -25,7 +23,5 @@ The setup is written as a link in a list item (ordered or unordered list) in the
 **Example**
 
 {% highlight markdown %}
-```markdown
 * [Authenticate with a support credential](<rootDir>/shared/auth_support_cred.md)
-```
 {% endhighlight %}

@@ -15,9 +15,7 @@ Like [setups](./setups.md), each teardown must be a separated markdown file. If 
 The teardown is written as a link in a list item (ordered or unordered list) in the following syntax:
 
 {% highlight markdown %}
-```markdown
 * [teardown_title](link_to_teardown_file)
-```
 {% endhighlight %}
 
 **Note**: A built-in variable `<rootDir>` can be used in link-to-setup-file to make link more readable.
@@ -25,7 +23,5 @@ The teardown is written as a link in a list item (ordered or unordered list) in 
 **Example**
 
 {% highlight markdown %}
-```markdown
 * [Session clean up](<rootDir>/shared/authsession_clean_up.md)
-```
 {% endhighlight %}

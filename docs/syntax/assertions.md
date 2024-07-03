@@ -13,9 +13,7 @@ Once a response has been returned from the request, an assertion will be evaluat
 The assertion is written as a list item (ordered or unordered list) in the following syntax:
 
 {% highlight markdown %}
-```markdown
 * `selector` assertion_operator `expected_value`
-```
 {% endhighlight %}
 
 * Selector is a value selector, locating a value in the response. See [Selector](./selectors.md)
@@ -31,9 +29,7 @@ The assertion is written as a list item (ordered or unordered list) in the follo
 **Example**
 
 {% highlight markdown %}
-```markdown
 * `Body.message.id` is defined
-```
 {% endhighlight %}
 
 ### is undefined
@@ -43,9 +39,7 @@ The assertion is written as a list item (ordered or unordered list) in the follo
 **Example**
 
 {% highlight markdown %}
-```markdown
 * `Body.message.error` is undefined
-```
 {% endhighlight %}
 
 ### == (Equal)
@@ -57,11 +51,9 @@ Value types for this assertion can be a number, string, or [regular expression](
 **Example**
 
 {% highlight markdown %}
-```markdown
 * `StatusCode` == `200`
 * `StatusText` == `"OK"`
 * `Headers.Content-Type` == `"application/json"`
-```
 {% endhighlight %}
 
 ### != (Not Equal)
@@ -73,11 +65,9 @@ Value types for this assertion can be a number, string, or [regular expression](
 **Example**
 
 {% highlight markdown %}
-```markdown
 * `StatusCode` != `404`
 * `StatusText` != `"NOT FOUND"`
 * `Headers.Content-Type` != `"text/plain"`
-```
 {% endhighlight %}
 
 ### > (Greater Than)
@@ -89,9 +79,7 @@ Value types for this assertion must be a number.
 **Example**
 
 {% highlight markdown %}
-```markdown
 * `Body.id` > `0`
-```
 {% endhighlight %}
 
 ### >= (Greater Than or Equal To)
@@ -103,9 +91,7 @@ Value types for this assertion must be a number.
 **Example**
 
 {% highlight markdown %}
-```markdown
 * `Body.id` >= `0`
-```
 {% endhighlight %}
 
 ### < (Less Than)
@@ -117,9 +103,7 @@ Value types for this assertion must be a number.
 **Example**
 
 {% highlight markdown %}
-```markdown
 * `Body.id` < `30`
-```
 {% endhighlight %}
 
 ### <= (Less Than or Equal To)
@@ -131,9 +115,7 @@ Value types for this assertion must be a number.
 **Example**
 
 {% highlight markdown %}
-```markdown
 * `Body.id` <= `30`
-```
 {% endhighlight %}
 
 ## Regular Expression Assertion
@@ -143,7 +125,5 @@ Regular expression is used in equality and difference assertion. The pattern is 
 **Example**
 
 {% highlight markdown %}
-```markdown
 * `StatusText` == `/^NOT.*/`
-```
 {% endhighlight %}
