@@ -14,10 +14,10 @@ A request is a HTTP request in the code block annotated language with `http`.
 
 {% highlight markdown %}
 ```http
-POST https://somedomain.com/resource HTTP/1.1
-Content-Length: 17
+POST https://fakestoreapi.com/products HTTP/1.1
+Content-Length: 125
 Content-Type: application/json
 
-{"resource":8839}
+{"title":"test product","price":13.5,"description":"lorem ipsum set","image":"https://i.pravatar.cc","category":"electronic"}
 ```
 {% endhighlight %}

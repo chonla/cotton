@@ -10,7 +10,7 @@ permalink: /cli
 ## Usage
 
 {% highlight bash %}
-  cotton [-d] [-c] <testpath|testdir>
+  cotton [-d] [-c] [-p] <testpath|testdir>
   cotton -v
   cotton --help
 
@@ -18,6 +18,7 @@ permalink: /cli
   -d    debug mode
   -h    display this help
   -i    disable certificate verification
+  -p    paranoid mode
   -s    stop when test failed
   -v    display cotton version
 {% endhighlight %}
@@ -41,6 +42,10 @@ Cotton prints out help information.
 ### `-i` Insecure mode
 
 Insecure mode will disable certificate verification.
+
+### `-p` Paranoid mode
+
+Paranoid mode is detailed verbose logging execution. Cotton prints out very detailed information for further debugging purpose.
 
 ### `-s` Panic mode
 

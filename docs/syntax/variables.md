@@ -51,23 +51,24 @@ The variable can be used within the request code block by putting variable name 
 **Example**
 
 {% highlight markdown %}
-* keyword:"value"
+* username:"peter"
+* password:"1234test"
 
 ```http
-POST https://somedomain.com/search HTTP/1.1
-Content-Length: 17
+POST https://fakestoreapi.com/auth/login HTTP/1.1
 Content-Type: application/json
+Content-Length: 42
 
-{"keyword":"{% raw %}{{keyword}}{% endraw %}"}
+{% raw %}{"username":"{{username}}","password":"{{password}}"}{% endraw %}
 ```
 {% endhighlight %}
 
 The actual request which sent to server will look like this:
 
 {% highlight http %}
-POST https://somedomain.com/search HTTP/1.1
-Content-Length: 17
+POST https://fakestoreapi.com/auth/login HTTP/1.1
 Content-Type: application/json
+Content-Length: 42
 
-{"keyword":"value"}
+{"username":"peter","password":"1234test"}
 {% endhighlight %}

@@ -18,12 +18,8 @@ A testcase requires two testcase elements, [request](../syntax/requests.md) and 
 
 {% highlight markdown %}
 ```http
-POST https://somedomain.com/resource HTTP/1.1
-Content-Length: 17
-Content-Type: application/json
-
-{"resource":8839}
+GET https://fakestoreapi.com/products HTTP/1.1
 ```
 
-* `StatusText` == `/^NOT.*/`
+* `Body.0.id`==`1`
 {% endhighlight %}
