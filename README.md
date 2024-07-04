@@ -53,6 +53,20 @@ See the files in `etc/examples` directory.
 * ~~Variables~~
 * ~~Ordered list support for Setups,Teardowns,Assertions,Captures~~
 
+## Contributing
+
+1. Fork it (https://github.com/chonla/cotton/fork).
+2. Create your feature branch (git checkout -b feature/fooBar).
+3. Commit your changes (git commit -am 'Add some fooBar').
+4. Push to the branch (git push origin feature/fooBar).
+5. Create a new Pull Request.
+
+## Testing
+
+```bash
+go test ./...
+```
+
 ## License
 
 [MIT](./LICENSE)
