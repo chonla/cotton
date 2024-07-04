@@ -18,10 +18,14 @@ The setup is written as a link in a list item (ordered or unordered list) in the
 * [setup_title](link_to_setup_file)
 {% endhighlight %}
 
-**Note**: A built-in variable `<rootDir>` can be used in link-to-setup-file to make link more readable.
+{: .info }
+The setup list can be anywhere in the testcase, but must be **BEFORE** the request.
 
 **Example**
 
 {% highlight markdown %}
 * [Authenticate with a support credential](<rootDir>/shared/auth_support_cred.md)
 {% endhighlight %}
+
+{: .info }
+A built-in variable `<rootDir>` can be used in link-to-setup-file to make link more readable.

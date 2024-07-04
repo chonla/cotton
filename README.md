@@ -43,7 +43,7 @@ See the files in `etc/examples` directory.
 * ~~Captures integration~~
 * ~~Debug mode~~
 * ~~CLI~~
-* Cookbook
+* ~~Cookbook~~
 * ~~Colorized logging~~
 * HTML reports
 * Upload request
@@ -52,6 +52,7 @@ See the files in `etc/examples` directory.
 * ~~Stop tests execution when failed~~
 * ~~Variables~~
 * ~~Ordered list support for Setups,Teardowns,Assertions,Captures~~
+* ~~Customized rootDir~~
 
 ## Contributing
 

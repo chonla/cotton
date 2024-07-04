@@ -8,7 +8,7 @@ parent: Guide
 
 # Testcase
 
-Testcase is a set of actions to test if a system meets the API requirement.
+Testcase is a set of actions to test if a system meets the requirement.
 
 ## A Minimal Testcase
 
@@ -28,6 +28,8 @@ GET https://fakestoreapi.com/products HTTP/1.1
 
 A testcase has 2 optional detail, title and description. The testcase title is the very first heading level 1 in the testcase file and the description is a paragraph right after the title. Other than that and not the testcase elements will be treated as documentation of the testcase.
 
+**Example**
+
 {% highlight markdown %}
 # List product
 
@@ -35,6 +37,28 @@ Listing product should return a list of product.
 
 ```http
 GET https://fakestoreapi.com/products HTTP/1.1
+```
+
+* `Body.0.id`==`1`
+* `Body.1.id`==`2`
+{% endhighlight %}
+
+## An Internationalized Testcase
+
+Since the testcase embraces the markdown syntax, you can also use any language to make the testcase more readable.
+
+**Example**
+
+{% highlight markdown %}
+# รายชื่อผลิตภัณฑ์ทั้งหมด
+
+ทดสอบ API สำหรับลิสต์รายชื่อผลิตภัณฑ์ทั้งหมด โดยจะต้องทำการล็อกอินเข้าใช้งานเพื่อเอา token ก่อน และส่ง token ไปใน header เพื่อเรียกดูรายชื่อผลิตภัณฑ์
+
+* [ลงชื่อเข้าใช้ระบบ](<rootDir>/etc/examples/fakestoreapi.com/executables/auth.md)
+
+```http
+GET https://fakestoreapi.com/products HTTP/1.1
+Authorization: Bearer {{access_token}}
 ```
 
 * `Body.0.id`==`1`

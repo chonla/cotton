@@ -67,8 +67,8 @@ func (m *MockLogger) PrintResponse(resp string) error {
 	return args.Error(0)
 }
 
-func (m *MockLogger) PrintError(err error) error {
-	args := m.Called(err)
+func (m *MockLogger) PrintError(fileContext string, err error) error {
+	args := m.Called(fileContext, err)
 	return args.Error(0)
 }
 

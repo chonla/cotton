@@ -60,7 +60,7 @@ func (c *NilLogger) PrintResponse(resp string) error {
 	return nil
 }
 
-func (c *NilLogger) PrintError(err error) error {
+func (c *NilLogger) PrintError(fileContext string, err error) error {
 	return nil
 }
 

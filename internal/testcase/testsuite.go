@@ -45,7 +45,7 @@ func NewTestsuite(path string, options *TestsuiteOptions) (*Testsuite, error) {
 			testcases = append(testcases, tc)
 		} else {
 			if err != nil {
-				options.Logger.PrintError(err)
+				options.Logger.PrintError(file, err)
 			}
 		}
 	}

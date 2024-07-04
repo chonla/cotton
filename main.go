@@ -23,6 +23,7 @@ func main() {
 	var ver bool
 	var insecure bool
 	var stopWhenFailed bool
+	var customRootDir string
 
 	flag.Usage = usage
 	flag.BoolVar(&compact, "c", false, "compact mode")
@@ -32,9 +33,15 @@ func main() {
 	flag.BoolVar(&stopWhenFailed, "s", false, "stop when test failed")
 	flag.BoolVar(&ver, "v", false, "display cotton version")
 	flag.BoolVar(&help, "h", false, "display this help")
+	flag.StringVar(&customRootDir, "r", "", "set rootDir path")
 	flag.Parse()
 
-	rootDir, _ := os.Getwd()
+	rootDir := ""
+	if customRootDir == "" {
+		rootDir, _ = os.Getwd()
+	} else {
+		rootDir = customRootDir
+	}
 	config := &config.Config{
 		RootDir: rootDir,
 	}
@@ -111,7 +118,7 @@ func main() {
 func usage() {
 	fmt.Fprintf(flag.CommandLine.Output(), `Usage of cotton:
 
-  cotton [-d] [-c] <testpath|testdir>
+  cotton [-d] [-c] [-p] [-r <rootdir>] <testpath|testdir>
   cotton -v
   cotton --help
 

@@ -10,7 +10,7 @@ permalink: /cli
 ## Usage
 
 {% highlight bash %}
-  cotton [-d] [-c] [-p] <testpath|testdir>
+  cotton [-d] [-c] [-p] [-r <rootdir>] <testpath|testdir>
   cotton -v
   cotton --help
 
@@ -19,6 +19,8 @@ permalink: /cli
   -h    display this help
   -i    disable certificate verification
   -p    paranoid mode
+  -r string
+        set rootDir path
   -s    stop when test failed
   -v    display cotton version
 {% endhighlight %}
@@ -46,6 +48,10 @@ Insecure mode will disable certificate verification.
 ### `-p` Paranoid mode
 
 Paranoid mode is detailed verbose logging execution. Cotton prints out very detailed information for further debugging purpose.
+
+### `-r` Set rootDir
+
+`rootDir` is a shortcut variable which can be used in setups and teardows link. Default is current directory.
 
 ### `-s` Panic mode
 

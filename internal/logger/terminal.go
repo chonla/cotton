@@ -151,9 +151,11 @@ func (c *TerminalLogger) PrintResponse(resp string) error {
 	return err
 }
 
-func (c *TerminalLogger) PrintError(err error) error {
-	val := color.New(color.FgRed).Sprint(err)
-	_, err = fmt.Println(val)
+func (c *TerminalLogger) PrintError(fileContext string, err error) error {
+	file := color.New(color.FgWhite).Sprintf("%s\n", fileContext)
+	val := color.New(color.FgRed).Sprintf("    %s", err)
+	message := fmt.Sprintf("%s%s", file, val)
+	_, err = fmt.Println(message)
 	return err
 }
 

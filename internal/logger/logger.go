@@ -29,7 +29,7 @@ type Logger interface {
 	PrintAssertionResult(assertionResult *result.AssertionResult) error
 	PrintRequest(req string) error
 	PrintResponse(resp string) error
-	PrintError(err error) error
+	PrintError(fileContext string, err error) error
 	PrintTestsuiteResult(testsuiteResult *result.TestsuiteResult) error
 	PrintDebugMessage(message string) error
 	PrintDetailedDebugMessage(messages ...string) error

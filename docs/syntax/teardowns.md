@@ -18,10 +18,14 @@ The teardown is written as a link in a list item (ordered or unordered list) in 
 * [teardown_title](link_to_teardown_file)
 {% endhighlight %}
 
-**Note**: A built-in variable `<rootDir>` can be used in link-to-setup-file to make link more readable.
+{: .info }
+The teardown list can be anywhere in the testcase, but must be **AFTER** the request.
 
 **Example**
 
 {% highlight markdown %}
 * [Session clean up](<rootDir>/shared/authsession_clean_up.md)
 {% endhighlight %}
+
+{: .info }
+A built-in variable `<rootDir>` can be used in link-to-setup-file to make link more readable.
