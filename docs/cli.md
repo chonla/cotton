@@ -5,7 +5,7 @@ nav_order: 2
 permalink: /cli
 ---
 
-# Command Line Interface
+# Command Line Interface (CLI)
 
 ## Usage
 
