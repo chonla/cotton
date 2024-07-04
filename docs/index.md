@@ -22,3 +22,12 @@ Cotton is a markdown-formatted API specification runner. It promotes the readabi
 * **Regular Expression Assertions**: Not only simple assertions, but Cotton also provides built-in regular expression assertions.
 * **Debug Logging**: Cotton CLI has a `-d` option to print out detailed information of test operations.
 * **CI/CD Ready**: Cotton CLI returns error if any test fails.
+
+## Getting Started
+
+
+## About Cotton
+
+Cotton is originally inspired by [silk test](https://github.com/matryer/silk) which is no longer maintained.
+
+Testcase syntax in Cotton version 0 is somehow close to silk test, but in version 1, the syntax is completely redesigned to promote readability.
