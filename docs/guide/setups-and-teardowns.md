@@ -35,7 +35,7 @@ Authorization: Bearer {{access_token}}
 
 `<rootDir>` is a shortcut variable allowing you to make link more dynamic.
 
-You can redefine `<rootDir>` via command line option `-r`.
+You can redefine `<rootDir>` via [command line](../cli.md) option `-r`.
 
 ## Nested setups and teardowns
 
