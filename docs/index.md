@@ -28,6 +28,6 @@ Cotton is a markdown-formatted API specification runner. It promotes the readabi
 
 ## About Cotton
 
-Cotton is originally inspired by [silk test](https://github.com/matryer/silk) which is no longer maintained.
+Cotton 0 was originally inspired by [silk test](https://github.com/matryer/silk) which is no longer maintained.
 
-Testcase syntax in Cotton version 0 is somehow close to silk test, but in version 1, the syntax is completely redesigned to promote readability.
+Testcase syntax in Cotton 0 is close to silk test, but in version 1, the syntax is completely redesigned to promote more readability.
