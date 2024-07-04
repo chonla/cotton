@@ -62,6 +62,11 @@ func (m *MockLogger) PrintRequest(req string) error {
 	return args.Error(0)
 }
 
+func (m *MockLogger) PrintResponse(resp string) error {
+	args := m.Called(resp)
+	return args.Error(0)
+}
+
 func (m *MockLogger) PrintError(err error) error {
 	args := m.Called(err)
 	return args.Error(0)
@@ -84,6 +89,15 @@ func (m *MockLogger) PrintSectionTitle(sectionTitle string) error {
 
 func (m *MockLogger) PrintDebugMessage(message string) error {
 	args := m.Called(message)
+	return args.Error(0)
+}
+
+func (m *MockLogger) PrintDetailedDebugMessage(messages ...string) error {
+	margs := make([]interface{}, len(messages))
+	for _, message := range messages {
+		margs = append(margs, message)
+	}
+	args := m.Called(margs)
 	return args.Error(0)
 }
 

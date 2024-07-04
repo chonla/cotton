@@ -37,6 +37,7 @@ func NewParser(options *ParserOptions) *ExecutableParser {
 }
 
 func (p *ExecutableParser) FromMarkdownFile(mdFileName string) (*Executable, error) {
+	p.options.Logger.PrintDetailedDebugMessage("Parsing", mdFileName)
 	mdFullPath := p.options.Configurator.ResolvePath(mdFileName)
 	lines, err := p.options.FileReader.Read(mdFullPath)
 	if err != nil {
@@ -59,21 +60,29 @@ func (p *ExecutableParser) FromMarkdownLines(mdLines []line.Line) (*Executable, 
 	captures := []*capture.Capture{}
 	defaultVars := variable.New()
 
+	p.options.Logger.PrintDetailedDebugMessage("----------")
 	for _, mdLine := range mdLines {
+		p.options.Logger.PrintDetailedDebugMessage("Line data", mdLine.Value())
 		if discardingCodeBlockBacktick {
+			p.options.Logger.PrintDetailedDebugMessage("Discarding code block backtick")
 			// discard everything after opening unsupport ```
 			if ok := mdLine.LookLike("^```$"); ok {
+				p.options.Logger.PrintDetailedDebugMessage("End of code block backtick found")
 				discardingCodeBlockBacktick = false
 			}
 		} else {
 			if discardingCodeBlockTilde {
+				p.options.Logger.PrintDetailedDebugMessage("Discarding code block tilde")
 				// discard everything after opening unsupport ~~~
 				if ok := mdLine.LookLike("^~~~$"); ok {
+					p.options.Logger.PrintDetailedDebugMessage("End of code block tilde found")
 					discardingCodeBlockTilde = false
 				}
 			} else {
 				if collectingCodeBlockBackTick {
+					p.options.Logger.PrintDetailedDebugMessage("Collecting code block backtick")
 					if ok := mdLine.LookLike("^```$"); ok {
+						p.options.Logger.PrintDetailedDebugMessage("End of code block backtick found")
 						collectingCodeBlockBackTick = false
 						discardingCodeBlockBacktick = false
 
@@ -83,6 +92,7 @@ func (p *ExecutableParser) FromMarkdownLines(mdLines []line.Line) (*Executable, 
 							req = nil
 						}
 					} else {
+						p.options.Logger.PrintDetailedDebugMessage("Collecting request")
 						if req == nil {
 							req = []string{}
 						}
@@ -90,15 +100,20 @@ func (p *ExecutableParser) FromMarkdownLines(mdLines []line.Line) (*Executable, 
 					}
 				} else {
 					if collectingCodeBlockTilde {
+						p.options.Logger.PrintDetailedDebugMessage("Collecting code block tilde")
+
 						if ok := mdLine.LookLike("^~~~$"); ok {
+							p.options.Logger.PrintDetailedDebugMessage("End of code block tilde found")
 							collectingCodeBlockTilde = false
 
 							if len(req) > 0 {
+								p.options.Logger.PrintDetailedDebugMessage("Request available, store request")
 								reqRaw = line.Line(strings.Join(req, "\n")).Value()
 								reqFound = true
 								req = nil
 							}
 						} else {
+							p.options.Logger.PrintDetailedDebugMessage("Collecting request")
 							if req == nil {
 								req = []string{}
 							}
@@ -106,27 +121,33 @@ func (p *ExecutableParser) FromMarkdownLines(mdLines []line.Line) (*Executable, 
 						}
 					} else {
 						if cap, ok := capture.Try(mdLine); ok {
+							p.options.Logger.PrintDetailedDebugMessage("Capture found")
 							captures = append(captures, cap)
 						} else {
 							if defaultVar, ok := variable.Try(mdLine); ok {
+								p.options.Logger.PrintDetailedDebugMessage("Variable found")
 								defaultVars.Add(defaultVar)
 							} else {
 								if mdLine.LookLike("^```http$") && !reqFound {
+									p.options.Logger.PrintDetailedDebugMessage("HTTP code block backtick found")
 									collectingCodeBlockBackTick = true
 									continue
 								}
 
 								if mdLine.LookLike("^~~~http$") && !reqFound {
+									p.options.Logger.PrintDetailedDebugMessage("HTTP code block tilde found")
 									collectingCodeBlockTilde = true
 									continue
 								}
 
 								if ok := mdLine.LookLike("^```"); ok {
+									p.options.Logger.PrintDetailedDebugMessage("Unsupport code block backtick found")
 									discardingCodeBlockBacktick = true
 									continue
 								}
 
 								if ok := mdLine.LookLike("^~~~"); ok {
+									p.options.Logger.PrintDetailedDebugMessage("Unsupport code block tilde found")
 									discardingCodeBlockTilde = true
 									continue
 								}
@@ -151,6 +172,8 @@ func (p *ExecutableParser) FromMarkdownLines(mdLines []line.Line) (*Executable, 
 		ex.AddCapture(cap)
 	}
 	ex.variables = ex.variables.MergeWith(defaultVars)
+
+	p.options.Logger.PrintDetailedDebugMessage("----------")
 
 	return ex, nil
 }

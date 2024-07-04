@@ -93,12 +93,12 @@ Content-Type: application/json
 	mockLogger := new(logger.MockLogger)
 	mockLogger.On("PrintExecutableTitle", mock.Anything).Return(nil)
 	mockLogger.On("PrintRequest", mock.Anything).Return(nil)
+	mockLogger.On("PrintResponse", mock.Anything).Return(nil)
 	mockLogger.On("PrintVariables", mock.Anything).Return(nil)
 
 	options := &executable.ExecutableOptions{
 		RequestParser: mockReqParser,
 		Logger:        mockLogger,
-		// ClockWrapper:  mockClock,
 	}
 
 	ex := executable.New("test", reqRaw, options)

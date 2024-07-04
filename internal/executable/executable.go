@@ -105,6 +105,8 @@ func (ex *Executable) Execute(passedVars *variable.Variables) (*result.Execution
 		return nil, err
 	}
 
+	ex.options.Logger.PrintResponse(resp.String())
+
 	vars := variable.New()
 	for _, cap := range ex.captures {
 		value, err := resp.ValueOf(cap.Selector)

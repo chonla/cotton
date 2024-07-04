@@ -13,6 +13,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 // First H1 is considered a test title
@@ -39,6 +40,7 @@ func TestH1AtVeryFirstLine(t *testing.T) {
 	mockHTTPRequestParser := new(httphelper.MockHTTPRequestParser)
 
 	mockLogger := new(logger.MockLogger)
+	mockLogger.On("PrintDetailedDebugMessage", mock.Anything).Return(nil)
 
 	mockExecutableParser := new(executable.MockExecutableParser)
 
@@ -94,6 +96,7 @@ func TestH1AtSomeOtherLines(t *testing.T) {
 	mockHTTPRequestParser := new(httphelper.MockHTTPRequestParser)
 
 	mockLogger := new(logger.MockLogger)
+	mockLogger.On("PrintDetailedDebugMessage", mock.Anything).Return(nil)
 
 	mockExecutableParser := new(executable.MockExecutableParser)
 
@@ -150,6 +153,7 @@ func TestMultipleH1sWillGrabTheFirstH1AsTitle(t *testing.T) {
 	mockHTTPRequestParser := new(httphelper.MockHTTPRequestParser)
 
 	mockLogger := new(logger.MockLogger)
+	mockLogger.On("PrintDetailedDebugMessage", mock.Anything).Return(nil)
 
 	mockExecutableParser := new(executable.MockExecutableParser)
 
@@ -207,6 +211,7 @@ func TestDescription(t *testing.T) {
 	mockHTTPRequestParser := new(httphelper.MockHTTPRequestParser)
 
 	mockLogger := new(logger.MockLogger)
+	mockLogger.On("PrintDetailedDebugMessage", mock.Anything).Return(nil)
 
 	mockExecutableParser := new(executable.MockExecutableParser)
 
@@ -268,6 +273,7 @@ func TestDescriptionAtOtherH1(t *testing.T) {
 	mockHTTPRequestParser := new(httphelper.MockHTTPRequestParser)
 
 	mockLogger := new(logger.MockLogger)
+	mockLogger.On("PrintDetailedDebugMessage", mock.Anything).Return(nil)
 
 	mockExecutableParser := new(executable.MockExecutableParser)
 
@@ -320,6 +326,7 @@ func TestGetHTTPRequestWithoutTitle(t *testing.T) {
 	mockHTTPRequestParser := new(httphelper.MockHTTPRequestParser)
 
 	mockLogger := new(logger.MockLogger)
+	mockLogger.On("PrintDetailedDebugMessage", mock.Anything).Return(nil)
 
 	mockExecutableParser := new(executable.MockExecutableParser)
 
@@ -382,6 +389,7 @@ func TestNotGetHTTPRequestWithinOtherCodeblock(t *testing.T) {
 	mockHTTPRequestParser := new(httphelper.MockHTTPRequestParser)
 
 	mockLogger := new(logger.MockLogger)
+	mockLogger.On("PrintDetailedDebugMessage", mock.Anything).Return(nil)
 
 	mockExecutableParser := new(executable.MockExecutableParser)
 
@@ -444,6 +452,7 @@ func TestNotGetHTTPRequestWithinOtherCodeblockFlip(t *testing.T) {
 	mockHTTPRequestParser := new(httphelper.MockHTTPRequestParser)
 
 	mockLogger := new(logger.MockLogger)
+	mockLogger.On("PrintDetailedDebugMessage", mock.Anything).Return(nil)
 
 	mockExecutableParser := new(executable.MockExecutableParser)
 
@@ -496,6 +505,7 @@ func TestGetHTTPRequestFromThreeTildedCodeBlock(t *testing.T) {
 	mockHTTPRequestParser := new(httphelper.MockHTTPRequestParser)
 
 	mockLogger := new(logger.MockLogger)
+	mockLogger.On("PrintDetailedDebugMessage", mock.Anything).Return(nil)
 
 	mockExecutableParser := new(executable.MockExecutableParser)
 
@@ -548,6 +558,7 @@ func TestDiscardHTTPRequestInNonHTTPCodeBlock(t *testing.T) {
 	mockHTTPRequestParser := new(httphelper.MockHTTPRequestParser)
 
 	mockLogger := new(logger.MockLogger)
+	mockLogger.On("PrintDetailedDebugMessage", mock.Anything).Return(nil)
 
 	mockExecutableParser := new(executable.MockExecutableParser)
 
@@ -597,6 +608,7 @@ func TestGetHTTPRequestInOtherHTTPCodeBlock(t *testing.T) {
 	mockHTTPRequestParser := new(httphelper.MockHTTPRequestParser)
 
 	mockLogger := new(logger.MockLogger)
+	mockLogger.On("PrintDetailedDebugMessage", mock.Anything).Return(nil)
 
 	mockExecutableParser := new(executable.MockExecutableParser)
 
@@ -665,6 +677,7 @@ func TestGetHTTPRequestInMixedHTTPCodeBlock(t *testing.T) {
 	mockHTTPRequestParser := new(httphelper.MockHTTPRequestParser)
 
 	mockLogger := new(logger.MockLogger)
+	mockLogger.On("PrintDetailedDebugMessage", mock.Anything).Return(nil)
 
 	mockExecutableParser := new(executable.MockExecutableParser)
 
@@ -724,6 +737,7 @@ func TestGetHTTPRequestInOnlyFirstHTTPCodeBlock(t *testing.T) {
 	mockHTTPRequestParser := new(httphelper.MockHTTPRequestParser)
 
 	mockLogger := new(logger.MockLogger)
+	mockLogger.On("PrintDetailedDebugMessage", mock.Anything).Return(nil)
 
 	mockExecutableParser := new(executable.MockExecutableParser)
 
@@ -778,7 +792,9 @@ func TestGetExecutablesBeforeTest(t *testing.T) {
 	}
 
 	mockHTTPRequestParser := new(httphelper.MockHTTPRequestParser)
+
 	mockLogger := new(logger.MockLogger)
+	mockLogger.On("PrintDetailedDebugMessage", mock.Anything).Return(nil)
 
 	executableOption := &executable.ExecutableOptions{
 		Logger:        mockLogger,
@@ -846,7 +862,9 @@ func TestGetExecutablesAfterTest(t *testing.T) {
 	}
 
 	mockHTTPRequestParser := new(httphelper.MockHTTPRequestParser)
+
 	mockLogger := new(logger.MockLogger)
+	mockLogger.On("PrintDetailedDebugMessage", mock.Anything).Return(nil)
 
 	executableOption := &executable.ExecutableOptions{
 		Logger:        mockLogger,
@@ -914,6 +932,7 @@ func TestGetCapturesInTestcase(t *testing.T) {
 	mockHTTPRequestParser := new(httphelper.MockHTTPRequestParser)
 
 	mockLogger := new(logger.MockLogger)
+	mockLogger.On("PrintDetailedDebugMessage", mock.Anything).Return(nil)
 
 	mockExecutableParser := new(executable.MockExecutableParser)
 
@@ -969,6 +988,7 @@ func TestGetAssertion(t *testing.T) {
 	mockHTTPRequestParser := new(httphelper.MockHTTPRequestParser)
 
 	mockLogger := new(logger.MockLogger)
+	mockLogger.On("PrintDetailedDebugMessage", mock.Anything).Return(nil)
 
 	mockExecutableParser := new(executable.MockExecutableParser)
 

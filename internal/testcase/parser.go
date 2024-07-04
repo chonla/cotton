@@ -35,6 +35,7 @@ func NewParser(options *ParserOptions) *Parser {
 }
 
 func (p *Parser) FromMarkdownFile(mdFileName string) (*Testcase, error) {
+	p.options.Logger.PrintDetailedDebugMessage("Parsing", mdFileName)
 	mdFullPath := p.options.Configurator.ResolvePath(mdFileName)
 	lines, err := p.options.FileReader.Read(mdFullPath)
 	if err != nil {
@@ -62,21 +63,29 @@ func (p *Parser) FromMarkdownLines(mdLines []line.Line) (*Testcase, error) {
 	teardowns := []*executable.Executable{}
 	defaultVars := variable.New()
 
+	p.options.Logger.PrintDetailedDebugMessage("==========")
+
 	for _, mdLine := range mdLines {
+		p.options.Logger.PrintDetailedDebugMessage("Line data", mdLine.Value())
 		if discardingCodeBlockBacktick {
+			p.options.Logger.PrintDetailedDebugMessage("Discarding code block backtick")
 			// discard everything after opening unsupport ```
 			if ok := mdLine.LookLike("^```$"); ok {
+				p.options.Logger.PrintDetailedDebugMessage("End of code block backtick found")
 				discardingCodeBlockBacktick = false
 			}
 		} else {
 			if discardingCodeBlockTilde {
+				p.options.Logger.PrintDetailedDebugMessage("Discarding code block tilde")
 				// discard everything after opening unsupport ~~~
 				if ok := mdLine.LookLike("^~~~$"); ok {
+					p.options.Logger.PrintDetailedDebugMessage("End of code block tilde found")
 					discardingCodeBlockTilde = false
 				}
 			} else {
 
 				if cap, ok := mdLine.Capture(`^ {0,3}#\s+(.*)`, 1); ok && !justTitle && !titleCollected {
+					p.options.Logger.PrintDetailedDebugMessage("Test title found")
 					title = cap
 					justTitle = true
 					titleCollected = true
@@ -84,15 +93,20 @@ func (p *Parser) FromMarkdownLines(mdLines []line.Line) (*Testcase, error) {
 				}
 
 				if collectingCodeBlockBackTick {
+					p.options.Logger.PrintDetailedDebugMessage("Collecting code block backtick")
+
 					if ok := mdLine.LookLike("^```$"); ok {
+						p.options.Logger.PrintDetailedDebugMessage("End of code block backtick found")
 						collectingCodeBlockBackTick = false
 
 						if len(req) > 0 {
+							p.options.Logger.PrintDetailedDebugMessage("Request available, store request")
 							reqRaw = line.Line(strings.Join(req, "\n")).Value()
 							reqFound = true
 							req = nil
 						}
 					} else {
+						p.options.Logger.PrintDetailedDebugMessage("Collecting request")
 						if req == nil {
 							req = []string{}
 						}
@@ -100,15 +114,20 @@ func (p *Parser) FromMarkdownLines(mdLines []line.Line) (*Testcase, error) {
 					}
 				} else {
 					if collectingCodeBlockTilde {
+						p.options.Logger.PrintDetailedDebugMessage("Collecting code block tilde")
+
 						if ok := mdLine.LookLike("^~~~$"); ok {
+							p.options.Logger.PrintDetailedDebugMessage("End of code block tilde found")
 							collectingCodeBlockTilde = false
 
 							if len(req) > 0 {
+								p.options.Logger.PrintDetailedDebugMessage("Request available, store request")
 								reqRaw = line.Line(strings.Join(req, "\n")).Value()
 								reqFound = true
 								req = nil
 							}
 						} else {
+							p.options.Logger.PrintDetailedDebugMessage("Collecting request")
 							if req == nil {
 								req = []string{}
 							}
@@ -116,14 +135,17 @@ func (p *Parser) FromMarkdownLines(mdLines []line.Line) (*Testcase, error) {
 						}
 					} else {
 						if cap, ok := capture.Try(mdLine); ok {
+							p.options.Logger.PrintDetailedDebugMessage("Capture found")
 							justTitle = false
 							captures = append(captures, cap)
 						} else {
 							if defaultVar, ok := variable.Try(mdLine); ok {
+								p.options.Logger.PrintDetailedDebugMessage("Variable found")
 								justTitle = false
 								defaultVars.Add(defaultVar)
 							} else {
 								if as, ok := assertion.Try(mdLine); ok {
+									p.options.Logger.PrintDetailedDebugMessage("Assertion found")
 									justTitle = false
 									assertions = append(assertions, as)
 								} else {
@@ -131,6 +153,7 @@ func (p *Parser) FromMarkdownLines(mdLines []line.Line) (*Testcase, error) {
 										// unordered list
 										justTitle = false
 										if !reqFound {
+											p.options.Logger.PrintDetailedDebugMessage("Setup found in unordered list")
 											ex, err := p.options.ExecutableParser.FromMarkdownFile(captures[2])
 											if err != nil {
 												return nil, err
@@ -138,6 +161,7 @@ func (p *Parser) FromMarkdownLines(mdLines []line.Line) (*Testcase, error) {
 											ex.SetTitle(captures[1])
 											setups = append(setups, ex)
 										} else {
+											p.options.Logger.PrintDetailedDebugMessage("Teardown found in unordered list")
 											ex, err := p.options.ExecutableParser.FromMarkdownFile(captures[2])
 											if err != nil {
 												return nil, err
@@ -150,6 +174,7 @@ func (p *Parser) FromMarkdownLines(mdLines []line.Line) (*Testcase, error) {
 											// ordered list
 											justTitle = false
 											if !reqFound {
+												p.options.Logger.PrintDetailedDebugMessage("Setup found in ordered list")
 												ex, err := p.options.ExecutableParser.FromMarkdownFile(captures[2])
 												if err != nil {
 													return nil, err
@@ -157,6 +182,7 @@ func (p *Parser) FromMarkdownLines(mdLines []line.Line) (*Testcase, error) {
 												ex.SetTitle(captures[1])
 												setups = append(setups, ex)
 											} else {
+												p.options.Logger.PrintDetailedDebugMessage("Teardown found in ordered list")
 												ex, err := p.options.ExecutableParser.FromMarkdownFile(captures[2])
 												if err != nil {
 													return nil, err
@@ -166,32 +192,38 @@ func (p *Parser) FromMarkdownLines(mdLines []line.Line) (*Testcase, error) {
 											}
 										} else {
 											if ok := mdLine.LookLike(`^ {0,3}#{1,6}\s+(.*)`); ok {
+												p.options.Logger.PrintDetailedDebugMessage("Other titles found, dropped")
 												justTitle = false
 												// continue
 											} else {
 												if mdLine.LookLike("^```http$") && !reqFound {
+													p.options.Logger.PrintDetailedDebugMessage("HTTP code block backtick found")
 													justTitle = false
 													collectingCodeBlockBackTick = true
 													continue
 												}
 
 												if mdLine.LookLike("^~~~http$") && !reqFound {
+													p.options.Logger.PrintDetailedDebugMessage("HTTP code block tilde found")
 													justTitle = false
 													collectingCodeBlockTilde = true
 													continue
 												}
 
 												if ok := mdLine.LookLike("^```"); ok {
+													p.options.Logger.PrintDetailedDebugMessage("Unsupport code block backtick found")
 													discardingCodeBlockBacktick = true
 													continue
 												}
 
 												if ok := mdLine.LookLike("^~~~"); ok {
+													p.options.Logger.PrintDetailedDebugMessage("Unsupport code block tilde found")
 													discardingCodeBlockTilde = true
 													continue
 												}
 
 												if justTitle {
+													p.options.Logger.PrintDetailedDebugMessage("Test description found")
 													description = append(description, mdLine.Value())
 												}
 											}
@@ -209,6 +241,8 @@ func (p *Parser) FromMarkdownLines(mdLines []line.Line) (*Testcase, error) {
 	if !reqFound {
 		return nil, errors.New("no callable request")
 	}
+
+	p.options.Logger.PrintDetailedDebugMessage("==========")
 
 	options := &TestcaseOptions{
 		RequestParser: p.options.RequestParser,

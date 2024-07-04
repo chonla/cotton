@@ -12,6 +12,7 @@ const (
 	Compact LogLevel = iota
 	Verbose
 	Debug
+	DetailedDebug
 )
 
 type Logger interface {
@@ -27,8 +28,10 @@ type Logger interface {
 	PrintAssertionResults(assertionResults []*result.AssertionResult) error
 	PrintAssertionResult(assertionResult *result.AssertionResult) error
 	PrintRequest(req string) error
+	PrintResponse(resp string) error
 	PrintError(err error) error
 	PrintTestsuiteResult(testsuiteResult *result.TestsuiteResult) error
 	PrintDebugMessage(message string) error
+	PrintDetailedDebugMessage(messages ...string) error
 	PrintVariables(variables *variable.Variables) error
 }

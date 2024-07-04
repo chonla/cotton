@@ -12,6 +12,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 func TestParseMarkdownFileButFailed(t *testing.T) {
@@ -25,6 +26,7 @@ func TestParseMarkdownFileButFailed(t *testing.T) {
 	mockHTTPRequestParser := new(httphelper.MockHTTPRequestParser)
 
 	mockLogger := new(logger.MockLogger)
+	mockLogger.On("PrintDetailedDebugMessage", mock.Anything).Return(nil)
 
 	options := &executable.ParserOptions{
 		Configurator:  config,
@@ -55,6 +57,7 @@ func TestParseMarkdownFileShouldReadFromGivenFile(t *testing.T) {
 	mockHTTPRequestParser := new(httphelper.MockHTTPRequestParser)
 
 	mockLogger := new(logger.MockLogger)
+	mockLogger.On("PrintDetailedDebugMessage", mock.Anything).Return(nil)
 
 	options := &executable.ParserOptions{
 		Configurator:  config,
@@ -91,6 +94,7 @@ func TestGetHTTPRequestInHTTPCodeBlock(t *testing.T) {
 	mockHTTPRequestParser := new(httphelper.MockHTTPRequestParser)
 
 	mockLogger := new(logger.MockLogger)
+	mockLogger.On("PrintDetailedDebugMessage", mock.Anything).Return(nil)
 
 	expectedExecutableOptions := &executable.ExecutableOptions{
 		Logger:        mockLogger,
@@ -138,6 +142,7 @@ func TestGetHTTPRequestInThreeTildedHTTPCodeBlock(t *testing.T) {
 	mockHTTPRequestParser := new(httphelper.MockHTTPRequestParser)
 
 	mockLogger := new(logger.MockLogger)
+	mockLogger.On("PrintDetailedDebugMessage", mock.Anything).Return(nil)
 
 	expectedExecutableOptions := &executable.ExecutableOptions{
 		Logger:        mockLogger,
@@ -196,6 +201,7 @@ func TestNotGetHTTPRequestInHTTPCodeBlockInOtherCodeBlock(t *testing.T) {
 	mockHTTPRequestParser := new(httphelper.MockHTTPRequestParser)
 
 	mockLogger := new(logger.MockLogger)
+	mockLogger.On("PrintDetailedDebugMessage", mock.Anything).Return(nil)
 
 	expectedExecutableOptions := &executable.ExecutableOptions{
 		Logger:        mockLogger,
@@ -254,6 +260,7 @@ func TestNotGetHTTPRequestInHTTPCodeBlockInOtherCodeBlockFlip(t *testing.T) {
 	mockHTTPRequestParser := new(httphelper.MockHTTPRequestParser)
 
 	mockLogger := new(logger.MockLogger)
+	mockLogger.On("PrintDetailedDebugMessage", mock.Anything).Return(nil)
 
 	expectedExecutableOptions := &executable.ExecutableOptions{
 		Logger:        mockLogger,
@@ -302,6 +309,7 @@ func TestDiscardHTTPRequestInNonHTTPCodeBlockWillCauseANilExecutable(t *testing.
 	mockHTTPRequestParser := new(httphelper.MockHTTPRequestParser)
 
 	mockLogger := new(logger.MockLogger)
+	mockLogger.On("PrintDetailedDebugMessage", mock.Anything).Return(nil)
 
 	options := &executable.ParserOptions{
 		Configurator:  config,
@@ -348,6 +356,7 @@ func TestGetHTTPRequestInOtherHTTPCodeBlock(t *testing.T) {
 	mockHTTPRequestParser := new(httphelper.MockHTTPRequestParser)
 
 	mockLogger := new(logger.MockLogger)
+	mockLogger.On("PrintDetailedDebugMessage", mock.Anything).Return(nil)
 
 	expectedExecutableOptions := &executable.ExecutableOptions{
 		Logger:        mockLogger,
@@ -413,6 +422,7 @@ func TestGetHTTPRequestInMixedHTTPCodeBlock(t *testing.T) {
 	mockHTTPRequestParser := new(httphelper.MockHTTPRequestParser)
 
 	mockLogger := new(logger.MockLogger)
+	mockLogger.On("PrintDetailedDebugMessage", mock.Anything).Return(nil)
 
 	expectedExecutableOptions := &executable.ExecutableOptions{
 		Logger:        mockLogger,
@@ -469,6 +479,7 @@ func TestGetHTTPRequestInOnlyFirstHTTPCodeBlock(t *testing.T) {
 	mockHTTPRequestParser := new(httphelper.MockHTTPRequestParser)
 
 	mockLogger := new(logger.MockLogger)
+	mockLogger.On("PrintDetailedDebugMessage", mock.Anything).Return(nil)
 
 	expectedExecutableOptions := &executable.ExecutableOptions{
 		Logger:        mockLogger,
@@ -526,6 +537,7 @@ body`
 	mockHTTPRequestParser := new(httphelper.MockHTTPRequestParser)
 
 	mockLogger := new(logger.MockLogger)
+	mockLogger.On("PrintDetailedDebugMessage", mock.Anything).Return(nil)
 
 	expectedExecutableOptions := &executable.ExecutableOptions{
 		Logger:        mockLogger,

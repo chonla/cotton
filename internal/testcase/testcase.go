@@ -172,6 +172,8 @@ func (t *Testcase) Execute(passedVars *variable.Variables) *result.TestResult {
 		return testResult
 	}
 
+	t.options.Logger.PrintResponse(resp.String())
+
 	for _, cap := range t.captures {
 		value, err := resp.ValueOf(cap.Selector)
 		if err != nil {

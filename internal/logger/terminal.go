@@ -4,6 +4,7 @@ import (
 	"cotton/internal/result"
 	"cotton/internal/stopwatch"
 	"cotton/internal/variable"
+	"strings"
 
 	"fmt"
 
@@ -127,13 +128,25 @@ func (c *TerminalLogger) PrintAssertionResult(assertionResult *result.AssertionR
 }
 
 func (c *TerminalLogger) PrintRequest(req string) error {
-	if c.level != Debug {
+	if c.level != Debug && c.level != DetailedDebug {
 		return nil
 	}
 
 	c.PrintSectionTitle("request")
 	fmt.Println("")
 	val := color.New(color.FgBlue).Sprint(req)
+	_, err := fmt.Println(val)
+	return err
+}
+
+func (c *TerminalLogger) PrintResponse(resp string) error {
+	if c.level != Debug && c.level != DetailedDebug {
+		return nil
+	}
+
+	c.PrintSectionTitle("response")
+	fmt.Println("")
+	val := color.New(color.FgBlue).Sprint(resp)
 	_, err := fmt.Println(val)
 	return err
 }
@@ -190,11 +203,32 @@ func (c *TerminalLogger) buildFieldValue(label string, value interface{}) string
 }
 
 func (c *TerminalLogger) PrintDebugMessage(message string) error {
-	if c.level != Debug {
+	if c.level != Debug && c.level != DetailedDebug {
 		return nil
 	}
 
 	return c.PrintSectionedMessage("debug", message)
+}
+
+func (c *TerminalLogger) PrintDetailedDebugMessage(messages ...string) error {
+	if c.level != DetailedDebug {
+		return nil
+	}
+
+	wrappedMessage := ""
+
+	switch len(messages) {
+	case 0:
+		wrappedMessage = ""
+	case 1:
+		wrappedMessage = color.New(color.FgWhite).Sprintf("%s", messages[0])
+	default:
+		wrappedDetailed := color.New(color.FgHiWhite).Sprintf("%s", strings.Join(messages[1:], " "))
+		wrappedLabel := color.New(color.FgWhite).Sprintf("%s", messages[0])
+		wrappedMessage = fmt.Sprintf("%s %s", wrappedLabel, wrappedDetailed)
+	}
+
+	return c.PrintSectionedMessage("detailed-debug", wrappedMessage)
 }
 
 func (c *TerminalLogger) PrintTimeEllapsed(ellapsedTime *stopwatch.EllapsedTime) error {

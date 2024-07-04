@@ -17,6 +17,7 @@ const Version = "1.0.0"
 
 func main() {
 	var debug bool
+	var detailedDebug bool
 	var compact bool
 	var help bool
 	var ver bool
@@ -26,6 +27,7 @@ func main() {
 	flag.Usage = usage
 	flag.BoolVar(&compact, "c", false, "compact mode")
 	flag.BoolVar(&debug, "d", false, "debug mode")
+	flag.BoolVar(&detailedDebug, "p", false, "paranoid mode")
 	flag.BoolVar(&insecure, "i", false, "disable certificate verification")
 	flag.BoolVar(&stopWhenFailed, "s", false, "stop when test failed")
 	flag.BoolVar(&ver, "v", false, "display cotton version")
@@ -48,6 +50,9 @@ func main() {
 	}
 	if debug {
 		level = logger.Debug
+	}
+	if detailedDebug {
+		level = logger.DetailedDebug
 	}
 
 	if ver {

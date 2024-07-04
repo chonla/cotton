@@ -56,6 +56,10 @@ func (c *NilLogger) PrintRequest(req string) error {
 	return nil
 }
 
+func (c *NilLogger) PrintResponse(resp string) error {
+	return nil
+}
+
 func (c *NilLogger) PrintError(err error) error {
 	return nil
 }
@@ -73,6 +77,10 @@ func (c *NilLogger) PrintSectionTitle(sectionTitle string) error {
 }
 
 func (c *NilLogger) PrintDebugMessage(message string) error {
+	return nil
+}
+
+func (c *NilLogger) PrintDetailedDebugMessage(messages ...string) error {
 	return nil
 }
 

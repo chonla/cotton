@@ -44,6 +44,10 @@ Givien the responded JSON:
 
 The id in the response can be referred with `Body.data.id`.
 
+## Selecting element in an array
+
+The array can be referred by using `.<array-index>.`. Array-index is zero-based.
+
 **Example**
 
 Givien the responded JSON:
@@ -63,5 +67,5 @@ Givien the responded JSON:
 ]
 ```
 
-The id in the second element in the response can be referred with `Body[1].data.id`.
+The id in the second element in the response can be referred with `Body.1.data.id`.
 

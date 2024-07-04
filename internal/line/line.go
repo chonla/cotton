@@ -131,3 +131,7 @@ func (l Line) ReflectJSValue() (interface{}, error) {
 func (l Line) ReflectRegexValue() (interface{}, error) {
 	return regexp.Compile(l.Value())
 }
+
+func (l Line) String() string {
+	return string(l)
+}

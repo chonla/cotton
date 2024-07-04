@@ -43,6 +43,10 @@ func NewTestsuite(path string, options *TestsuiteOptions) (*Testsuite, error) {
 		tc, err := parser.FromMarkdownFile(file)
 		if err == nil && len(tc.assertions) > 0 {
 			testcases = append(testcases, tc)
+		} else {
+			if err != nil {
+				options.Logger.PrintError(err)
+			}
 		}
 	}
 
