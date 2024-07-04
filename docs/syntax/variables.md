@@ -45,7 +45,7 @@ See [Captures](./captures.md).
 
 ## Using a variable
 
-The variable can be used within the request code block by putting variable name enclosed with `{{` and `}}`.
+The variable can be used within the request code block by putting variable name enclosed with {% raw %}`{{`{% endraw %} and {% raw %}`}}`{% endraw %}.
 
 **Example**
 
@@ -57,7 +57,7 @@ POST https://somedomain.com/search HTTP/1.1
 Content-Length: 17
 Content-Type: application/json
 
-{"keyword":"{{keyword}}"}
+{"keyword":"{% raw %}{{keyword}}{% endraw %}"}
 ```
 {% endhighlight %}
 
