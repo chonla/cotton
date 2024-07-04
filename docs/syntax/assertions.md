@@ -120,7 +120,10 @@ Value types for this assertion must be a number.
 
 ## Regular Expression Assertion
 
-Regular expression is used in equality and difference assertion. The pattern is enclosed between slashes like in Javascript. The value to be asserted **MUST** be string.
+Regular expression is used in equality and difference assertion. The pattern is enclosed between slashes like in Javascript.
+
+{: .info }
+The value to be asserted with regular expression assertion **MUST** be string.
 
 **Example**
 

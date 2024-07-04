@@ -18,4 +18,5 @@ A capture is written in a list item (ordered or unordered list) in the following
 
 You can notice, the difference between capturing a value into a variable and variable definition is the selector for capture is enclosed with backticks, but the value is not.
 
+{: .info }
 The capture will capture the response within the same markdown file. You cannot capture the value from the other markdown files.

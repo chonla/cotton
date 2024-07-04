@@ -57,3 +57,6 @@ search.preview_words_after: 5
 #   - vendor/cache/
 #   - vendor/gems/
 #   - vendor/ruby/
+callouts:
+  info:
+    color: yellow

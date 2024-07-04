@@ -10,6 +10,7 @@ parent: Syntax
 
 A variable is named value which can be reused. There are 2 ways to define a variable, explicitly define a variable with value or capture a value from response into a variable.
 
+{: .info }
 The variables which defined in earlier step, no matter in setup or testcase or teardown, it will be reusable in later steps.
 
 ## Defining a variable
