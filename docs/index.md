@@ -23,9 +23,6 @@ Cotton is a markdown-formatted API specification runner. It promotes the readabi
 * **Debug Logging**: Cotton CLI has a `-d` option to print out detailed information of test operations.
 * **CI/CD Ready**: Cotton CLI returns error if any test fails.
 
-## Getting Started
-
-
 ## About Cotton
 
 Cotton 0 was originally inspired by [silk test](https://github.com/matryer/silk) which is no longer maintained.
