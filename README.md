@@ -1,30 +1,26 @@
 # Cotton
 
-Cotton is a markdown-formatted API specification runner.
+Cotton is a markdown-formatted API specification runner. Cotton promotes the readability and understandability of API specification.
 
-## Version 0.x compatibility
+## Syntax, Guide and Examples
 
-This version contains several breaking changes and is not compatible with previous version.
+See [Guidebook](https://chonla.github.io/cotton) for detail.
 
-## Markdown as an API specification
+## Key Features
 
-Cotton allows users to write tests in more intuitive and readable way.
+* **Customizable Documentation**: Cotton offers intuitive syntax. You can make your API document more readable.
+* **Setups and Teardowns**: Cotton allows you to to test setups and teardown.
+* **Variables**: Cotton allows you to define initial variables and use them later.
+* **Captures**: Cotton offers value capturing into variable, which help you to perform tests with dynamic data.
+* **Regular Expression Assertions**: Not only simple assertions, but Cotton also provides built-in regular expression assertions.
+* **Debug Logging**: Cotton CLI has a `-d` option to print out detailed information of test operations.
+* **CI/CD Ready**: Cotton CLI returns error if any test fails.
 
-## Specification structure
+## Backward Compatibility
 
-* <u>**Test case title**</u> will be picked from <u>**the first heading level 1**</u>.
-* <u>**Test case description**</u> is right after <u>**the test case title**</u>.
-* <u>**Test case request**</u> is the request in <u>**the first http-language code block**</u>.
-* An <u>**unordered list**</u> with links to executable files -- if it is written <u>**before the test case request**</u>, it is test setups. if it is written <u>**after the test case request**</u>, it is test teardowns.
-* <u>**Assertions**</u> is also written in an <u>**unordered list**</u> in the format `` `selector` <operator> `expected-value` ``.
-* <u>**Captures**</u> is also written in an <u>**unordered list**</u> in the format `` `name` : `selector` ``.
-* Other than things listed above will be considered as documentation. This embraces readability to everyone.
+Cotton 1 contains several breaking changes and is not compatible with Cotton 0.
 
-## Examples
-
-See the files in `etc/examples` directory.
-
-## TO DO
+## To Do List
 
 * ~~Three-tilded code block parsing~~
 * ~~More assertion operators~~
@@ -61,12 +57,6 @@ See the files in `etc/examples` directory.
 3. Commit your changes (git commit -am 'Add some fooBar').
 4. Push to the branch (git push origin feature/fooBar).
 5. Create a new Pull Request.
-
-## Testing
-
-```bash
-go test ./...
-```
 
 ## License
 

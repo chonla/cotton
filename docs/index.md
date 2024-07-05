@@ -11,7 +11,7 @@ permalink: /
 
 # Cotton
 
-Cotton is a markdown-formatted API specification runner. It promotes the readability of API specification.
+Cotton is a markdown-formatted API specification runner. Cotton promotes the readability and understandability of API specification.
 
 ## Key Features
 
