@@ -20,36 +20,6 @@ See [Guidebook](https://chonla.github.io/cotton) for detail.
 
 Cotton 1 contains several breaking changes and is not compatible with Cotton 0.
 
-## To Do List
-
-* ~~Three-tilded code block parsing~~
-* ~~More assertion operators~~
-  * ~~== (Equal to)~~
-  * ~~&gt; (Greater than)~~
-  * ~~&lt; (Less than)~~
-  * ~~!=~~ (Not equal to)
-  * ~~&gt;= (Greater than or equal to)~~
-  * ~~&lt;= (Less than or equal to)~~
-  * ~~is undefined (or not present)~~
-  * ~~is defined (or present)~~
-* ~~More readable logging~~
-* ~~Regular expression assertion operands~~
-  * ~~== (Match)~~
-  * ~~!= (Not match)~~
-* ~~Captures integration~~
-* ~~Debug mode~~
-* ~~CLI~~
-* ~~Cookbook~~
-* ~~Colorized logging~~
-* HTML reports
-* Upload request
-* ~~Insecure mode~~
-* ~~Track time taken~~
-* ~~Stop tests execution when failed~~
-* ~~Variables~~
-* ~~Ordered list support for Setups,Teardowns,Assertions,Captures~~
-* ~~Customized rootDir~~
-
 ## Contributing
 
 1. Fork it (https://github.com/chonla/cotton/fork).
@@ -60,4 +30,4 @@ Cotton 1 contains several breaking changes and is not compatible with Cotton 0.
 
 ## License
 
-[MIT](./LICENSE)
+This software and source code are available as open source under [MIT License](./LICENSE)
