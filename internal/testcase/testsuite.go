@@ -46,6 +46,9 @@ func NewTestsuite(path string, options *TestsuiteOptions) (*Testsuite, error) {
 		} else {
 			if err != nil {
 				options.Logger.PrintError(file, err)
+				if options.StopWhenFailed {
+					return nil, err
+				}
 			}
 		}
 	}
