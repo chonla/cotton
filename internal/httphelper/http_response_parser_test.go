@@ -17,7 +17,7 @@ Content-Type: application/json
 	resp, err := responseParser.Parse(respString)
 
 	expectedSpecs := map[string]interface{}{
-		"statusCode": 200,
+		"statusCode": float64(200),
 		"status":     "200 OK",
 		"headers": map[string]string{
 			"content-type":   "application/json",

@@ -31,12 +31,12 @@ func (p *HTTPResponseParser) Parse(responseString string) (*HTTPResponse, error)
 
 	firstLine := lines[0]
 	if captured, ok := firstLine.CaptureAll(`^(.+)/(.+) (.\d+) (.+)$`); ok {
-		statusCode, err := strconv.Atoi(captured[3])
+		statusCode, err := strconv.ParseFloat(captured[3], 64)
 		if err != nil {
 			return nil, errors.New("unexpected status code")
 		}
 		statusText := captured[4]
-		status = fmt.Sprintf("%d %s", statusCode, statusText)
+		status = fmt.Sprintf("%d %s", int(statusCode), statusText)
 		protocol := captured[1]
 		protocolVersion := captured[2]
 		headersCount := 0
@@ -60,7 +60,7 @@ func (p *HTTPResponseParser) Parse(responseString string) (*HTTPResponse, error)
 
 		r := &http.Response{
 			Status:     status,
-			StatusCode: statusCode,
+			StatusCode: int(statusCode),
 			Header:     http.Header{},
 		}
 		valueMap := ValueMap{

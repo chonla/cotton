@@ -17,7 +17,7 @@ type HTTPResponse struct {
 	body            string
 	protocol        string
 	protocolVersion string
-	statusCode      int
+	statusCode      float64
 	status          string
 	valueMap        ValueMap
 	wrappedBody     string

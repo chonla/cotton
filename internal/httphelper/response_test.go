@@ -23,7 +23,7 @@ Content-Type: application/json
 	assert.Equal(t, "1.1", protocolVersionValue.Value())
 
 	statusCodeValue, _ := resp.ValueOf("StatusCode")
-	assert.Equal(t, 200, statusCodeValue.Value())
+	assert.Equal(t, float64(200), statusCodeValue.Value())
 
 	statusTextValue, _ := resp.ValueOf("StatusText")
 	assert.Equal(t, "OK", statusTextValue.Value())
