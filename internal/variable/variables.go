@@ -3,6 +3,9 @@ package variable
 import (
 	"errors"
 	"fmt"
+	"slices"
+
+	"github.com/samber/lo"
 )
 
 type Variables struct {
@@ -82,4 +85,15 @@ func (v *Variables) ToStringMap() map[string]interface{} {
 		m[k] = v
 	}
 	return m
+}
+
+func (v *Variables) SimilarTo(anotherVariables *Variables) bool {
+	return slices.EqualFunc(v.names, anotherVariables.names, func(a1, a2 string) bool {
+		return a1 == a2
+	}) &&
+		lo.EveryBy(v.names, func(name string) bool {
+			a1, e1 := v.ValueOf(name)
+			a2, e2 := anotherVariables.ValueOf(name)
+			return a1 == a2 && e1 == e2
+		})
 }

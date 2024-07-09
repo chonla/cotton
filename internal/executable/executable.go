@@ -64,6 +64,15 @@ func (ex *Executable) AddCapture(capture *capture.Capture) {
 	ex.captures = append(ex.captures, capture.Clone())
 }
 
+func (ex *Executable) Variables() *variable.Variables {
+	// return clone of variables
+	return ex.variables.Clone()
+}
+
+func (ex *Executable) AddVariable(variable *variable.Variable) {
+	ex.variables.Add(variable)
+}
+
 func (ex *Executable) Clone() *Executable {
 	capturesClone := []*capture.Capture{}
 	for _, cap := range ex.captures {

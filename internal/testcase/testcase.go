@@ -65,6 +65,15 @@ func (t *Testcase) RawRequest() string {
 	return t.reqRaw
 }
 
+func (t *Testcase) Variables() *variable.Variables {
+	// return clone of variables
+	return t.variables.Clone()
+}
+
+func (t *Testcase) AddVariable(variable *variable.Variable) {
+	t.variables.Add(variable)
+}
+
 func (t *Testcase) Captures() []*capture.Capture {
 	// return clone of captures
 	clones := []*capture.Capture{}
@@ -253,5 +262,6 @@ func (t *Testcase) SimilarTo(anotherTestcase *Testcase) bool {
 		}) &&
 		slices.EqualFunc(t.assertions, anotherTestcase.assertions, func(a1, a2 *assertion.Assertion) bool {
 			return a1.SimilarTo(a2)
-		})
+		}) &&
+		t.variables.SimilarTo(anotherTestcase.variables)
 }

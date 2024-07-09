@@ -12,6 +12,7 @@ import (
 	"cotton/internal/logger"
 	"cotton/internal/reader"
 	"cotton/internal/testcase"
+	"cotton/internal/variable"
 	"os"
 	"testing"
 
@@ -45,34 +46,57 @@ func TestParsingCompleteTestcaseMarkdownFile(t *testing.T) {
 		RequestParser: &httphelper.HTTPRequestParser{},
 		Logger:        logger.NewNilLogger(logger.Compact),
 	}
-	result, err := parser.FromMarkdownFile("<rootDir>/etc/examples/testcase.md")
+	result, err := parser.FromMarkdownFile("<rootDir>/etc/examples/fakestoreapi.com/testcases/full_documented.md")
 
 	executableOptions := &executable.ExecutableOptions{
 		RequestParser: &httphelper.HTTPRequestParser{},
 		Logger:        logger.NewNilLogger(logger.Compact),
 	}
-	expectedSetup := executable.New("Link before the test will be executed before executing test", `GET /get-info HTTP/1.1
-Host: localhost`, executableOptions)
-	expectedSetup.AddCapture(capture.New("readiness", "$.readiness"))
-	expectedSetup.AddCapture(capture.New("version", "$.version"))
+	expectedSetup1 := executable.New("Create a new user for authentication", `POST https://fakestoreapi.com/users HTTP/1.1
+Content-Type: application/json
+Content-Length: 277
 
-	expectedTeardown := executable.New("Link after the test will be executed after executing test", `GET /time-taken HTTP/1.1
-Host: localhost`, executableOptions)
-	expectedTeardown.AddCapture(capture.New("time", "$.millisec"))
+{"email":"John@gmail.com","username":"{{username}}","password":"{{password}}","name":{"firstname":"John","lastname":"Doe"},"address":{"city":"kilcoole","street":"7835 new road","number":3,"zipcode":"12926-3874","geolocation":{"lat":"-37.3159","long":"81.1496"}},"phone":"1-570-236-7033"}`, executableOptions)
+	expectedSetup1.AddCapture(capture.New("new_user_id", "Body.id"))
+	expectedSetup1.AddVariable(&variable.Variable{
+		Name:  "username",
+		Value: "mor_2314",
+	})
+	expectedSetup1.AddVariable(&variable.Variable{
+		Name:  "password",
+		Value: "83r5^_",
+	})
 
-	expectedTestcase := testcase.NewTestcase("This is title of test case written with ATX Heading 1", "The test case is described by providing paragraphs right after the test case title.\n\nThe description of test case can be single or multiple lines.\n\nCotton will consider only the first ATX Heading 1 as the test title.", `POST /some-path HTTP/1.1
-Host: localhost
+	expectedSetup2 := executable.New("Authentication with the new user", `POST https://fakestoreapi.com/auth/login HTTP/1.1
+Content-Type: application/json
+Content-Length: 43
 
-{
-    "login": "login_name"
-}`, testcaseOptions)
-	expectedTestcase.AddSetup(expectedSetup)
+{"username":"{{username}}","password":"{{password}}"}`, executableOptions)
+	expectedSetup2.AddCapture(capture.New("access_token", "Body.token"))
+	expectedSetup2.AddVariable(&variable.Variable{
+		Name:  "username",
+		Value: "mor_2314",
+	})
+	expectedSetup2.AddVariable(&variable.Variable{
+		Name:  "password",
+		Value: "83r5^_",
+	})
+
+	expectedTeardown := executable.New("Delete test user", `DELETE https://fakestoreapi.com/users/{{new_user_id}} HTTP/1.1
+Content-Type: application/json`, executableOptions)
+	expectedTestcase := testcase.NewTestcase("Full documented testcase", "The testcase is described by providing paragraphs right after the test case title.", `GET https://fakestoreapi.com/products HTTP/1.1
+Authorization: Bearer {{access_token}}`, testcaseOptions)
+	expectedTestcase.AddSetup(expectedSetup1)
+	expectedTestcase.AddSetup(expectedSetup2)
 	expectedTestcase.AddTeardown(expectedTeardown)
 
 	eqOp, _ := assertion.NewOp("==")
-	expectedTestcase.AddAssertion(assertion.New("$.form.result", eqOp, "success"))
-	expectedTestcase.AddAssertion(assertion.New("$.form.result.length", eqOp, float64(1)))
+	gtOp, _ := assertion.NewOp(">")
+	expectedTestcase.AddAssertion(assertion.New("StatusCode", eqOp, float64(200)))
+	expectedTestcase.AddAssertion(assertion.New("Body.#", gtOp, float64(0)))
+	expectedTestcase.AddAssertion(assertion.New("Body.0.id", eqOp, float64(1)))
 
 	assert.NoError(t, err)
 	assert.Equal(t, expectedTestcase, result)
+	// assert.True(t, expectedTestcase.SimilarTo(result))
 }

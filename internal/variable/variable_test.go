@@ -43,3 +43,12 @@ func TestSettingVariableFromLineDataAsNumber(t *testing.T) {
 		Value: float64(123),
 	}, result)
 }
+
+func TestPrefixingWithBoldShouldNotBeAVariable(t *testing.T) {
+	mdLine := line.Line("**Note:** You can find more detail on syntax on [Guide](https://chonla.github.io/cotton).")
+
+	result, ok := variable.Try(mdLine)
+
+	assert.False(t, ok)
+	assert.Nil(t, result)
+}

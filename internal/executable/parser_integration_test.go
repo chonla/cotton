@@ -10,6 +10,7 @@ import (
 	"cotton/internal/httphelper"
 	"cotton/internal/logger"
 	"cotton/internal/reader"
+	"cotton/internal/variable"
 	"os"
 	"testing"
 
@@ -34,12 +35,22 @@ func TestParsingCompleteExecutableMarkdownFile(t *testing.T) {
 	}
 
 	parser := executable.NewParser(parserOptions)
-	expectedExecutable := executable.New("Untitled", `GET /get-info HTTP/1.1
-Host: localhost`, executableOptions)
-	expectedExecutable.AddCapture(capture.New("readiness", "$.readiness"))
-	expectedExecutable.AddCapture(capture.New("version", "$.version"))
+	expectedExecutable := executable.New("Untitled", `POST https://fakestoreapi.com/auth/login HTTP/1.1
+Content-Type: application/json
+Content-Length: 43
 
-	result, err := parser.FromMarkdownFile("<rootDir>/etc/examples/executable_before.md")
+{"username":"{{username}}","password":"{{password}}"}`, executableOptions)
+	expectedExecutable.AddCapture(capture.New("access_token", "Body.token"))
+	expectedExecutable.AddVariable(&variable.Variable{
+		Name:  "username",
+		Value: "mor_2314",
+	})
+	expectedExecutable.AddVariable(&variable.Variable{
+		Name:  "password",
+		Value: "83r5^_",
+	})
+
+	result, err := parser.FromMarkdownFile("<rootDir>/etc/examples/fakestoreapi.com/executables/auth.md")
 
 	assert.NoError(t, err)
 	assert.Equal(t, expectedExecutable, result)

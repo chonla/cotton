@@ -24,7 +24,7 @@ Authorization: Bearer {{access_token}}
 
 The header `After Test` above is also an optional. All links defined as list after code block ` ```http` will be executed after test request.
 
-* [Link after the test will be executed after executing test](<rootDir>/etc/examples/fakestoreapi.com/executables/delete_user.md)
+* [Delete test user](<rootDir>/etc/examples/fakestoreapi.com/executables/delete_user.md)
 
 ## Assertions
 
