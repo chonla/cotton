@@ -22,7 +22,7 @@ import (
 func TestParsingCompleteTestcaseMarkdownFile(t *testing.T) {
 	curdir, _ := os.Getwd()
 	config := &config.Config{
-		RootDir: curdir + "/../..",
+		BaseDir: curdir + "/../..",
 	}
 
 	executableParserOptions := &executable.ParserOptions{
@@ -46,7 +46,7 @@ func TestParsingCompleteTestcaseMarkdownFile(t *testing.T) {
 		RequestParser: &httphelper.HTTPRequestParser{},
 		Logger:        logger.NewNilLogger(logger.Compact),
 	}
-	result, err := parser.FromMarkdownFile("<rootDir>/etc/examples/fakestoreapi.com/testcases/full_documented.md")
+	result, err := parser.FromMarkdownFile("../../etc/examples/fakestoreapi.com/testcases/full_documented.md")
 
 	executableOptions := &executable.ExecutableOptions{
 		RequestParser: &httphelper.HTTPRequestParser{},
@@ -98,5 +98,4 @@ Authorization: Bearer {{access_token}}`, testcaseOptions)
 
 	assert.NoError(t, err)
 	assert.Equal(t, expectedTestcase, result)
-	// assert.True(t, expectedTestcase.SimilarTo(result))
 }

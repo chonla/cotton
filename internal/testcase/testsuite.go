@@ -26,14 +26,13 @@ type Testsuite struct {
 }
 
 func NewTestsuite(path string, options *TestsuiteOptions) (*Testsuite, error) {
-	actualPath := options.TestcaseParserOption.Configurator.ResolvePath(path)
 	dir := directory.New()
-	files, err := dir.ListFiles(actualPath, "md")
+	files, err := dir.ListFiles(path, "md")
 	if err != nil {
 		return nil, err
 	}
 
-	options.Logger.PrintDebugMessage(fmt.Sprintf("Test path: %s", actualPath))
+	options.Logger.PrintDebugMessage(fmt.Sprintf("Test path: %s", path))
 	options.Logger.PrintDebugMessage(fmt.Sprintf("\nFile(s) scanned:\n- %s", strings.Join(files, "\n- ")))
 
 	testcases := []*Testcase{}

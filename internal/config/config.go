@@ -1,15 +1,27 @@
 package config
 
-import "cotton/internal/line"
+import (
+	"cotton/internal/line"
+	"fmt"
+)
 
 type Config struct {
-	RootDir string
+	BaseDir string
 }
 
 func (c *Config) ResolvePath(path string) string {
 	pathLine := line.Line(path)
-	if pathLine.LookLike("<rootDir>") {
-		return pathLine.Replace("<rootDir>", c.RootDir)
+	// windows + linux
+	if pathLine.StartsWith("/") || pathLine.LookLike(`^[a-zA-Z]:`) || pathLine.StartsWith("\\") {
+		return path
 	}
-	return path
+	baseDir := line.Line(c.BaseDir)
+	sep := "/"
+	if baseDir.Contains("\\") {
+		sep = "\\"
+	}
+	if baseDir.EndsWith("/") || baseDir.EndsWith("\\") || baseDir.Value() == "" {
+		sep = ""
+	}
+	return fmt.Sprintf("%s%s%s", baseDir, sep, path)
 }

@@ -97,6 +97,14 @@ func (l Line) StartsWith(partial string) bool {
 	return strings.HasPrefix(string(l), partial)
 }
 
+func (l Line) EndsWith(partial string) bool {
+	return strings.HasSuffix(string(l), partial)
+}
+
+func (l Line) Contains(partial string) bool {
+	return strings.Contains(string(l), partial)
+}
+
 func (l Line) ReflectJSValue() (interface{}, error) {
 	if cap, ok := l.Capture(`"(.+)"`, 1); ok {
 		return cap, nil

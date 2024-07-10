@@ -38,8 +38,7 @@ func NewParser(options *ParserOptions) *ExecutableParser {
 
 func (p *ExecutableParser) FromMarkdownFile(mdFileName string) (*Executable, error) {
 	p.options.Logger.PrintDetailedDebugMessage("Parsing", mdFileName)
-	mdFullPath := p.options.Configurator.ResolvePath(mdFileName)
-	lines, err := p.options.FileReader.Read(mdFullPath)
+	lines, err := p.options.FileReader.Read(mdFileName)
 	if err != nil {
 		return nil, err
 	}

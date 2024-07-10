@@ -23,7 +23,7 @@ func main() {
 	var ver bool
 	var insecure bool
 	var stopWhenFailed bool
-	var customRootDir string
+	var customBaseDir string
 
 	flag.Usage = usage
 	flag.BoolVar(&compact, "c", false, "compact mode")
@@ -33,22 +33,22 @@ func main() {
 	flag.BoolVar(&stopWhenFailed, "s", false, "stop when test failed")
 	flag.BoolVar(&ver, "v", false, "display cotton version")
 	flag.BoolVar(&help, "h", false, "display this help")
-	flag.StringVar(&customRootDir, "r", "", "set rootDir path")
+	flag.StringVar(&customBaseDir, "b", "", "set baseDir path")
 	flag.Parse()
 
-	rootDir := ""
-	if customRootDir == "" {
-		rootDir, _ = os.Getwd()
+	baseDir := ""
+	if customBaseDir == "" {
+		baseDir, _ = os.Getwd()
 	} else {
-		rootDir = customRootDir
+		baseDir = customBaseDir
 	}
 	config := &config.Config{
-		RootDir: rootDir,
+		BaseDir: baseDir,
 	}
 
 	testDir := flag.Arg(0)
 	if testDir == "" {
-		testDir = rootDir
+		testDir = "./"
 	}
 
 	level := logger.Verbose

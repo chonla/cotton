@@ -152,9 +152,10 @@ func (c *TerminalLogger) PrintResponse(resp string) error {
 }
 
 func (c *TerminalLogger) PrintError(fileContext string, err error) error {
-	file := color.New(color.FgWhite).Sprintf("%s\n", fileContext)
-	val := color.New(color.FgRed).Sprintf("    %s", err)
-	message := fmt.Sprintf("%s%s", file, val)
+	section := color.New(color.FgRed).Sprintf("[error] ")
+	file := color.New(color.FgWhite).Sprintf("%s", fileContext)
+	val := color.New(color.FgRed).Sprintf("%s", err)
+	message := fmt.Sprintf("%s%s in %s", section, val, file)
 	_, err = fmt.Println(message)
 	return err
 }

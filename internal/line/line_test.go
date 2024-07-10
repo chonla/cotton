@@ -57,17 +57,17 @@ func TestUnmatchedLookLike(t *testing.T) {
 }
 
 func TestReplaceSingleString(t *testing.T) {
-	l := line.Line("<rootDir>/some/path")
+	l := line.Line("%rootDir%/some/path")
 
-	newPath := l.Replace("<rootDir>", "/tmp")
+	newPath := l.Replace("%rootDir%", "/tmp")
 
 	assert.Equal(t, "/tmp/some/path", newPath)
 }
 
 func TestReplaceMultipleStrings(t *testing.T) {
-	l := line.Line("<rootDir>/some/path<rootDir>")
+	l := line.Line("%rootDir%/some/path%rootDir%")
 
-	newPath := l.Replace("<rootDir>", "/tmp")
+	newPath := l.Replace("%rootDir%", "/tmp")
 
 	assert.Equal(t, "/tmp/some/path/tmp", newPath)
 }
@@ -75,7 +75,7 @@ func TestReplaceMultipleStrings(t *testing.T) {
 func TestReplaceUnmatchString(t *testing.T) {
 	l := line.Line("/some/path")
 
-	newPath := l.Replace("<rootDir>", "/tmp")
+	newPath := l.Replace("%rootDir%", "/tmp")
 
 	assert.Equal(t, "/some/path", newPath)
 }

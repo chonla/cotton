@@ -20,7 +20,7 @@ import (
 func TestParsingCompleteExecutableMarkdownFile(t *testing.T) {
 	curdir, _ := os.Getwd()
 	config := &config.Config{
-		RootDir: curdir + "/../..",
+		BaseDir: curdir + "/../..",
 	}
 
 	parserOptions := &executable.ParserOptions{
@@ -50,7 +50,7 @@ Content-Length: 43
 		Value: "83r5^_",
 	})
 
-	result, err := parser.FromMarkdownFile("<rootDir>/etc/examples/fakestoreapi.com/executables/auth.md")
+	result, err := parser.FromMarkdownFile("../../etc/examples/fakestoreapi.com/executables/auth.md")
 
 	assert.NoError(t, err)
 	assert.Equal(t, expectedExecutable, result)

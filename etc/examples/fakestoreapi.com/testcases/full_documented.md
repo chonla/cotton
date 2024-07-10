@@ -6,8 +6,8 @@ The testcase is described by providing paragraphs right after the test case titl
 
 The header `Before Test` above is an optional and written there for understandability purpose. All links defined as list item before HTTP request are considered test setting ups.
 
-* [Create a new user for authentication](<rootDir>/etc/examples/fakestoreapi.com/executables/add_user.md)
-* [Authentication with the new user](<rootDir>/etc/examples/fakestoreapi.com/executables/auth.md)
+* [Create a new user for authentication](etc/examples/fakestoreapi.com/executables/add_user.md)
+* [Authentication with the new user](etc/examples/fakestoreapi.com/executables/auth.md)
 
 ## Request
 
@@ -24,7 +24,7 @@ Authorization: Bearer {{access_token}}
 
 The header `After Test` above is also an optional. All links defined as list after code block ` ```http` will be executed after test request.
 
-* [Delete test user](<rootDir>/etc/examples/fakestoreapi.com/executables/delete_user.md)
+* [Delete test user](etc/examples/fakestoreapi.com/executables/delete_user.md)
 
 ## Assertions
 

@@ -17,8 +17,8 @@ You can put setups and teardowns as many as you want, as long as the setups are 
 {% highlight markdown %}
 # List Products
 
-* [Sign in](<rootDir>/etc/examples/fakestoreapi.com/executables/auth.md)
-* [Create data session](<rootDir>/etc/examples/fakestoreapi.com/executables/create_session.md)
+* [Sign in](etc/examples/fakestoreapi.com/executables/auth.md)
+* [Create data session](etc/examples/fakestoreapi.com/executables/create_session.md)
 
 ```http
 GET https://fakestoreapi.com/products HTTP/1.1
@@ -27,16 +27,16 @@ Authorization: Bearer {{access_token}}
 
 * `Body.0.id`==`1`
 
-* [Release data session](<rootDir>/etc/examples/fakestoreapi.com/executables/release_session.md)
-* [Sign out](<rootDir>/etc/examples/fakestoreapi.com/executables/auth.md)
+* [Release data session](etc/examples/fakestoreapi.com/executables/release_session.md)
+* [Sign out](etc/examples/fakestoreapi.com/executables/auth.md)
 {% endhighlight %}
 
-## rootDir Definition
+## Base Directory
 
-`<rootDir>` is a shortcut variable allowing you to make link more dynamic.
+All relative links in Setups and Teardowns are referenced from execution directory.
 
-You can redefine `<rootDir>` via [command line](../cli.md) option `-r`.
+You can redefine base directory via [command line](../cli.md) option `-b`.
 
-## Nested setups and teardowns
+## Nested Setups and Teardowns
 
 Setups and teardowns cannot be nested. That means in setup and teardown files, declaration of nested setups and teardowns will be ignored.

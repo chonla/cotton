@@ -17,7 +17,7 @@ import (
 
 func TestParseMarkdownFileButFailed(t *testing.T) {
 	config := &config.Config{
-		RootDir: "",
+		BaseDir: "",
 	}
 
 	mockFileReader := new(reader.MockFileReader)
@@ -46,7 +46,7 @@ func TestParseMarkdownFileButFailed(t *testing.T) {
 
 func TestParseMarkdownFileShouldReadFromGivenFile(t *testing.T) {
 	config := &config.Config{
-		RootDir: "",
+		BaseDir: "",
 	}
 
 	lines := []line.Line{""}
@@ -75,7 +75,7 @@ func TestParseMarkdownFileShouldReadFromGivenFile(t *testing.T) {
 
 func TestGetHTTPRequestInHTTPCodeBlock(t *testing.T) {
 	config := &config.Config{
-		RootDir: "",
+		BaseDir: "",
 	}
 
 	lines := []line.Line{
@@ -124,7 +124,7 @@ body`
 
 func TestGetHTTPRequestInThreeTildedHTTPCodeBlock(t *testing.T) {
 	config := &config.Config{
-		RootDir: "",
+		BaseDir: "",
 	}
 
 	lines := []line.Line{
@@ -172,7 +172,7 @@ body`
 
 func TestNotGetHTTPRequestInHTTPCodeBlockInOtherCodeBlock(t *testing.T) {
 	config := &config.Config{
-		RootDir: "",
+		BaseDir: "",
 	}
 
 	lines := []line.Line{
@@ -231,7 +231,7 @@ body`
 
 func TestNotGetHTTPRequestInHTTPCodeBlockInOtherCodeBlockFlip(t *testing.T) {
 	config := &config.Config{
-		RootDir: "",
+		BaseDir: "",
 	}
 
 	lines := []line.Line{
@@ -290,7 +290,7 @@ body`
 
 func TestDiscardHTTPRequestInNonHTTPCodeBlockWillCauseANilExecutable(t *testing.T) {
 	config := &config.Config{
-		RootDir: "",
+		BaseDir: "",
 	}
 
 	lines := []line.Line{
@@ -329,7 +329,7 @@ func TestDiscardHTTPRequestInNonHTTPCodeBlockWillCauseANilExecutable(t *testing.
 
 func TestGetHTTPRequestInOtherHTTPCodeBlock(t *testing.T) {
 	config := &config.Config{
-		RootDir: "",
+		BaseDir: "",
 	}
 
 	lines := []line.Line{
@@ -387,7 +387,7 @@ body`
 
 func TestGetHTTPRequestInMixedHTTPCodeBlock(t *testing.T) {
 	config := &config.Config{
-		RootDir: "",
+		BaseDir: "",
 	}
 
 	lines := []line.Line{
@@ -453,7 +453,7 @@ body`
 
 func TestGetHTTPRequestInOnlyFirstHTTPCodeBlock(t *testing.T) {
 	config := &config.Config{
-		RootDir: "",
+		BaseDir: "",
 	}
 
 	lines := []line.Line{
@@ -510,7 +510,7 @@ body`
 
 func TestGetCaptures(t *testing.T) {
 	config := &config.Config{
-		RootDir: "",
+		BaseDir: "",
 	}
 
 	lines := []line.Line{

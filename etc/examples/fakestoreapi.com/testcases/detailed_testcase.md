@@ -1,6 +1,6 @@
 # Listing products
 
-* [Make authentication](<rootDir>/etc/examples/fakestoreapi.com/executables/auth.md)
+* [Make authentication](../executables/auth.md)
 
 ```http
 GET https://fakestoreapi.com/products HTTP/1.1

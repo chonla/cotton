@@ -24,8 +24,5 @@ The setup list can be anywhere in the testcase, but must be **BEFORE** the reque
 **Example**
 
 {% highlight markdown %}
-* [Authenticate with a support credential](<rootDir>/shared/auth_support_cred.md)
+* [Authenticate with a support credential](shared/auth_support_cred.md)
 {% endhighlight %}
-
-{: .info }
-A built-in variable `<rootDir>` can be used in link-to-setup-file to make link more readable.

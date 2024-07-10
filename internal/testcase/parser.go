@@ -36,8 +36,7 @@ func NewParser(options *ParserOptions) *Parser {
 
 func (p *Parser) FromMarkdownFile(mdFileName string) (*Testcase, error) {
 	p.options.Logger.PrintDetailedDebugMessage("Parsing", mdFileName)
-	mdFullPath := p.options.Configurator.ResolvePath(mdFileName)
-	lines, err := p.options.FileReader.Read(mdFullPath)
+	lines, err := p.options.FileReader.Read(mdFileName)
 	if err != nil {
 		return nil, err
 	}
@@ -154,7 +153,9 @@ func (p *Parser) FromMarkdownLines(mdLines []line.Line) (*Testcase, error) {
 										justTitle = false
 										if !reqFound {
 											p.options.Logger.PrintDetailedDebugMessage("Setup found in unordered list")
-											ex, err := p.options.ExecutableParser.FromMarkdownFile(captures[2])
+											executableFileName := captures[2]
+											executableFullPath := p.options.Configurator.ResolvePath(executableFileName)
+											ex, err := p.options.ExecutableParser.FromMarkdownFile(executableFullPath)
 											if err != nil {
 												return nil, err
 											}
@@ -162,7 +163,9 @@ func (p *Parser) FromMarkdownLines(mdLines []line.Line) (*Testcase, error) {
 											setups = append(setups, ex)
 										} else {
 											p.options.Logger.PrintDetailedDebugMessage("Teardown found in unordered list")
-											ex, err := p.options.ExecutableParser.FromMarkdownFile(captures[2])
+											executableFileName := captures[2]
+											executableFullPath := p.options.Configurator.ResolvePath(executableFileName)
+											ex, err := p.options.ExecutableParser.FromMarkdownFile(executableFullPath)
 											if err != nil {
 												return nil, err
 											}
@@ -175,7 +178,9 @@ func (p *Parser) FromMarkdownLines(mdLines []line.Line) (*Testcase, error) {
 											justTitle = false
 											if !reqFound {
 												p.options.Logger.PrintDetailedDebugMessage("Setup found in ordered list")
-												ex, err := p.options.ExecutableParser.FromMarkdownFile(captures[2])
+												executableFileName := captures[2]
+												executableFullPath := p.options.Configurator.ResolvePath(executableFileName)
+												ex, err := p.options.ExecutableParser.FromMarkdownFile(executableFullPath)
 												if err != nil {
 													return nil, err
 												}
@@ -183,7 +188,9 @@ func (p *Parser) FromMarkdownLines(mdLines []line.Line) (*Testcase, error) {
 												setups = append(setups, ex)
 											} else {
 												p.options.Logger.PrintDetailedDebugMessage("Teardown found in ordered list")
-												ex, err := p.options.ExecutableParser.FromMarkdownFile(captures[2])
+												executableFileName := captures[2]
+												executableFullPath := p.options.Configurator.ResolvePath(executableFileName)
+												ex, err := p.options.ExecutableParser.FromMarkdownFile(executableFullPath)
 												if err != nil {
 													return nil, err
 												}

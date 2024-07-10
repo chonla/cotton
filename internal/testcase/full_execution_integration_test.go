@@ -26,7 +26,7 @@ import (
 func TestGetDataFromHttpBin(t *testing.T) {
 	curdir, _ := os.Getwd()
 	config := &config.Config{
-		RootDir: curdir + "/../..",
+		BaseDir: curdir + "/../..",
 	}
 
 	mockTime, _ := time.Parse(time.RFC3339, "2024-06-26T15:27:05+07:00")
@@ -63,7 +63,7 @@ func TestGetDataFromHttpBin(t *testing.T) {
 	}
 
 	parser := testcase.NewParser(parserOptions)
-	tc, err := parser.FromMarkdownFile("<rootDir>/etc/examples/httpbin.org/get.md")
+	tc, err := parser.FromMarkdownFile("../../etc/examples/httpbin.org/get.md")
 
 	expectedSetup := executable.New("Post some data to host", `POST https://httpbin.org/post HTTP/1.1
 Content-Type: application/x-www-form-urlencoded
@@ -118,7 +118,7 @@ secret=updatedValue`, executableOptions)
 func TestGetDataFromHttpBinWithThreeTildedCodeBlock(t *testing.T) {
 	curdir, _ := os.Getwd()
 	config := &config.Config{
-		RootDir: curdir + "/../..",
+		BaseDir: curdir + "/../..",
 	}
 
 	mockTime, _ := time.Parse(time.RFC3339, "2024-06-26T15:27:05+07:00")
@@ -155,7 +155,7 @@ func TestGetDataFromHttpBinWithThreeTildedCodeBlock(t *testing.T) {
 	}
 
 	parser := testcase.NewParser(parserOptions)
-	tc, err := parser.FromMarkdownFile("<rootDir>/etc/examples/httpbin.org/3tildes.md")
+	tc, err := parser.FromMarkdownFile("../../etc/examples/httpbin.org/3tildes.md")
 
 	expectedSetup := executable.New("Post some data to host", `POST https://httpbin.org/post HTTP/1.1
 Content-Type: application/x-www-form-urlencoded

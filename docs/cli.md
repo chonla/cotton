@@ -10,17 +10,17 @@ permalink: /cli
 ## Usage
 
 {% highlight bash %}
-  cotton [-d] [-c] [-p] [-r <rootdir>] <testpath|testdir>
+  cotton [-d] [-c] [-p] [-b <basedir>] <testpath|testdir>
   cotton -v
   cotton --help
 
+  -b string
+        set baseDir path
   -c    compact mode
   -d    debug mode
   -h    display this help
   -i    disable certificate verification
   -p    paranoid mode
-  -r string
-        set rootDir path
   -s    stop when test failed
   -v    display cotton version
 {% endhighlight %}
@@ -28,6 +28,10 @@ permalink: /cli
 ## Options
 
 By default, Cotton prints out test title, setup title, teardown title, result, and summary.
+
+### `-b` Set baseDir
+
+All links in setups and teardows with relative path will be referenced from baseDir. Default is current directory.
 
 ### `-c` Compact mode
 
@@ -48,10 +52,6 @@ Insecure mode will disable certificate verification.
 ### `-p` Paranoid mode
 
 Paranoid mode is detailed verbose logging execution. Cotton prints out very detailed information for further debugging purpose.
-
-### `-r` Set rootDir
-
-`rootDir` is a shortcut variable which can be used in setups and teardows link. Default is current directory.
 
 ### `-s` Panic mode
 

@@ -24,8 +24,5 @@ The teardown list can be anywhere in the testcase, but must be **AFTER** the req
 **Example**
 
 {% highlight markdown %}
-* [Session clean up](<rootDir>/shared/authsession_clean_up.md)
+* [Session clean up](shared/authsession_clean_up.md)
 {% endhighlight %}
-
-{: .info }
-A built-in variable `<rootDir>` can be used in link-to-setup-file to make link more readable.

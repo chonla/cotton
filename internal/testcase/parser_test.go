@@ -19,7 +19,7 @@ import (
 // First H1 is considered a test title
 func TestH1AtVeryFirstLine(t *testing.T) {
 	config := &config.Config{
-		RootDir: "",
+		BaseDir: "",
 	}
 
 	lines := []line.Line{
@@ -73,7 +73,7 @@ body`
 
 func TestH1AtSomeOtherLines(t *testing.T) {
 	config := &config.Config{
-		RootDir: "",
+		BaseDir: "",
 	}
 
 	lines := []line.Line{
@@ -130,7 +130,7 @@ body`
 
 func TestMultipleH1sWillGrabTheFirstH1AsTitle(t *testing.T) {
 	config := &config.Config{
-		RootDir: "",
+		BaseDir: "",
 	}
 
 	lines := []line.Line{
@@ -187,7 +187,7 @@ body`
 
 func TestDescription(t *testing.T) {
 	config := &config.Config{
-		RootDir: "",
+		BaseDir: "",
 	}
 
 	lines := []line.Line{
@@ -245,7 +245,7 @@ body`
 
 func TestDescriptionAtOtherH1(t *testing.T) {
 	config := &config.Config{
-		RootDir: "",
+		BaseDir: "",
 	}
 
 	lines := []line.Line{
@@ -307,7 +307,7 @@ body`
 
 func TestGetHTTPRequestWithoutTitle(t *testing.T) {
 	config := &config.Config{
-		RootDir: "",
+		BaseDir: "",
 	}
 
 	lines := []line.Line{
@@ -360,7 +360,7 @@ body`
 
 func TestNotGetHTTPRequestWithinOtherCodeblock(t *testing.T) {
 	config := &config.Config{
-		RootDir: "",
+		BaseDir: "",
 	}
 
 	lines := []line.Line{
@@ -423,7 +423,7 @@ body`
 
 func TestNotGetHTTPRequestWithinOtherCodeblockFlip(t *testing.T) {
 	config := &config.Config{
-		RootDir: "",
+		BaseDir: "",
 	}
 
 	lines := []line.Line{
@@ -486,7 +486,7 @@ body`
 
 func TestGetHTTPRequestFromThreeTildedCodeBlock(t *testing.T) {
 	config := &config.Config{
-		RootDir: "",
+		BaseDir: "",
 	}
 
 	lines := []line.Line{
@@ -539,7 +539,7 @@ body`
 
 func TestDiscardHTTPRequestInNonHTTPCodeBlock(t *testing.T) {
 	config := &config.Config{
-		RootDir: "",
+		BaseDir: "",
 	}
 
 	lines := []line.Line{
@@ -581,7 +581,7 @@ func TestDiscardHTTPRequestInNonHTTPCodeBlock(t *testing.T) {
 
 func TestGetHTTPRequestInOtherHTTPCodeBlock(t *testing.T) {
 	config := &config.Config{
-		RootDir: "",
+		BaseDir: "",
 	}
 
 	lines := []line.Line{
@@ -642,7 +642,7 @@ body`
 
 func TestGetHTTPRequestInMixedHTTPCodeBlock(t *testing.T) {
 	config := &config.Config{
-		RootDir: "",
+		BaseDir: "",
 	}
 
 	lines := []line.Line{
@@ -711,7 +711,7 @@ body`
 
 func TestGetHTTPRequestInOnlyFirstHTTPCodeBlock(t *testing.T) {
 	config := &config.Config{
-		RootDir: "",
+		BaseDir: "",
 	}
 
 	lines := []line.Line{
@@ -771,7 +771,7 @@ body`
 
 func TestGetExecutablesBeforeTest(t *testing.T) {
 	config := &config.Config{
-		RootDir: "",
+		BaseDir: "",
 	}
 
 	lines := []line.Line{
@@ -841,7 +841,7 @@ body`
 
 func TestGetExecutablesAfterTest(t *testing.T) {
 	config := &config.Config{
-		RootDir: "",
+		BaseDir: "",
 	}
 
 	lines := []line.Line{
@@ -911,7 +911,7 @@ body`
 
 func TestGetCapturesInTestcase(t *testing.T) {
 	config := &config.Config{
-		RootDir: "",
+		BaseDir: "",
 	}
 
 	lines := []line.Line{
@@ -966,7 +966,7 @@ body`
 
 func TestGetAssertion(t *testing.T) {
 	config := &config.Config{
-		RootDir: "",
+		BaseDir: "",
 	}
 
 	lines := []line.Line{
