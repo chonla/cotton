@@ -104,7 +104,6 @@ func main() {
 
 	ts, err := testcase.NewTestsuite(testDir, options)
 	if err != nil {
-		fmt.Println(err)
 		os.Exit(1)
 	}
 
