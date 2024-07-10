@@ -11,6 +11,8 @@ Cotton is a command line tool. You can install from package managers like homebr
 
 ## Installation
 
+### Homebrew (Mac OS)/Linuxbrew (Linux)
+
 ```bash
 brew tap chonla/universe
 brew install cotton
