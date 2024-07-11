@@ -125,7 +125,7 @@ func main() {
 func usage() {
 	fmt.Fprintf(flag.CommandLine.Output(), `Usage of cotton:
 
-  cotton [-d] [-c] [-p] [-r <rootdir>] <testpath|testdir>
+  cotton [-d] [-c] [-p] [-b <basedir>] <testpath|testdir>
   cotton -v
   cotton --help
 
