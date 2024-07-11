@@ -27,13 +27,13 @@ Authorization: Bearer {{access_token}}
 
 * `Body.0.id`==`1`
 
-* [Release data session](etc/examples/fakestoreapi.com/executables/release_session.md)
-* [Sign out](etc/examples/fakestoreapi.com/executables/auth.md)
+* [Release data session](../executables/release_session.md)
+* [Sign out](../executables/auth.md)
 {% endhighlight %}
 
 ## Base Directory
 
-All relative links in Setups and Teardowns are referenced from execution directory.
+All relative links in Setups and Teardowns are referenced from test path argument.
 
 You can redefine base directory via [command line](../cli.md) option `-b`.
 
