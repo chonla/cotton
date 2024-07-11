@@ -17,8 +17,8 @@ You can put setups and teardowns as many as you want, as long as the setups are 
 {% highlight markdown %}
 # List Products
 
-* [Sign in](etc/examples/fakestoreapi.com/executables/auth.md)
-* [Create data session](etc/examples/fakestoreapi.com/executables/create_session.md)
+* [Sign in](../executables/auth.md)
+* [Create data session](../executables/create_session.md)
 
 ```http
 GET https://fakestoreapi.com/products HTTP/1.1
