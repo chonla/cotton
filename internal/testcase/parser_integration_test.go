@@ -22,7 +22,7 @@ import (
 func TestParsingCompleteTestcaseMarkdownFile(t *testing.T) {
 	curdir, _ := os.Getwd()
 	config := &config.Config{
-		BaseDir: curdir + "/../..",
+		BaseDir: curdir + "/../../etc/examples/fakestoreapi.com/testcases/",
 	}
 
 	executableParserOptions := &executable.ParserOptions{

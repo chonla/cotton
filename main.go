@@ -3,6 +3,7 @@ package main
 import (
 	"cotton/internal/clock"
 	"cotton/internal/config"
+	"cotton/internal/directory"
 	"cotton/internal/executable"
 	"cotton/internal/httphelper"
 	"cotton/internal/logger"
@@ -36,19 +37,26 @@ func main() {
 	flag.StringVar(&customBaseDir, "b", "", "set baseDir path")
 	flag.Parse()
 
+	testPath := flag.Arg(0)
+	if testPath == "" {
+		testPath = "./"
+	}
+
+	dir := directory.New()
+	testBaseDir, err := dir.DirectoryOf(testPath)
+
 	baseDir := ""
 	if customBaseDir == "" {
-		baseDir, _ = os.Getwd()
+		if err == nil {
+			baseDir = testBaseDir
+		} else {
+			baseDir, _ = os.Getwd()
+		}
 	} else {
 		baseDir = customBaseDir
 	}
 	config := &config.Config{
 		BaseDir: baseDir,
-	}
-
-	testDir := flag.Arg(0)
-	if testDir == "" {
-		testDir = "./"
 	}
 
 	level := logger.Verbose
@@ -102,7 +110,7 @@ func main() {
 		ClockWrapper:         clockWrapper,
 	}
 
-	ts, err := testcase.NewTestsuite(testDir, options)
+	ts, err := testcase.NewTestsuite(testPath, options)
 	if err != nil {
 		os.Exit(1)
 	}
