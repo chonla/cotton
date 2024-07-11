@@ -9,4 +9,8 @@ type TestsuiteResult struct {
 	FailedCount     int
 	SkippedCount    int
 	EllapsedTime    *stopwatch.EllapsedTime
+	Start           int64
+	Stop            int64
+	AppVersion      string
+	TestResults     []*TestResult
 }

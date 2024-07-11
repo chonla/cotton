@@ -8,6 +8,7 @@ import (
 	"cotton/internal/httphelper"
 	"cotton/internal/logger"
 	"cotton/internal/reader"
+	"cotton/internal/reporter"
 	"cotton/internal/testcase"
 	"flag"
 	"fmt"
@@ -25,6 +26,7 @@ func main() {
 	var insecure bool
 	var stopWhenFailed bool
 	var customBaseDir string
+	var reporterType string
 
 	flag.Usage = usage
 	flag.BoolVar(&compact, "c", false, "compact mode")
@@ -34,7 +36,8 @@ func main() {
 	flag.BoolVar(&stopWhenFailed, "s", false, "stop when test failed")
 	flag.BoolVar(&ver, "v", false, "display cotton version")
 	flag.BoolVar(&help, "h", false, "display this help")
-	flag.StringVar(&customBaseDir, "b", "", "set baseDir path")
+	flag.StringVar(&customBaseDir, "b", "", "set base directory path")
+	flag.StringVar(&reporterType, "r", "", "set reporter type")
 	flag.Parse()
 
 	testPath := flag.Arg(0)
@@ -108,6 +111,8 @@ func main() {
 		StopWhenFailed:       stopWhenFailed,
 		Logger:               log,
 		ClockWrapper:         clockWrapper,
+		AppVersion:           Version,
+		TestReporter:         reporter.NewReporter(reporter.ReporterType(reporterType)),
 	}
 
 	ts, err := testcase.NewTestsuite(testPath, options)

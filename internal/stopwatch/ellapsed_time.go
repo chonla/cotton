@@ -3,6 +3,7 @@ package stopwatch
 import "fmt"
 
 type EllapsedTime struct {
+	duration    int64
 	millisecond int64
 	second      int64
 	minute      int64
@@ -15,10 +16,15 @@ func NewEllapsedTime(millisec int64) *EllapsedTime {
 	s %= 60
 
 	return &EllapsedTime{
+		duration:    millisec,
 		millisecond: ms,
 		second:      s,
 		minute:      m,
 	}
+}
+
+func (e *EllapsedTime) Duration() int64 {
+	return e.duration
 }
 
 func (e *EllapsedTime) String() string {

@@ -10,4 +10,6 @@ type TestResult struct {
 	Assertions   []*AssertionResult
 	Error        error
 	EllapsedTime *stopwatch.EllapsedTime
+	Start        int64
+	Stop         int64
 }

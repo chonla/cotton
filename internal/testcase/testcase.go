@@ -133,11 +133,14 @@ func (t *Testcase) Execute(passedVars *variable.Variables) *result.TestResult {
 		Assertions:   []*result.AssertionResult{},
 		Error:        nil,
 		EllapsedTime: nil,
+		Start:        t.options.ClockWrapper.Epoch(),
+		Stop:         0,
 	}
 	watch := stopwatch.New(t.options.ClockWrapper)
 	watch.Start()
 	defer (func() {
 		testResult.EllapsedTime = watch.Stop()
+		testResult.Stop = t.options.ClockWrapper.Epoch()
 	})()
 
 	if t.reqRaw == "" {

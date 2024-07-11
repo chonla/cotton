@@ -4,6 +4,7 @@ import (
 	"cotton/internal/clock"
 	"cotton/internal/directory"
 	"cotton/internal/logger"
+	"cotton/internal/reporter"
 	"cotton/internal/result"
 	"cotton/internal/stopwatch"
 	"cotton/internal/variable"
@@ -17,6 +18,8 @@ type TestsuiteOptions struct {
 	Logger               logger.Logger
 	TestcaseParserOption *ParserOptions
 	ClockWrapper         clock.ClockWrapper
+	TestReporter         reporter.Reporter
+	AppVersion           string
 }
 
 type Testsuite struct {
@@ -66,12 +69,16 @@ func (ts *Testsuite) Execute() (*result.TestsuiteResult, error) {
 	initialVars := variable.New()
 
 	testsuiteResult := &result.TestsuiteResult{
+		AppVersion:      ts.options.AppVersion,
 		PassedCount:     0,
 		ExecutionsCount: 0,
 		FailedCount:     0,
 		SkippedCount:    0,
 		TestCount:       len(ts.testcases),
 		EllapsedTime:    nil,
+		Start:           ts.options.ClockWrapper.Epoch(),
+		Stop:            0,
+		TestResults:     []*result.TestResult{},
 	}
 
 	watch := stopwatch.New(ts.options.ClockWrapper)
@@ -88,6 +95,7 @@ func (ts *Testsuite) Execute() (*result.TestsuiteResult, error) {
 			testsuiteResult.FailedCount += 1
 		}
 		testsuiteResult.ExecutionsCount += 1
+		testsuiteResult.TestResults = append(testsuiteResult.TestResults, result)
 		ts.options.Logger.PrintInlineTestResult(result.Passed)
 		ts.options.Logger.PrintInlineTimeEllapsed(result.EllapsedTime)
 		ts.options.Logger.PrintSectionTitle("result")
@@ -100,7 +108,9 @@ func (ts *Testsuite) Execute() (*result.TestsuiteResult, error) {
 	}
 	testsuiteResult.SkippedCount = testsuiteResult.TestCount - testsuiteResult.ExecutionsCount
 	testsuiteResult.EllapsedTime = watch.Stop()
+	testsuiteResult.Stop = ts.options.ClockWrapper.Epoch()
 	ts.options.Logger.PrintTestsuiteResult(testsuiteResult)
+	ts.options.TestReporter.Save(testsuiteResult)
 
 	return testsuiteResult, nil
 }

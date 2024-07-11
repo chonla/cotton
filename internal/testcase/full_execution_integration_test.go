@@ -33,6 +33,7 @@ func TestGetDataFromHttpBin(t *testing.T) {
 
 	mockClock := new(clock.MockClock)
 	mockClock.On("Now").Return(mockTime)
+	mockClock.On("Epoch").Return(mockTime.Unix())
 
 	executableParserOptions := &executable.ParserOptions{
 		Configurator:  config,
@@ -105,6 +106,8 @@ secret=updatedValue`, executableOptions)
 		Passed:       true,
 		Assertions:   expectedAssertionResults,
 		EllapsedTime: stopwatch.NewEllapsedTime(0),
+		Start:        mockTime.Unix(),
+		Stop:         mockTime.Unix(),
 	}
 
 	initialVars := variable.New()
@@ -125,6 +128,7 @@ func TestGetDataFromHttpBinWithThreeTildedCodeBlock(t *testing.T) {
 
 	mockClock := new(clock.MockClock)
 	mockClock.On("Now").Return(mockTime)
+	mockClock.On("Epoch").Return(mockTime.Unix())
 
 	executableParserOptions := &executable.ParserOptions{
 		Configurator:  config,
@@ -197,6 +201,8 @@ secret=updatedValue`, executableOptions)
 		Passed:       true,
 		Assertions:   expectedAssertionResults,
 		EllapsedTime: stopwatch.NewEllapsedTime(0),
+		Start:        mockTime.Unix(),
+		Stop:         mockTime.Unix(),
 	}
 
 	initialVars := variable.New()
