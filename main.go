@@ -15,7 +15,7 @@ import (
 	"os"
 )
 
-const Version = "1.0.0"
+var Version = "1.0.0"
 
 func main() {
 	var debug bool
