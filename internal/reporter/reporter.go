@@ -6,6 +6,7 @@ type ReporterType string
 
 const (
 	CTRF ReporterType = "ctrf"
+	HTML ReporterType = "html"
 )
 
 type Reporter interface {
@@ -15,6 +16,9 @@ type Reporter interface {
 func NewReporter(reporterType ReporterType) Reporter {
 	if reporterType == CTRF {
 		return NewCTRFReporter()
+	}
+	if reporterType == HTML {
+		return NewHTMLReporter()
 	}
 	return NewNoReporter()
 }

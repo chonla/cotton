@@ -10,7 +10,7 @@ permalink: /cli
 ## Usage
 
 {% highlight bash %}
-  cotton [-d] [-c] [-p] [-b <basedir>] [-r <reportype>] <testpath|testdir>
+  cotton [-d] [-c] [-p] [-b <basedir>] [-r <reporttype>] <testpath|testdir>
   cotton -v
   cotton --help
 
@@ -22,7 +22,7 @@ permalink: /cli
   -i    disable certificate verification
   -p    paranoid mode
   -r string
-        set reporter type
+        set reporter type, html or ctrf
   -s    stop when test failed
   -v    display cotton version
 {% endhighlight %}
@@ -61,6 +61,7 @@ Paranoid mode is detailed verbose logging execution. Cotton prints out very deta
 Set reporter type. Default is no reporter.
 
 * `ctrf` for Common Test Result Format reporter.
+* `html` for HTML Test Result Format reporter.
 
 ### `-s` Panic mode
 

@@ -128,7 +128,7 @@ func (t *Testcase) AddTeardown(teardown *executable.Executable) {
 
 func (t *Testcase) Execute(passedVars *variable.Variables) *result.TestResult {
 	testResult := &result.TestResult{
-		Title:        t.title,
+		Title:        t.Title(),
 		Passed:       false,
 		Assertions:   []*result.AssertionResult{},
 		Error:        nil,

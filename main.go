@@ -37,7 +37,7 @@ func main() {
 	flag.BoolVar(&ver, "v", false, "display cotton version")
 	flag.BoolVar(&help, "h", false, "display this help")
 	flag.StringVar(&customBaseDir, "b", "", "set base directory path")
-	flag.StringVar(&reporterType, "r", "", "set reporter type")
+	flag.StringVar(&reporterType, "r", "", "set reporter type, html or ctrf")
 	flag.Parse()
 
 	testPath := flag.Arg(0)
@@ -130,7 +130,7 @@ func main() {
 func usage() {
 	fmt.Fprintf(flag.CommandLine.Output(), `Usage of cotton:
 
-  cotton [-d] [-c] [-p] [-b <basedir>] <testpath|testdir>
+  cotton [-d] [-c] [-p] [-b <basedir>] [-r <reporttype>] <testpath|testdir>
   cotton -v
   cotton --help
 
