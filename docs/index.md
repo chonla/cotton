@@ -11,6 +11,8 @@ permalink: /
 
 # Cotton
 
+![GitHub Repo stars](https://img.shields.io/github/stars/chonla/cotton) ![GitHub Release](https://img.shields.io/github/v/release/chonla/cotton)
+
 Cotton is a markdown-formatted API specification runner. Cotton promotes the readability and understandability of API specification.
 
 ## Key Features
