@@ -7,6 +7,6 @@ forcetest:
 forceintegration:
 	go clean -testcache && go test -tags=integration ./...
 coverage:
-	go clean -testcache && go test -cover ./...
+	go clean -testcache && go test -cover -coverprofile=cover.out ./... && go tool cover -html="cover.out"
 build:
 	go build -ldflags="-X 'main.Version=$(version)'" -o cotton .
