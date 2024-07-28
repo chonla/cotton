@@ -10,7 +10,7 @@ permalink: /cli
 ## Usage
 
 {% highlight bash %}
-  cotton [-d] [-c] [-p] [-b <basedir>] [-r <reporttype>] <testpath|testdir>
+  cotton [-d] [-c] [-p] [-i] [-b <basedir>] [-r <reporttype>] <testpath|testdir>
   cotton -v
   cotton --help
 
