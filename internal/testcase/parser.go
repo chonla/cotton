@@ -22,6 +22,7 @@ type ParserOptions struct {
 	ExecutableParser executable.Parser
 	Logger           logger.Logger
 	ClockWrapper     clock.ClockWrapper
+	InsecureRequest  bool
 }
 
 type Parser struct {
@@ -252,9 +253,10 @@ func (p *Parser) FromMarkdownLines(mdLines []line.Line) (*Testcase, error) {
 	p.options.Logger.PrintDetailedDebugMessage("==========")
 
 	options := &TestcaseOptions{
-		RequestParser: p.options.RequestParser,
-		Logger:        p.options.Logger,
-		ClockWrapper:  p.options.ClockWrapper,
+		RequestParser:   p.options.RequestParser,
+		Logger:          p.options.Logger,
+		ClockWrapper:    p.options.ClockWrapper,
+		InsecureRequest: p.options.InsecureRequest,
 	}
 	tc := NewTestcase(title, line.Line(strings.Join(description, "\n")).Trim().Value(), reqRaw, options)
 	for _, cap := range captures {

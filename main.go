@@ -89,11 +89,12 @@ func main() {
 	clockWrapper := clock.New()
 
 	exOptions := &executable.ParserOptions{
-		Configurator:  config,
-		FileReader:    reader,
-		RequestParser: reqParser,
-		Logger:        log,
-		ClockWrapper:  clockWrapper,
+		Configurator:    config,
+		FileReader:      reader,
+		RequestParser:   reqParser,
+		Logger:          log,
+		ClockWrapper:    clockWrapper,
+		InsecureRequest: insecure,
 	}
 	exParser := executable.NewParser(exOptions)
 
@@ -104,6 +105,7 @@ func main() {
 		Logger:           log,
 		ExecutableParser: exParser,
 		ClockWrapper:     clockWrapper,
+		InsecureRequest:  insecure,
 	}
 
 	options := &testcase.TestsuiteOptions{
@@ -130,7 +132,7 @@ func main() {
 func usage() {
 	fmt.Fprintf(flag.CommandLine.Output(), `Usage of cotton:
 
-  cotton [-d] [-c] [-p] [-b <basedir>] [-r <reporttype>] <testpath|testdir>
+  cotton [-d] [-c] [-p] [-i] [-b <basedir>] [-r <reporttype>] <testpath|testdir>
   cotton -v
   cotton --help
 

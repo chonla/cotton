@@ -14,11 +14,12 @@ import (
 )
 
 type ParserOptions struct {
-	Configurator  *config.Config
-	FileReader    reader.Reader
-	RequestParser httphelper.RequestParser
-	Logger        logger.Logger
-	ClockWrapper  clock.ClockWrapper
+	Configurator    *config.Config
+	FileReader      reader.Reader
+	RequestParser   httphelper.RequestParser
+	Logger          logger.Logger
+	ClockWrapper    clock.ClockWrapper
+	InsecureRequest bool
 }
 
 type Parser interface {
@@ -163,8 +164,9 @@ func (p *ExecutableParser) FromMarkdownLines(mdLines []line.Line) (*Executable, 
 	}
 
 	options := &ExecutableOptions{
-		RequestParser: p.options.RequestParser,
-		Logger:        p.options.Logger,
+		RequestParser:   p.options.RequestParser,
+		Logger:          p.options.Logger,
+		InsecureRequest: p.options.InsecureRequest,
 	}
 	ex := New(title, reqRaw, options)
 	for _, cap := range captures {
