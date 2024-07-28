@@ -9,7 +9,7 @@ See [Guidebook](https://chonla.github.io/cotton) for detail.
 ## Key Features
 
 * **Customizable Documentation**: Cotton offers intuitive syntax. You can make your API document more readable.
-* **Setups and Teardowns**: Cotton allows you to to test setups and teardown.
+* **Setups and Teardowns**: Cotton allows you to test setups and teardown.
 * **Variables**: Cotton allows you to define initial variables and use them later.
 * **Captures**: Cotton offers value capturing into variable, which help you to perform tests with dynamic data.
 * **Regular Expression Assertions**: Not only simple assertions, but Cotton also provides built-in regular expression assertions.
