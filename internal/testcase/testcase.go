@@ -29,6 +29,7 @@ type Testcase struct {
 	title       string
 	description string
 	reqRaw      string
+	filename    string
 	captures    []*capture.Capture
 	setups      []*executable.Executable
 	teardowns   []*executable.Executable
@@ -42,6 +43,7 @@ func NewTestcase(title, description, reqRaw string, options *TestcaseOptions) *T
 		title:       title,
 		description: description,
 		reqRaw:      reqRaw,
+		filename:    "",
 		captures:    []*capture.Capture{},
 		setups:      []*executable.Executable{},
 		teardowns:   []*executable.Executable{},
@@ -124,6 +126,14 @@ func (t *Testcase) Teardowns() []*executable.Executable {
 
 func (t *Testcase) AddTeardown(teardown *executable.Executable) {
 	t.teardowns = append(t.teardowns, teardown.Clone())
+}
+
+func (t *Testcase) SetFilename(filename string) {
+	t.filename = filename
+}
+
+func (t *Testcase) Filename() string {
+	return t.filename
 }
 
 func (t *Testcase) Execute(passedVars *variable.Variables) *result.TestResult {

@@ -19,6 +19,7 @@ type Logger interface {
 	PrintSectionedMessage(section, message string) error
 	PrintTestcaseSequence(index, total int) error
 	PrintTestcaseTitle(title string) error
+	PrintTestcaseTitleWithPath(title, path string) error
 	PrintSectionTitle(sectionTitle string) error
 	PrintExecutableTitle(title string) error
 	PrintTestResult(passed bool) error

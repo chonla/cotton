@@ -25,6 +25,7 @@ func main() {
 	var ver bool
 	var insecure bool
 	var stopWhenFailed bool
+	var listTests bool
 	var customBaseDir string
 	var reporterType string
 
@@ -34,6 +35,7 @@ func main() {
 	flag.BoolVar(&detailedDebug, "p", false, "paranoid mode")
 	flag.BoolVar(&insecure, "i", false, "disable certificate verification")
 	flag.BoolVar(&stopWhenFailed, "s", false, "stop when test failed")
+	flag.BoolVar(&listTests, "l", false, "display test case titles, no test execution")
 	flag.BoolVar(&ver, "v", false, "display cotton version")
 	flag.BoolVar(&help, "h", false, "display this help")
 	flag.StringVar(&customBaseDir, "b", "", "set base directory path")
@@ -122,17 +124,25 @@ func main() {
 		os.Exit(1)
 	}
 
-	_, err = ts.Execute()
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+	if listTests {
+		err = ts.PrintTitles()
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+	} else {
+		_, err = ts.Execute()
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
 	}
 }
 
 func usage() {
 	fmt.Fprintf(flag.CommandLine.Output(), `Usage of cotton:
 
-  cotton [-d] [-c] [-p] [-i] [-b <basedir>] [-r <reporttype>] <testpath|testdir>
+  cotton [-d] [-c] [-p] [-i] [-l] [-b <basedir>] [-r <reporttype>] <testpath|testdir>
   cotton -v
   cotton --help
 

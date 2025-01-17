@@ -86,6 +86,7 @@ Content-Length: 43
 Content-Type: application/json`, executableOptions)
 	expectedTestcase := testcase.NewTestcase("Full documented testcase", "The testcase is described by providing paragraphs right after the test case title.", `GET https://fakestoreapi.com/products HTTP/1.1
 Authorization: Bearer {{access_token}}`, testcaseOptions)
+	expectedTestcase.SetFilename("../../etc/examples/fakestoreapi.com/testcases/full_documented.md")
 	expectedTestcase.AddSetup(expectedSetup1)
 	expectedTestcase.AddSetup(expectedSetup2)
 	expectedTestcase.AddTeardown(expectedTeardown)

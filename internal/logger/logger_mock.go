@@ -12,6 +12,11 @@ type MockLogger struct {
 	mock.Mock
 }
 
+func (m *MockLogger) PrintTestcaseTitleWithPath(title, path string) error {
+	args := m.Called(title, path)
+	return args.Error(0)
+}
+
 func (m *MockLogger) PrintTestcaseTitle(title string) error {
 	args := m.Called(title)
 	return args.Error(0)

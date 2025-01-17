@@ -20,6 +20,10 @@ func (c *NilLogger) PrintTestcaseTitle(title string) error {
 	return nil
 }
 
+func (c *NilLogger) PrintTestcaseTitleWithPath(title, path string) error {
+	return nil
+}
+
 func (c *NilLogger) PrintExecutableTitle(title string) error {
 	return nil
 }

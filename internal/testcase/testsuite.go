@@ -65,6 +65,14 @@ func NewTestsuite(path string, options *TestsuiteOptions) (*Testsuite, error) {
 	}, nil
 }
 
+func (ts *Testsuite) PrintTitles() error {
+	for _, tc := range ts.testcases {
+		ts.options.Logger.PrintTestcaseTitleWithPath(tc.Title(), tc.Filename())
+	}
+
+	return nil
+}
+
 func (ts *Testsuite) Execute() (*result.TestsuiteResult, error) {
 	initialVars := variable.New()
 

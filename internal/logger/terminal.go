@@ -32,6 +32,17 @@ func (c *TerminalLogger) PrintTestcaseTitle(title string) error {
 	return err
 }
 
+func (c *TerminalLogger) PrintTestcaseTitleWithPath(title, path string) error {
+	var err error
+	if c.level == Compact {
+		_, err = fmt.Printf("%s (%s)", color.New(color.FgHiWhite).Sprint(title), color.New(color.FgWhite).Sprint(path))
+	} else {
+		_, err = fmt.Printf("%s (%s)\n", color.New(color.FgHiWhite).Sprint(title), color.New(color.FgWhite).Sprint(path))
+	}
+
+	return err
+}
+
 func (c *TerminalLogger) PrintSectionTitle(sectionTitle string) error {
 	if c.level == Compact {
 		return nil

@@ -62,6 +62,7 @@ Host: url
 post
 body`
 	expectedTestcase := testcase.NewTestcase("Title", "", expectedRawRequest, testcaseOptions)
+	expectedTestcase.SetFilename("mock_file")
 
 	parser := testcase.NewParser(options)
 	result, err := parser.FromMarkdownFile("mock_file")
@@ -118,6 +119,7 @@ Host: url
 post
 body`
 	expectedTestcase := testcase.NewTestcase("Title", "", expectedRawRequest, testcaseOptions)
+	expectedTestcase.SetFilename("mock_file")
 
 	parser := testcase.NewParser(options)
 	result, err := parser.FromMarkdownFile("mock_file")
@@ -175,6 +177,7 @@ Host: url
 post
 body`
 	expectedTestcase := testcase.NewTestcase("Title", "", expectedRawRequest, testcaseOptions)
+	expectedTestcase.SetFilename("mock_file")
 
 	parser := testcase.NewParser(options)
 	result, err := parser.FromMarkdownFile("mock_file")
@@ -233,6 +236,7 @@ Host: url
 post
 body`
 	expectedTestcase := testcase.NewTestcase("Title", "Wonderful\nworld", expectedRawRequest, testcaseOptions)
+	expectedTestcase.SetFilename("mock_file")
 
 	parser := testcase.NewParser(options)
 	result, err := parser.FromMarkdownFile("mock_file")
@@ -295,6 +299,7 @@ Host: url
 post
 body`
 	expectedTestcase := testcase.NewTestcase("Title", "Wonderful", expectedRawRequest, testcaseOptions)
+	expectedTestcase.SetFilename("mock_file")
 
 	parser := testcase.NewParser(options)
 	result, err := parser.FromMarkdownFile("mock_file")
@@ -348,6 +353,7 @@ Host: url
 post
 body`
 	expectedTestcase := testcase.NewTestcase("", "", expectedRawRequest, testcaseOptions)
+	expectedTestcase.SetFilename("mock_file")
 
 	parser := testcase.NewParser(options)
 	result, err := parser.FromMarkdownFile("mock_file")
@@ -411,6 +417,7 @@ Host: url
 post
 body`
 	expectedTestcase := testcase.NewTestcase("", "", expectedRawRequest, testcaseOptions)
+	expectedTestcase.SetFilename("mock_file")
 
 	parser := testcase.NewParser(options)
 	result, err := parser.FromMarkdownFile("mock_file")
@@ -474,6 +481,7 @@ Host: url
 post
 body`
 	expectedTestcase := testcase.NewTestcase("", "", expectedRawRequest, testcaseOptions)
+	expectedTestcase.SetFilename("mock_file")
 
 	parser := testcase.NewParser(options)
 	result, err := parser.FromMarkdownFile("mock_file")
@@ -527,6 +535,7 @@ Host: url
 post
 body`
 	expectedTestcase := testcase.NewTestcase("", "", expectedRawRequest, testcaseOptions)
+	expectedTestcase.SetFilename("mock_file")
 
 	parser := testcase.NewParser(options)
 	result, err := parser.FromMarkdownFile("mock_file")
@@ -630,6 +639,7 @@ Host: url
 post
 body`
 	expectedTestcase := testcase.NewTestcase("", "", expectedRawRequest, testcaseOptions)
+	expectedTestcase.SetFilename("mock_file")
 
 	parser := testcase.NewParser(options)
 	result, err := parser.FromMarkdownFile("mock_file")
@@ -699,6 +709,7 @@ Host: url
 post
 body`
 	expectedTestcase := testcase.NewTestcase("", "", expectedRawRequest, testcaseOptions)
+	expectedTestcase.SetFilename("mock_file")
 
 	parser := testcase.NewParser(options)
 	result, err := parser.FromMarkdownFile("mock_file")
@@ -759,6 +770,7 @@ Host: url
 post
 body`
 	expectedTestcase := testcase.NewTestcase("", "", expectedRawRequest, testcaseOptions)
+	expectedTestcase.SetFilename("mock_file")
 
 	parser := testcase.NewParser(options)
 	result, err := parser.FromMarkdownFile("mock_file")
@@ -829,6 +841,7 @@ Host: url
 post
 body`
 	expectedTestcase := testcase.NewTestcase("", "", expectedRawRequest, testcaseOptions)
+	expectedTestcase.SetFilename("mock_file")
 	expectedTestcase.AddSetup(mockSetup1)
 	expectedTestcase.AddSetup(mockSetup2)
 
@@ -899,6 +912,7 @@ Host: url
 post
 body`
 	expectedTestcase := testcase.NewTestcase("", "", expectedRawRequest, testcaseOptions)
+	expectedTestcase.SetFilename("mock_file")
 	expectedTestcase.AddTeardown(mockTeardown1)
 	expectedTestcase.AddTeardown(mockTeardown2)
 
@@ -954,6 +968,7 @@ Host: url
 post
 body`
 	expectedTestcase := testcase.NewTestcase("", "", expectedRawRequest, testcaseOptions)
+	expectedTestcase.SetFilename("mock_file")
 	expectedTestcase.AddCapture(capture.New("varname", "$.result"))
 
 	parser := testcase.NewParser(options)
@@ -1011,6 +1026,7 @@ post
 body`
 	eqOp, _ := assertion.NewOp("==")
 	expectedTestcase := testcase.NewTestcase("", "", expectedRawRequest, testcaseOptions)
+	expectedTestcase.SetFilename("mock_file")
 	expectedTestcase.AddAssertion(assertion.New("$.var", eqOp, float64(3)))
 	expectedTestcase.AddAssertion(assertion.New("$.var2", eqOp, "good.vibe"))
 

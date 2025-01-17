@@ -41,7 +41,12 @@ func (p *Parser) FromMarkdownFile(mdFileName string) (*Testcase, error) {
 	if err != nil {
 		return nil, err
 	}
-	return p.FromMarkdownLines(lines)
+	tc, err := p.FromMarkdownLines(lines)
+	if err != nil {
+		return nil, err
+	}
+	tc.SetFilename(mdFileName)
+	return tc, err
 }
 
 func (p *Parser) FromMarkdownLines(mdLines []line.Line) (*Testcase, error) {

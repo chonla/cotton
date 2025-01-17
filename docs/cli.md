@@ -10,7 +10,7 @@ permalink: /cli
 ## Usage
 
 {% highlight bash %}
-  cotton [-d] [-c] [-p] [-i] [-b <basedir>] [-r <reporttype>] <testpath|testdir>
+  cotton [-d] [-c] [-p] [-i] [-l] [-b <basedir>] [-r <reporttype>] <testpath|testdir>
   cotton -v
   cotton --help
 
@@ -20,6 +20,7 @@ permalink: /cli
   -d    debug mode
   -h    display this help
   -i    disable certificate verification
+  -l    display test case titles, no test execution
   -p    paranoid mode
   -r string
         set reporter type, html or ctrf
@@ -50,6 +51,11 @@ Cotton prints out help information.
 ### `-i` Insecure mode
 
 Insecure mode will disable certificate verification.
+
+### `-l` List test cases
+`Since 1.2.0`
+
+List all test cases. No test cases are executed.
 
 ### `-p` Paranoid mode
 
