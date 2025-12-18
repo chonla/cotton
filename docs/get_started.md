@@ -29,8 +29,8 @@ Create a markdown file (text file with `.md` extension) with the following conte
 GET https://fakestoreapi.com/products HTTP/1.1
 ```
 
-- `$[0].id` == `1`
-- `$[0].title` =~ `/product/i`
+* `$.0.id` == `1`
+* `$.0.title` =~ `/product/i`
 {% endhighlight %}
 
 ## Execute Testcases

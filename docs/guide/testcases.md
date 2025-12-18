@@ -21,7 +21,7 @@ A testcase requires two testcase elements, [request](../syntax/requests.md) and 
 GET https://fakestoreapi.com/products HTTP/1.1
 ```
 
-* `Body.0.id`==`1`
+* `$.0.id` == `1`
 {% endhighlight %}
 
 ## A Detailed Testcase
@@ -39,8 +39,8 @@ Listing product should return a list of product.
 GET https://fakestoreapi.com/products HTTP/1.1
 ```
 
-* `Body.0.id`==`1`
-* `Body.1.id`==`2`
+* `$.0.id` == `1`
+* `$.1.id` == `2`
 {% endhighlight %}
 
 ## An Internationalized Testcase
@@ -61,5 +61,5 @@ GET https://fakestoreapi.com/products HTTP/1.1
 Authorization: Bearer {{access_token}}
 ```
 
-* `Body.0.id`==`1`
+* `$.0.id` == `1`
 {% endhighlight %}
