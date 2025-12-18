@@ -29,13 +29,26 @@ Create a markdown file (text file with `.md` extension) with the following conte
 GET https://fakestoreapi.com/products HTTP/1.1
 ```
 
-* `Body.0.id`==`1`
+- `$[0].id` == `1`
+- `$[0].title` =~ `/product/i`
 {% endhighlight %}
 
 ## Execute Testcases
 
 ```sh
-cotton
+cotton ./first-testcase.md
+```
+
+Or to run all tests in a directory:
+
+```sh
+cotton ./tests
+```
+
+With a custom timeout:
+
+```sh
+cotton ./tests --timeout 45000
 ```
 
 You should see the output like this in your terminal.

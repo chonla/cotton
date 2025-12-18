@@ -8,39 +8,21 @@ parent: Syntax
 
 # Assertions
 
-Once a response has been returned from the request, an assertion will be evaluated to verify if value in the response satisfies the requirements.
+Once a response has been returned from the request, assertions are evaluated against the JSON response body to verify expected values.
 
 The assertion is written as a list item (ordered or unordered list) in the following syntax:
 
 {% highlight markdown %}
-* `selector` assertion_operator `expected_value`
+* `$.json.path` operator `expected_value`
 {% endhighlight %}
 
-* Selector is a value selector, locating a value in the response. See [Selectors](./selectors.md)
-* Assertion operator is an assertion operation, which can be unary operator or binary operator. The binary operator requires an expected value as the operand. See [Assertion Operators](#assertion-operators) below.
-* Expected value is an optional operand, depending on operator.
+* Selector: a JSON path starting with `$`. See [Selectors](./selectors.md).
+* Operator: comparison or regex operator. See [Assertion Operators](#assertion-operators).
+* Expected value: number, string (quoted), regex (`/pattern/`), `null`, or `undefined`.
 
 ## Assertion Operators
 
-### is defined
-
-`is defined` is an operator to check if the value is defined in response.
-
-**Example**
-
-{% highlight markdown %}
-* `Body.message.id` is defined
-{% endhighlight %}
-
-### is undefined
-
-`is undefined` is an operator to check if the value is not defined in response.
-
-**Example**
-
-{% highlight markdown %}
-* `Body.message.error` is undefined
-{% endhighlight %}
+> Note: Unary operators like "is defined"/"is undefined" are not supported. Use comparisons with `undefined`/`null` as shown below.
 
 ### == (Equal)
 
@@ -51,9 +33,8 @@ Value types for this assertion can be a number, string, or [regular expression](
 **Example**
 
 {% highlight markdown %}
-* `StatusCode` == `200`
-* `StatusText` == `"OK"`
-* `Headers.Content-Type` == `"application/json"`
+* `$.status` == `"ok"`
+* `$.data.id` == `42`
 {% endhighlight %}
 
 ### != (Not Equal)
@@ -65,9 +46,7 @@ Value types for this assertion can be a number, string, or [regular expression](
 **Example**
 
 {% highlight markdown %}
-* `StatusCode` != `404`
-* `StatusText` != `"NOT FOUND"`
-* `Headers.Content-Type` != `"text/plain"`
+* `$.data.name` != `"Guest"`
 {% endhighlight %}
 
 ### > (Greater Than)
@@ -79,7 +58,7 @@ Value types for this assertion must be a number.
 **Example**
 
 {% highlight markdown %}
-* `Body.id` > `0`
+* `$.metrics.duration_ms` > `0`
 {% endhighlight %}
 
 ### >= (Greater Than or Equal To)
@@ -91,7 +70,7 @@ Value types for this assertion must be a number.
 **Example**
 
 {% highlight markdown %}
-* `Body.id` >= `0`
+* `$.metrics.duration_ms` >= `100`
 {% endhighlight %}
 
 ### < (Less Than)
@@ -103,7 +82,7 @@ Value types for this assertion must be a number.
 **Example**
 
 {% highlight markdown %}
-* `Body.id` < `30`
+* `$.data.count` < `30`
 {% endhighlight %}
 
 ### <= (Less Than or Equal To)
@@ -115,18 +94,43 @@ Value types for this assertion must be a number.
 **Example**
 
 {% highlight markdown %}
-* `Body.id` <= `30`
+* `$.data.count` <= `30`
 {% endhighlight %}
 
-## Regular Expression Assertion
+### =~ (Regex Match)
 
-Regular expression is used in equality and difference assertion. The pattern is enclosed between slashes like in Javascript.
+`=~` is an operator to check if the value matches the regex pattern.
 
-{: .info }
-The value to be asserted with regular expression assertion **MUST** be string.
+The pattern is enclosed between forward slashes like `/pattern/`.
 
 **Example**
 
 {% highlight markdown %}
-* `StatusText` == `/^NOT.*/`
+* `$.title` =~ `/^Executive/`
+* `$.department` =~ `/[A-Z]{2,}/`
+{% endhighlight %}
+
+### !~ (Regex Not Match)
+
+`!~` is an operator to check if the value does **not** match the regex pattern.
+
+**Example**
+
+{% highlight markdown %}
+* `$.title` !~ `/^Sales/`
+{% endhighlight %}
+
+## Regular Expression Assertion
+
+Regular expressions are used in regex match/not-match assertions and can also be used in equality/difference assertions. The pattern is delimited by forward slashes.
+
+{: .info }
+Regex assertions operate on string values. Convert numbers in your API if needed.
+
+Checking existence:
+
+{% highlight markdown %}
+* `$.data.error` == `undefined`   # not present
+* `$.data.deleted_at` == `null`    # null or not present
+* `$.data.name` != `undefined`     # present
 {% endhighlight %}

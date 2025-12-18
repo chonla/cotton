@@ -18,15 +18,10 @@ Cotton is a markdown-formatted API specification runner. Cotton promotes the rea
 ## Key Features
 
 * **Customizable Documentation**: Cotton offers intuitive syntax. You can make your API document more readable.
-* **Setups and Teardowns**: Cotton allows you to test setups and teardown.
-* **Variables**: Cotton allows you to define initial variables and use them later.
-* **Captures**: Cotton offers value capturing into variable, which help you to perform tests with dynamic data.
-* **Regular Expression Assertions**: Not only simple assertions, but Cotton also provides built-in regular expression assertions.
+* **Setups and Teardowns**: Cotton allows you to test setups and teardown with proper variable sharing across contexts.
+* **Variables**: Cotton allows you to define initial variables and use them later, with support for capturing values from responses.
+* **Captures**: Cotton offers value capturing into variables using JSON paths, which help you to perform tests with dynamic data.
+* **Assertions**: Cotton provides multiple assertion operators including equality, comparison, and regular expression matching.
 * **Debug Logging**: Cotton CLI has a `-d` option to print out detailed information of test operations.
-* **CI/CD Ready**: Cotton CLI returns error if any test fails.
-
-## About Cotton
-
-Cotton 0 was originally inspired by [silk test](https://github.com/matryer/silk) which is no longer maintained.
-
-Testcase syntax in Cotton 0 is close to silk test, but in version 1, the syntax is completely redesigned to promote more readability.
+* **Report Generation**: Cotton can generate JSON reports with test results and timing information.
+* **CI/CD Ready**: Cotton CLI returns appropriate exit codes and supports multiple input formats (file, directory, or glob patterns).

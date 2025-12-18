@@ -8,15 +8,31 @@ parent: Syntax
 
 # Captures
 
-Capturing a value is one of two ways to define a [variable](./variables.md).
+Capturing a value is one way to define a [variable](./variables.md) based on a JSON response.
 
-A capture is written in a list item (ordered or unordered list) in the following syntax:
+In Cotton, captures are declared the same way as variables — as list items before the request — but with the value set to a JSON path (starting with `$`). The actual value will be resolved from the most recent JSON response after the request runs.
+
+Syntax:
 
 {% highlight markdown %}
-* variable_name:`selector`
+* `variable_name` = `$.path.to.value`
 {% endhighlight %}
 
-You can notice, the difference between capturing a value into a variable and variable definition is the selector for capture is enclosed with backticks, but the value is not.
+Example:
+
+{% highlight markdown %}
+* `token` = `$.data.access_token`
+
+```http
+POST https://api.example.com/auth HTTP/1.1
+Content-Type: application/json
+
+{"username":"user","password":"pass"}
+```
+{% endhighlight %}
+
+After the request completes, `token` will be captured from the JSON response and becomes available for subsequent steps (e.g., teardowns or later specs).
 
 {: .info }
-The capture will capture the response within the same markdown file. You cannot capture the value from the other markdown files.
+- Captures are resolved from the current spec’s response. If a previous step (e.g., a setup) produced a response, JSON-path variables may also resolve before the main request.
+- The response body must be valid JSON for captures to work.

@@ -19,7 +19,7 @@ The teardown is written as a link in a list item (ordered or unordered list) in 
 {% endhighlight %}
 
 {: .info }
-The teardown list can be anywhere in the testcase, but must be **AFTER** the request.
+The teardown list can be anywhere in the testcase, but must be **AFTER** the request. Teardowns execute in order and share variables captured during the testcase.
 
 **Example**
 

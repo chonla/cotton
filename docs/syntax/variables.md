@@ -18,41 +18,49 @@ The variables which defined in earlier step, no matter in setup or testcase or t
 A variable definition is written in a list item (ordered or unordered list) in the following syntax:
 
 {% highlight markdown %}
-* variable_name:value
+* `variable_name` = `value`
 {% endhighlight %}
 
-If the value is string, enclose it with double quote. Otherwise, it will be treated as a number. Anyway, if the value cannot be parsed into a number, it will be assumed to be a string.
+If the value is a string, enclose it with double quotes. Otherwise, it will be treated as a number. If the value cannot be parsed as a number, it will be assumed to be a string.
 
 **Example**
 
 {% highlight markdown %}
-* id:3
-* keyword:"value"
+* `id` = `3`
+* `keyword` = `"value"`
 {% endhighlight %}
 
-Defining a variable which has a duplicate name will replace the previous definition. The `keyword` in the following example yield the value of `"another value"`.
-
-**Example**
-
-{% highlight markdown %}
-* id:3
-* keyword:"value"
-* keyword:"another value"
-{% endhighlight %}
+{: .warning }
+Missing variables in requests (e.g., using `{{ undefined_var }}`) will cause a ParseError and abort the spec execution.
 
 ## Capturing a value into a variable
 
-See [Captures](./captures.md).
-
-## Using a variable
-
-The variable can be used within the request code block by putting variable name enclosed with {% raw %}`{{`{% endraw %} and {% raw %}`}}`{% endraw %}.
+Declare the variable before the request with a JSON path (starting with `$`). After the request completes, the value will be captured from the JSON response body.
 
 **Example**
 
 {% highlight markdown %}
-* username:"peter"
-* password:"1234test"
+* `token` = `$.data.access_token`
+
+```http
+POST https://api.example.com/auth HTTP/1.1
+Content-Type: application/json
+
+{"username":"user","password":"pass"}
+```
+{% endhighlight %}
+
+See [Captures](./captures.md) for more details.
+
+## Using a variable
+
+The variable can be used within the request code block by putting variable name enclosed with {% raw %}`{{`{% endraw %} and {% raw %}`}}`{% endraw %} (double curly braces).
+
+**Example**
+
+{% highlight markdown %}
+* `username` = `"peter"`
+* `password` = `"1234test"`
 
 ```http
 POST https://fakestoreapi.com/auth/login HTTP/1.1
