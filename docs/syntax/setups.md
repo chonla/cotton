@@ -19,7 +19,10 @@ The setup is written as a link in a list item (ordered or unordered list) in the
 {% endhighlight %}
 
 {: .info }
-The setup list can be anywhere in the testcase, but must be **BEFORE** the request.
+The setup list can be anywhere in the testcase, but must be **BEFORE** the request. Setups execute in order, share variables with the testcase, and can produce JSON responses used for variable resolution.
+
+{: .warning }
+Cotton detects cycles across linked specs and stops execution with an error if a loop is found.
 
 **Example**
 

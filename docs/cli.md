@@ -10,69 +10,66 @@ permalink: /cli
 ## Usage
 
 {% highlight bash %}
-  cotton [-d] [-c] [-p] [-i] [-l] [-b <basedir>] [-r <reporttype>] <testpath|testdir>
+  cotton [file|dir|glob ...] [-d] [-q] [-m] [-f] [-v] [--timeout <ms>] [--json-report <file>]
   cotton -v
   cotton --help
 
-  -b string
-        set base directory path
-  -c    compact mode
-  -d    debug mode
-  -h    display this help
-  -i    disable certificate verification
-  -l    display test case titles, no test execution
-  -p    paranoid mode
-  -r string
-        set reporter type, html or ctrf
-  -s    stop when test failed
-  -v    display cotton version
+  -d, --debug
+        enable debug logging
+  -q, --quiet
+        suppress output (exit code only)
+  -m, --monochrome
+        disable colored output
+  -f, --fail-fast
+        stop on first failing test
+  -v, --version
+        display cotton version
+  --timeout <ms>
+        set HTTP timeout (1–60000 ms; default 30000)
+  --json-report <file>
+        generate JSON report to specified file
 {% endhighlight %}
 
 ## Options
 
 By default, Cotton prints out test title, setup title, teardown title, result, and summary.
 
-### `-b` Set baseDir
+### `-d, --debug`
 
-All links in setups and teardows with relative path will be referenced from baseDir. Default is current directory.
+Debug mode enables verbose logging. Cotton prints out setup/teardown titles, request/response bodies, variable resolutions, and expectation evaluations.
 
-### `-c` Compact mode
+### `-q, --quiet`
 
-Compact mode is minimal logging execution. Cotton prints out only test title, result, and summary.
+Quiet mode suppresses all output and prints only the exit code (0 for success, non-zero for failure). Useful for CI/CD pipelines.
 
-### `-d` Debug mode
+### `-m, --monochrome`
 
-Debug mode is verbose logging execution. Cotton prints out everything for debugging purpose.
+Monochrome mode disables colored output. Useful for terminals that don't support colors.
 
-### `-h` Display help
+### `-f, --fail-fast`
 
-Cotton prints out help information.
+Fail-fast mode stops test execution on the first failing test. Exit code will be non-zero if any test failed.
 
-### `-i` Insecure mode
+### `-v, --version`
 
-Insecure mode will disable certificate verification.
+Displays the Cotton version and exits with code 0.
 
-### `-l` List test cases
-`Since 1.2.0`
+### `--timeout <ms>`
 
-List all test cases. No test cases are executed.
+Sets the HTTP timeout in milliseconds. Valid range: 1–60000; default is 30000. Values exceeding 60000 are capped at 60000. If an invalid timeout is provided, Cotton exits with a ParseError.
 
-### `-p` Paranoid mode
+**Example**
 
-Paranoid mode is detailed verbose logging execution. Cotton prints out very detailed information for further debugging purpose.
+{% highlight bash %}
+cotton ./specs --timeout 45000
+{% endhighlight %}
 
-### `-r` Reporter type
-`Since 1.1.0`
+### `--json-report <file>`
 
-Set reporter type. Default is no reporter.
+Generates a JSON report with test results, timing, and summary to the specified file.
 
-* `ctrf` for Common Test Result Format reporter.
-* `html` for HTML Test Result Format reporter.
+**Example**
 
-### `-s` Panic mode
-
-Cotton will terminate immidiately if a test failed.
-
-### `-v` Version
-
-Cotton prints out application version.
+{% highlight bash %}
+cotton ./specs --json-report results.json
+{% endhighlight %}

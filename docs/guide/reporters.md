@@ -6,11 +6,16 @@ permalink: /guide/reporters
 parent: Guide
 ---
 
-# Reporters
+# Report Generation
 
-Cotton can export test result with reporters by specifying with command line option `-r`. Seee [CLI](../cli.md).
+Cotton can generate test reports in JSON format by specifying the output file with the `--json-report` flag. See [CLI](../cli.md) for details.
 
-## CTRF Reporter
-`Since 1.1.0`
+## JSON Report
 
-CTRF or Common Test Result Format is JSON result with [CTRF schema](https://ctrf.io/docs/category/schema). Use `-r ctrf` CLI option.
+JSON reports contain test results, timing information, and a summary. Use the `--json-report` flag to generate a report:
+
+{% highlight bash %}
+cotton ./specs --json-report results.json
+{% endhighlight %}
+
+The report will be saved to the specified file in JSON format.

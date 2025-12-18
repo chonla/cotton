@@ -29,9 +29,9 @@ jobs:
                   github_token: ${{ secrets.GITHUB_TOKEN }}
                   goos: ${{ matrix.goos }}
                   goarch: ${{ matrix.goarch }}
-                  goversion: "https://dl.google.com/go/go1.22.5.linux-amd64.tar.gz"
+                  goversion: "https://dl.google.com/go/go1.25.5.linux-amd64.tar.gz"
                   project_path: "./"
                   binary_name: "cotton"
                   extra_files: README.md
-                  ldflags: -X "main.Version=${{env.RELEASE_TAG}}"
+                  ldflags: -X "github.com/chonla/cotton/cli.Version=${{env.RELEASE_TAG}}"
                   sha256sum: true

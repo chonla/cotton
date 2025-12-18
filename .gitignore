@@ -1,5 +1,29 @@
-cotton
-result.json
-result.html
-cover.out
-cover.html
+# Go build artifacts
+
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of Go coverage and profiling tools
+*.out
+coverage.out
+profile.out
+*.prof
+
+# Common build output directories
+bin/
+build/
+dist/
+
+# macOS system files
+.DS_Store
+
+# IDE settings
+.vscode/
+.idea/
